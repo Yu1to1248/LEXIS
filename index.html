@@ -10036,7 +10036,7 @@ const MISSIONS = {
       desc: '1000単語を全て最低1回正解する',
       check: (st, deck) => {
         const total = deck.items.length;
-        const cleared = deck.items.filter(i => (st.corrects[i.a] || 0) > 0).length;
+        const cleared = deck.items.filter(i => (st.corrects[i.key || i.a] || 0) > 0).length;
         return { done: cleared >= total, progress: cleared, total };
       }
     },
@@ -10439,7 +10439,8 @@ function getStaleItems(days) {
   const state = getState();
   const threshold = Date.now() - days * 864e5;
   return deck.items.filter(w => {
-    const t = state.lastSeen[w.a];
+    const _k = w.key || w.a;
+    const t = state.lastSeen[_k];
     return !t || new Date(t).getTime() < threshold;
   });
 }
@@ -10448,7 +10449,8 @@ function getVirginItems() {
   const deck = getDeck();
   const state = getState();
   return deck.items.filter(w => {
-    return !state.lastSeen[w.a];
+    const _vk = w.key || w.a;
+    return !state.lastSeen[_vk];
   });
 }
 
@@ -10514,10 +10516,12 @@ function startTest() {
   }
 
   // 英→日モードの場合、wordデッキのq/aを入れ替え
+  // key = 記録用安定キー（常に元の a 値＝英語）
   const _deck = getDeck();
   if (isWordDeck(_deck) && testState.direction === 'en2ja') {
     pool = pool.map(w => ({
       ...w,
+      key: w.a,           // 元の英語キーを保持
       q: w.en || w.a,
       a: w.ja || w.q,
       _reversed: true
@@ -10525,10 +10529,14 @@ function startTest() {
   } else if (isWordDeck(_deck)) {
     pool = pool.map(w => ({
       ...w,
+      key: w.a,           // 元の英語キーを保持
       q: w.ja || w.q,
       a: w.en || w.a,
       _reversed: false
     }));
+  } else {
+    // word以外は key = a のまま
+    pool = pool.map(w => ({ ...w, key: w.key || w.a }));
   }
 
   testState.queue = pool; testState.idx = 0; testState.correct = 0;
@@ -10710,24 +10718,25 @@ function fcAnswer(isOk) {
 
   testState.answered = true;
   state.totalAsked++;
-  state.lastSeen[q.a] = new Date().toISOString();
+  const _qk = q.key || q.a;
+  state.lastSeen[_qk] = new Date().toISOString();
 
   // recentLog更新
   if (!state.recentLog) state.recentLog = {};
-  const log = state.recentLog[q.a] || [];
+  const log = state.recentLog[_qk] || [];
   log.push(isOk ? 1 : 0);
   if (log.length > 5) log.shift();
-  state.recentLog[q.a] = log;
+  state.recentLog[_qk] = log;
 
   // 直近5回全正解なら苦手から除外
-  if (log.length === 5 && log.every(v => v === 1) && state.mistakes[q.a]) {
-    delete state.mistakes[q.a];
+  if (log.length === 5 && log.every(v => v === 1) && state.mistakes[_qk]) {
+    delete state.mistakes[_qk];
   }
 
   if (isOk) {
     testState.correct++;
     testState.streak++;
-    state.corrects[q.a] = (state.corrects[q.a]||0) + 1;
+    state.corrects[_qk] = (state.corrects[_qk]||0) + 1;
     const isWeak = testState.mode === 'weak';
     const xpEarned = calcQuestionXp(isWeak, testState.streak - 1, 1); // Pattern1固定
     const oldLv = getLevelFromXp(state.xp || 0);
@@ -10747,7 +10756,7 @@ function fcAnswer(isOk) {
     setTimeout(() => { card.style.boxShadow = ''; card.style.transition = ''; }, 400);
   } else {
     testState.streak = 0;
-    state.mistakes[q.a] = (state.mistakes[q.a]||0) + 1;
+    state.mistakes[_qk] = (state.mistakes[_qk]||0) + 1;
     testState.wrong.push(q);
     const card = document.getElementById('fc-card');
     card.style.transition = 'box-shadow .2s';
@@ -10841,24 +10850,25 @@ function submitAnswer() {
   const isOk = checkAnswer(inp.value, q.a, q.set);
   testState.answered = true;
   state.totalAsked++;
-  state.lastSeen[q.a] = new Date().toISOString();
+  const _wqk = q.key || q.a;
+  state.lastSeen[_wqk] = new Date().toISOString();
 
   // 直近5回ログ更新
   if (!state.recentLog) state.recentLog = {};
-  const log = state.recentLog[q.a] || [];
+  const log = state.recentLog[_wqk] || [];
   log.push(isOk ? 1 : 0);
   if (log.length > 5) log.shift();
-  state.recentLog[q.a] = log;
+  state.recentLog[_wqk] = log;
 
   // 直近5回全正解なら苦手から除外
-  if (log.length === 5 && log.every(v => v === 1) && state.mistakes[q.a]) {
-    delete state.mistakes[q.a];
+  if (log.length === 5 && log.every(v => v === 1) && state.mistakes[_wqk]) {
+    delete state.mistakes[_wqk];
   }
 
   if (isOk) {
     testState.correct++;
     testState.streak++;
-    state.corrects[q.a] = (state.corrects[q.a]||0) + 1;
+    state.corrects[_wqk] = (state.corrects[_wqk]||0) + 1;
     inp.className='ans-input ok';
     document.getElementById('fb-mark').textContent='○ CORRECT';
     document.getElementById('fb-mark').className='fb-mark ok';
@@ -10887,7 +10897,7 @@ function submitAnswer() {
     updateGlobalLvBar();
   } else {
     testState.streak = 0;
-    state.mistakes[q.a] = (state.mistakes[q.a]||0) + 1;
+    state.mistakes[_wqk] = (state.mistakes[_wqk]||0) + 1;
     testState.wrong.push(q);
     inp.className='ans-input ng';
     document.getElementById('fb-mark').textContent='✕ INCORRECT';
@@ -10963,8 +10973,9 @@ function showResult() {
     document.getElementById('res-empty').style.display='none';
     retryBtn.style.display = '';
     testState.wrong.forEach(w => {
-      const wrong = state.mistakes[w.a]||0;
-      const ok    = state.corrects[w.a]||0;
+      const _rk = w.key||w.a;
+      const wrong = state.mistakes[_rk]||0;
+      const ok    = state.corrects[_rk]||0;
       const total2 = wrong+ok;
       const rate2  = total2?Math.round((ok/total2)*100):0;
       const rateColor=rate2>=80?'var(--success)':rate2>=50?'var(--warn)':'var(--danger)';
@@ -11015,7 +11026,7 @@ function getWeakItems(limit) {
     .filter(([ans]) => !isGraduated(state, ans))  // 直近5回全正解は除外
     .sort((a,b)=>b[1]-a[1]).slice(0,limit)
     .map(([ans,wrong])=>{
-      const w = deck.items.find(x=>x.a===ans);
+      const w = deck.items.find(x=>(x.key||x.a)===ans);
       if (!w) return null;
       const ok=state.corrects[ans]||0;
       const total=wrong+ok;
@@ -11036,7 +11047,7 @@ function renderRanking() {
     const rank=i+1;
     const cls=rank===1?'t1':rank===2?'t2':rank===3?'t3':rank<=10?'t10':'';
     const pct=Math.round((w.wrong/max)*100);
-    const last=state.lastSeen[w.a];
+    const last=state.lastSeen[w.key||w.a];
     const isStale=!last||(Date.now()-new Date(last).getTime()>STALE_DEFAULT_DAYS*864e5);
     const rateColor=w.rate>=80?'var(--success)':w.rate>=50?'var(--warn)':'var(--danger)';
     const recentDots = (w.recent||[]).map(v=>
@@ -11086,16 +11097,16 @@ function renderWordList() {
 
   let list=[...deck.items];
   if (kw) list=list.filter(w=>w.a.toLowerCase().includes(kw)||w.q.includes(kw));
-  if (filter==='weak')  list=list.filter(w=>(state.mistakes[w.a]||0)>0);
-  if (filter==='stale') list=list.filter(w=>{ const t=state.lastSeen[w.a]; return !t||(Date.now()-new Date(t).getTime()>STALE_DEFAULT_DAYS*864e5); });
-  if (filter==='never') list=list.filter(w=>!state.lastSeen[w.a]);
-  if (filter==='clean') list=list.filter(w=>!state.mistakes[w.a]);
+  if (filter==='weak')  list=list.filter(w=>(state.mistakes[w.key||w.a]||0)>0);
+  if (filter==='stale') list=list.filter(w=>{ const t=state.lastSeen[w.key||w.a]; return !t||(Date.now()-new Date(t).getTime()>STALE_DEFAULT_DAYS*864e5); });
+  if (filter==='never') list=list.filter(w=>!state.lastSeen[w.key||w.a]);
+  if (filter==='clean') list=list.filter(w=>!state.mistakes[w.key||w.a]);
 
   if (sort==='id')    list.sort((a,b)=>a.id-b.id);
-  if (sort==='weak')  list.sort((a,b)=>(state.mistakes[b.a]||0)-(state.mistakes[a.a]||0));
+  if (sort==='weak')  list.sort((a,b)=>(state.mistakes[b.key||b.a]||0)-(state.mistakes[a.key||a.a]||0));
   if (sort==='stale') list.sort((a,b)=>{
-    const ta=state.lastSeen[a.a]?new Date(state.lastSeen[a.a]).getTime():0;
-    const tb=state.lastSeen[b.a]?new Date(state.lastSeen[b.a]).getTime():0;
+    const ta=state.lastSeen[a.key||a.a]?new Date(state.lastSeen[a.key||a.a]).getTime():0;
+    const tb=state.lastSeen[b.key||b.a]?new Date(state.lastSeen[b.key||b.a]).getTime():0;
     return ta-tb;
   });
 
@@ -11106,11 +11117,12 @@ function renderWordList() {
   empty.style.display='none';
 
   list.forEach(w => {
-    const wrong=state.mistakes[w.a]||0;
-    const ok=state.corrects[w.a]||0;
+    const _rwk=w.key||w.a;
+    const wrong=state.mistakes[_rwk]||0;
+    const ok=state.corrects[_rwk]||0;
     const total=wrong+ok;
     const rate=total?Math.round((ok/total)*100):null;
-    const last=state.lastSeen[w.a];
+    const last=state.lastSeen[_rwk];
     const isStale=!last||(Date.now()-new Date(last).getTime()>STALE_DEFAULT_DAYS*864e5);
     const li=document.createElement('li'); li.className='wi';
     const scoreHtml = total>0
@@ -11230,7 +11242,7 @@ function renderHome() {
     list.forEach(w => {
       const li=document.createElement('li'); li.className='wi';
       const rateColor=w.rate>=80?'var(--success)':w.rate>=50?'var(--warn)':'var(--danger)';
-      li.innerHTML=`<span class="wi-en" style="min-width:160px;font-size:12px">${w.a}</span><span class="wi-ja">${w.q}</span><span class="wi-date">${fmtDate(state.lastSeen[w.a])}</span><span class="wi-score"><span class="sc-ok">○${w.ok}</span><span class="sc-sep">/</span><span class="sc-ng">✕${w.wrong}</span><span class="sc-rate" style="color:${rateColor}">${w.rate}%</span></span>`;
+      li.innerHTML=`<span class="wi-en" style="min-width:160px;font-size:12px">${w.a}</span><span class="wi-ja">${w.q}</span><span class="wi-date">${fmtDate(state.lastSeen[w.key||w.a])}</span><span class="wi-score"><span class="sc-ok">○${w.ok}</span><span class="sc-sep">/</span><span class="sc-ng">✕${w.wrong}</span><span class="sc-rate" style="color:${rateColor}">${w.rate}%</span></span>`;
       ul.appendChild(li);
     });
   }
