@@ -365,23 +365,29 @@ body::before {
 .im-btn .im-label { font-size:12px; }
 .im-btn .im-xp { font-size:10px; color:var(--muted); font-family:var(--font-mono); }
 .im-btn.on .im-xp { color:var(--accent); }
-/* ── グローバルレベル（ヘッダー常時表示） ── */
+/* ── グローバルレベル（ロゴ右隣） ── */
 .global-lv-wrap {
-  margin-top:5px; display:flex; align-items:center; gap:8px; min-width:0;
+  display:flex; align-items:center; gap:8px;
 }
 .global-lv-badge {
-  font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:1px;
-  background:linear-gradient(120deg,var(--warn),#ff7a44);
+  font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:1.5px;
+  background:linear-gradient(120deg,var(--accent),var(--accent2));
   -webkit-background-clip:text; -webkit-text-fill-color:transparent;
   white-space:nowrap; line-height:1;
 }
-.global-lv-bar-wrap { flex:1; min-width:60px; }
-.global-lv-bar-bg { height:3px; background:rgba(255,255,255,.1); border-radius:2px; overflow:hidden; }
+.global-lv-bar-wrap { min-width:70px; }
+.global-lv-bar-bg {
+  height:3px; background:rgba(79,142,247,.15); border-radius:2px; overflow:hidden;
+}
 .global-lv-bar-fill {
-  height:3px; background:linear-gradient(90deg,var(--warn),#ff7a44);
+  height:3px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
   border-radius:2px; transition:width .6s;
 }
-.global-lv-label { font-size:9px; color:var(--muted); font-family:var(--font-mono); margin-top:2px; letter-spacing:.3px; }
+.global-lv-label {
+  font-size:9px; color:var(--muted); font-family:var(--font-mono);
+  margin-top:2px; letter-spacing:.3px;
+}
 
 /* ── デッキレベルカード（ホーム） ── */
 .deck-lv-card {
@@ -404,9 +410,9 @@ body::before {
 .g-lvup-overlay {
   position:fixed; inset:0; z-index:12000; pointer-events:none;
   display:flex; align-items:center; justify-content:center;
-  background:rgba(255,140,60,0); transition:background .25s;
+  background:rgba(79,142,247,0); transition:background .25s;
 }
-.g-lvup-overlay.flash { background:rgba(255,140,60,.18); }
+.g-lvup-overlay.flash { background:rgba(79,142,247,.12); }
 .g-lvup-content {
   text-align:center; opacity:0; transform:scale(.7) translateY(20px);
   transition:all .4s cubic-bezier(.34,1.56,.64,1);
@@ -414,10 +420,12 @@ body::before {
 }
 .g-lvup-overlay.show .g-lvup-content { opacity:1; transform:scale(1) translateY(0); }
 .g-lvup-overlay.show { pointer-events:auto; }
-.g-lvup-label { font-size:12px; color:var(--warn); font-family:var(--font-mono); letter-spacing:3px; margin-bottom:4px; opacity:.8; }
-.g-lvup-main { font-family:'Bebas Neue',sans-serif; font-size:72px; letter-spacing:6px;
-  background:linear-gradient(120deg,#ffd700,#ff7a44);
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; }
+.g-lvup-label { font-size:12px; color:var(--accent); font-family:var(--font-mono); letter-spacing:3px; margin-bottom:4px; opacity:.8; }
+.g-lvup-main {
+  font-family:'Bebas Neue',sans-serif; font-size:72px; letter-spacing:6px;
+  background:linear-gradient(120deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1;
+}
 .g-lvup-sub { font-size:14px; color:var(--muted); font-family:var(--font-mono); margin-top:8px; }
 .g-lvup-close { margin-top:20px; display:inline-block; font-size:11px; color:var(--muted); font-family:var(--font-mono); }
 
@@ -555,17 +563,19 @@ body::before {
 </div>
 
 <header class="header">
-  <div>
-    <div class="logo">LEXIS</div>
-    <div class="logo-sub" id="logo-sub">英単語 苦手分析ツール</div>
-    <!-- 総合レベル（常時表示） -->
-    <div class="global-lv-wrap">
-      <div class="global-lv-badge" id="g-lv-badge">Lv.1</div>
-      <div class="global-lv-bar-wrap">
-        <div class="global-lv-bar-bg"><div class="global-lv-bar-fill" id="g-lv-bar" style="width:0%"></div></div>
-        <div class="global-lv-label" id="g-lv-label">0 / 50 XP</div>
+  <div style="min-width:0;">
+    <!-- ロゴ行：LEXIS + 総合レベルを横並び -->
+    <div style="display:flex;align-items:baseline;gap:14px;">
+      <div class="logo">LEXIS</div>
+      <div class="global-lv-wrap">
+        <div class="global-lv-badge" id="g-lv-badge">Lv.1</div>
+        <div class="global-lv-bar-wrap">
+          <div class="global-lv-bar-bg"><div class="global-lv-bar-fill" id="g-lv-bar" style="width:0%"></div></div>
+          <div class="global-lv-label" id="g-lv-label">0 / 50 XP</div>
+        </div>
       </div>
     </div>
+    <div class="logo-sub" id="logo-sub">英単語 苦手分析ツール</div>
     <!-- 旧XPバー（参照保持のみ・非表示） -->
     <div class="xp-bar-wrap" id="xp-bar-wrap" style="display:none">
       <div class="xp-bar-bg"><div class="xp-bar-fill" id="xp-bar-fill" style="width:0%"></div></div>
