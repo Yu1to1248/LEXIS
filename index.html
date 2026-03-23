@@ -272,7 +272,7 @@ body::before {
 .data-textarea:focus { outline:none; border-color:var(--accent); }
 .data-textarea[readonly] { color:var(--muted); cursor:text; }
 /* ── DECK SWITCHER ── */
-.deck-bar { display:flex; gap:8px; padding:10px 32px; background:var(--bg); border-bottom:1px solid var(--border); overflow-x:auto; align-items:center; }
+.deck-bar { display:flex; gap:0; padding:4px 24px; background:var(--bg); border-bottom:1px solid var(--border); overflow-x:auto; align-items:flex-start; }
 .deck-bar-label { font-size:9px; color:var(--muted); letter-spacing:2px; font-family:var(--font-mono); white-space:nowrap; margin-right:4px; }
 .deck-btn { padding:5px 14px; border-radius:20px; border:1px solid var(--border); background:none; color:var(--muted); font-family:var(--font-ja); font-size:12px; cursor:pointer; transition:all .2s; white-space:nowrap; }
 .deck-btn:hover { color:var(--text); border-color:rgba(79,142,247,.5); }
@@ -285,6 +285,7 @@ body::before {
 .deck-tag.kokyou { background:rgba(167,113,255,.15); color:#a771ff; border:1px solid rgba(167,113,255,.3); }
 .deck-tag.kogo   { background:rgba(255,140,80,.15); color:#ff8c50; border:1px solid rgba(255,140,80,.3); }
 .deck-tag.patan1 { background:rgba(79,212,247,.15); color:var(--frost); border:1px solid rgba(79,212,247,.3); }
+.deck-tag.biology { background:rgba(63,221,138,.13); color:var(--success); border:1px solid rgba(63,221,138,.3); }
 .deck-tag.chart  { background:rgba(79,142,247,.15); color:var(--accent); border:1px solid rgba(79,142,247,.3); }
 /* 割合バー */
 .chart-grade-bar { display:flex; height:18px; border-radius:6px; overflow:hidden; margin-bottom:2px; }
@@ -364,6 +365,160 @@ body::before {
 .im-btn .im-label { font-size:12px; }
 .im-btn .im-xp { font-size:10px; color:var(--muted); font-family:var(--font-mono); }
 .im-btn.on .im-xp { color:var(--accent); }
+/* ── グローバルレベル（ヘッダー常時表示） ── */
+.global-lv-wrap {
+  margin-top:5px; display:flex; align-items:center; gap:8px; min-width:0;
+}
+.global-lv-badge {
+  font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:1px;
+  background:linear-gradient(120deg,var(--warn),#ff7a44);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  white-space:nowrap; line-height:1;
+}
+.global-lv-bar-wrap { flex:1; min-width:60px; }
+.global-lv-bar-bg { height:3px; background:rgba(255,255,255,.1); border-radius:2px; overflow:hidden; }
+.global-lv-bar-fill {
+  height:3px; background:linear-gradient(90deg,var(--warn),#ff7a44);
+  border-radius:2px; transition:width .6s;
+}
+.global-lv-label { font-size:9px; color:var(--muted); font-family:var(--font-mono); margin-top:2px; letter-spacing:.3px; }
+
+/* ── デッキレベルカード（ホーム） ── */
+.deck-lv-card {
+  background:linear-gradient(135deg,rgba(79,142,247,.07),rgba(124,79,255,.05));
+  border:1px solid rgba(79,142,247,.2); border-radius:14px;
+  padding:16px 20px; margin-bottom:16px;
+  display:flex; align-items:center; gap:16px;
+}
+.deck-lv-num {
+  font-family:'Bebas Neue',sans-serif; font-size:48px; color:var(--accent);
+  line-height:1; flex-shrink:0;
+}
+.deck-lv-info { flex:1; min-width:0; }
+.deck-lv-name { font-size:10px; color:var(--muted); font-family:var(--font-mono); letter-spacing:1px; margin-bottom:5px; }
+.deck-lv-bar-bg { height:4px; background:rgba(255,255,255,.1); border-radius:2px; overflow:hidden; margin-bottom:4px; }
+.deck-lv-bar-fill { height:4px; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:2px; transition:width .6s; }
+.deck-lv-xp { font-size:10px; color:var(--muted); font-family:var(--font-mono); }
+
+/* ── グローバルLvUp：全画面フラッシュ ── */
+.g-lvup-overlay {
+  position:fixed; inset:0; z-index:12000; pointer-events:none;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(255,140,60,0); transition:background .25s;
+}
+.g-lvup-overlay.flash { background:rgba(255,140,60,.18); }
+.g-lvup-content {
+  text-align:center; opacity:0; transform:scale(.7) translateY(20px);
+  transition:all .4s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;
+}
+.g-lvup-overlay.show .g-lvup-content { opacity:1; transform:scale(1) translateY(0); }
+.g-lvup-overlay.show { pointer-events:auto; }
+.g-lvup-label { font-size:12px; color:var(--warn); font-family:var(--font-mono); letter-spacing:3px; margin-bottom:4px; opacity:.8; }
+.g-lvup-main { font-family:'Bebas Neue',sans-serif; font-size:72px; letter-spacing:6px;
+  background:linear-gradient(120deg,#ffd700,#ff7a44);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; }
+.g-lvup-sub { font-size:14px; color:var(--muted); font-family:var(--font-mono); margin-top:8px; }
+.g-lvup-close { margin-top:20px; display:inline-block; font-size:11px; color:var(--muted); font-family:var(--font-mono); }
+
+/* ── デッキLvUp：コンパクトなポップアップ（既存lvup-toastとは別スタイル） ── */
+.deck-lvup-popup {
+  position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px) scale(.9);
+  background:var(--surface); border:1px solid var(--accent); border-radius:16px;
+  padding:14px 28px; text-align:center; z-index:9998;
+  opacity:0; pointer-events:none;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1); min-width:200px;
+  box-shadow:0 8px 40px rgba(79,142,247,.25);
+}
+.deck-lvup-popup.show { opacity:1; transform:translateX(-50%) translateY(0) scale(1); pointer-events:auto; }
+.deck-lvup-popup-label { font-size:9px; color:var(--muted); font-family:var(--font-mono); letter-spacing:2px; margin-bottom:2px; }
+.deck-lvup-popup-lv { font-size:40px; font-family:'Bebas Neue',sans-serif; color:var(--accent); line-height:1.1; }
+.deck-lvup-popup-name { font-size:11px; color:var(--muted); font-family:var(--font-mono); }
+.deck-lvup-popup-xp { display:inline-block; margin-top:6px; padding:2px 12px; border-radius:10px;
+  background:rgba(79,142,247,.12); color:var(--accent); font-family:var(--font-mono); font-size:11px; }
+
+/* ── 教科グループ deck-bar（アコーディオン） ── */
+.subject-group { display:flex; flex-direction:column; }
+.subject-label {
+  font-size:8px; color:var(--muted); letter-spacing:1.5px; font-family:var(--font-mono);
+  text-transform:uppercase; padding:4px 8px 2px; white-space:nowrap;
+}
+.subject-decks { display:flex; flex-wrap:wrap; gap:4px; padding:0 4px 4px; }
+.deck-bar-sep { width:1px; background:var(--border); margin:6px 6px; flex-shrink:0; align-self:stretch; }
+
+/* ── 新: 教科タブバー ── */
+.subject-tab-bar {
+  display:flex; gap:0; padding:0 20px; background:var(--bg);
+  border-bottom:1px solid var(--border); overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.subject-tab {
+  padding:10px 18px; font-family:var(--font-ja); font-size:13px; font-weight:600;
+  color:var(--muted); border:none; background:none; cursor:pointer;
+  border-bottom:2px solid transparent; white-space:nowrap;
+  transition:all .2s; letter-spacing:.5px;
+}
+.subject-tab:hover { color:var(--text); }
+.subject-tab.on { color:var(--accent); border-bottom-color:var(--accent); }
+
+/* デッキ選択パネル（タブ下の展開エリア） */
+.deck-panel {
+  display:none; padding:6px 20px 10px;
+  background:var(--surface2); border-bottom:1px solid var(--border);
+  gap:6px; flex-wrap:wrap;
+}
+.deck-panel.on { display:flex; }
+
+@media (max-width:600px) {
+  .subject-tab { padding:8px 12px; font-size:12px; }
+  .deck-panel { padding:6px 12px 10px; }
+}
+
+/* ── 設定モーダル ── */
+.settings-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(4px);
+  z-index:9000; display:none; align-items:center; justify-content:center;
+}
+.settings-overlay.show { display:flex; }
+.settings-modal {
+  background:var(--surface); border:1px solid var(--border); border-radius:20px;
+  padding:28px 24px; width:min(440px,94vw); max-height:86vh; overflow-y:auto; position:relative;
+}
+.settings-close { position:absolute; top:14px; right:18px; background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer; }
+.settings-title { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:2px; margin-bottom:2px; }
+.settings-sub { font-size:10px; color:var(--muted); font-family:var(--font-mono); margin-bottom:22px; letter-spacing:1px; }
+.settings-sec-label { font-size:9px; color:var(--muted); font-family:var(--font-mono); letter-spacing:2px; text-transform:uppercase; padding:12px 0 8px; border-bottom:1px solid var(--border); margin-bottom:12px; }
+.settings-row { display:flex; align-items:center; justify-content:space-between; padding:9px 0; gap:12px; }
+.settings-row-lbl { font-size:13px; color:var(--text); }
+.settings-row-desc { font-size:10px; color:var(--muted); margin-top:1px; }
+.settings-slider { -webkit-appearance:none; appearance:none; width:120px; height:4px; border-radius:2px; background:var(--border); outline:none; cursor:pointer; }
+.settings-slider::-webkit-slider-thumb { -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:var(--accent); cursor:pointer; }
+.settings-val { font-family:var(--font-mono); font-size:11px; color:var(--accent); min-width:36px; text-align:right; }
+.settings-preset-row { display:flex; gap:8px; margin-top:4px; }
+.settings-preset-btn { flex:1; padding:8px 4px; border:1px solid var(--border); border-radius:8px; background:none; color:var(--muted); font-size:11px; font-family:var(--font-ja); cursor:pointer; transition:all .2s; }
+.settings-preset-btn:hover { border-color:var(--accent); color:var(--accent); }
+.settings-btn { position:fixed; top:18px; right:64px; z-index:200;
+  background:var(--surface2); border:1px solid var(--border); border-radius:50%;
+  width:38px; height:38px; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:16px; transition:all .2s; }
+.settings-btn:hover { border-color:var(--accent); }
+
+/* ── レスポンシブ ── */
+:root { --q-font-size:36px; --ui-scale:1; }
+.q-meaning { font-size:var(--q-font-size) !important; }
+.fc-front-text { font-size:calc(var(--q-font-size) * .7) !important; }
+@media (max-width:600px) {
+  .header { padding:10px 14px; gap:10px; }
+  .logo { font-size:26px; letter-spacing:3px; }
+  .main { padding:14px 12px; max-width:100%; }
+  .nav { padding:6px 10px; gap:2px; }
+  .nb { padding:5px 9px; font-size:11px; }
+  .hstat-n { font-size:14px; }
+  .hstat-l { font-size:8px; }
+  .global-lv-badge { font-size:16px; }
+  .header-stats { gap:14px; }
+}
+
 </style>
 </head>
 <body>
@@ -372,14 +527,49 @@ body::before {
 <div id="app">
 
 <button class="prof-btn" onclick="openProfile()" title="プロフィール">👤</button>
+<button class="settings-btn" onclick="openSettings()" title="設定">⚙️</button>
+
+<!-- グローバルLvUp オーバーレイ（全画面演出） -->
+<div class="g-lvup-overlay" id="g-lvup-overlay" onclick="closeGlobalLvUp()">
+  <div class="g-lvup-content" id="g-lvup-content">
+    <div class="g-lvup-label">✦ GLOBAL LEVEL UP ✦</div>
+    <div class="g-lvup-main" id="g-lvup-num">2</div>
+    <div class="g-lvup-sub" id="g-lvup-sub">LEVEL 2 REACHED</div>
+    <div class="g-lvup-close">タップして閉じる</div>
+  </div>
+</div>
+
+<!-- デッキLvUp ポップアップ（コンパクト） -->
+<div class="deck-lvup-popup" id="deck-lvup-popup" onclick="closeDeckLvUp()">
+  <div class="deck-lvup-popup-label">DECK LEVEL UP</div>
+  <div class="deck-lvup-popup-lv" id="deck-lvup-lv">2</div>
+  <div class="deck-lvup-popup-name" id="deck-lvup-name"></div>
+  <div class="deck-lvup-popup-xp" id="deck-lvup-xp"></div>
+</div>
+
+<!-- 旧toast（後方互換・非表示） -->
+<div class="lvup-toast" id="lvup-toast" style="display:none!important">
+  <div class="lvup-toast-label">LEVEL UP!</div>
+  <div class="lvup-toast-lv" id="lvup-lv">2</div>
+  <div class="lvup-xp-badge" id="lvup-xp-badge">+0 XP</div>
+</div>
 
 <header class="header">
   <div>
     <div class="logo">LEXIS</div>
     <div class="logo-sub" id="logo-sub">英単語 苦手分析ツール</div>
-    <div class="xp-bar-wrap" id="xp-bar-wrap">
+    <!-- 総合レベル（常時表示） -->
+    <div class="global-lv-wrap">
+      <div class="global-lv-badge" id="g-lv-badge">Lv.1</div>
+      <div class="global-lv-bar-wrap">
+        <div class="global-lv-bar-bg"><div class="global-lv-bar-fill" id="g-lv-bar" style="width:0%"></div></div>
+        <div class="global-lv-label" id="g-lv-label">0 / 50 XP</div>
+      </div>
+    </div>
+    <!-- 旧XPバー（参照保持のみ・非表示） -->
+    <div class="xp-bar-wrap" id="xp-bar-wrap" style="display:none">
       <div class="xp-bar-bg"><div class="xp-bar-fill" id="xp-bar-fill" style="width:0%"></div></div>
-      <div class="xp-label" id="xp-label">Lv.1 — 0 / 212 XP</div>
+      <div class="xp-label" id="xp-label"></div>
     </div>
   </div>
   <div class="header-stats">
@@ -389,13 +579,6 @@ body::before {
     <div class="hstat"><div class="hstat-n" id="hs-stale" style="color:var(--frost)">0</div><div class="hstat-l">未復習</div></div>
   </div>
 </header>
-
-<!-- レベルアップ toast -->
-<div class="lvup-toast" id="lvup-toast" onclick="skipLevelUp()">
-  <div class="lvup-toast-label">LEVEL UP!</div>
-  <div class="lvup-toast-lv" id="lvup-lv">2</div>
-  <div class="lvup-xp-badge" id="lvup-xp-badge">+0 XP</div>
-</div>
 
 <!-- プロフィールモーダル -->
 <div class="prof-overlay" id="prof-overlay" onclick="closeProfile(event)">
@@ -410,10 +593,58 @@ body::before {
   </div>
 </div>
 
-<div class="deck-bar" id="deck-bar">
-  <span class="deck-bar-label">DECK</span>
-  <!-- JS で生成 -->
+<!-- 設定モーダル -->
+<div class="settings-overlay" id="settings-overlay" onclick="if(event.target===this)closeSettings()">
+  <div class="settings-modal">
+    <button class="settings-close" onclick="closeSettings()">✕</button>
+    <div class="settings-title">SETTINGS</div>
+    <div class="settings-sub">// デバイスごとにローカル保存されます</div>
+
+    <div class="settings-sec-label">// 文字・レイアウト</div>
+    <div class="settings-row">
+      <div><div class="settings-row-lbl">問題文サイズ</div><div class="settings-row-desc">テスト中の問題文の大きさ</div></div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <input type="range" class="settings-slider" id="set-qsize" min="18" max="56" step="2" value="36" oninput="applySettings()">
+        <span class="settings-val" id="set-qsize-v">36</span>
+      </div>
+    </div>
+    <div class="settings-row">
+      <div><div class="settings-row-lbl">UIフォントサイズ</div><div class="settings-row-desc">ボタン・カードなど全体</div></div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <input type="range" class="settings-slider" id="set-uisize" min="11" max="17" step="1" value="13" oninput="applySettings()">
+        <span class="settings-val" id="set-uisize-v">13</span>
+      </div>
+    </div>
+    <div class="settings-row">
+      <div><div class="settings-row-lbl">カード余白</div><div class="settings-row-desc">カードの内側のパディング</div></div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <input type="range" class="settings-slider" id="set-pad" min="10" max="36" step="2" value="24" oninput="applySettings()">
+        <span class="settings-val" id="set-pad-v">24</span>
+      </div>
+    </div>
+
+    <div class="settings-sec-label">// プリセット</div>
+    <div class="settings-preset-row">
+      <button class="settings-preset-btn" onclick="applyPreset('pc')">💻 PC</button>
+      <button class="settings-preset-btn" onclick="applyPreset('tablet')">📱 タブレット</button>
+      <button class="settings-preset-btn" onclick="applyPreset('phone')">📲 スマホ</button>
+    </div>
+
+    <div class="settings-sec-label" style="margin-top:8px;">// テスト動作</div>
+    <div class="settings-row">
+      <div><div class="settings-row-lbl">正解後に自動で次へ</div><div class="settings-row-desc">フラッシュカードで正解時に自動進む</div></div>
+      <label style="cursor:pointer;display:flex;align-items:center;gap:6px;">
+        <input type="checkbox" id="set-autonext" onchange="applySettings()" style="width:16px;height:16px;cursor:pointer;">
+        <span style="font-size:10px;color:var(--muted);font-family:var(--font-mono);">ON</span>
+      </label>
+    </div>
+  </div>
 </div>
+
+<!-- 教科タブバー -->
+<div class="subject-tab-bar" id="subject-tab-bar"></div>
+<!-- デッキパネル（教科タブ選択時に展開） -->
+<div id="deck-panel-wrap"></div>
 
 <nav class="nav" id="main-nav">
   <button class="nb on"  id="nb-home"    onclick="goView('home')">🏠 ホーム</button>
@@ -432,6 +663,7 @@ body::before {
   <div class="pg-sub">// 学習状況の概要</div>
   <div id="home-reset-banner"></div>
   <div id="home-stale-banner"></div>
+  <div id="home-deck-lv-card"></div>
   <div class="mode-grid">
     <div class="mode-card" onclick="goView('test');setMode('range')">
       <div class="mc-icon">📋</div><div class="mc-title">範囲テスト</div>
@@ -4770,6 +5002,841 @@ const KOGO = [
 ];
 
 // ══════════════════════════════════════════════
+//  生物基礎 一問一答データ
+// ══════════════════════════════════════════════
+const BIOLOGY = [
+  {id:30001,ch:30,q:"地球上の森林や草原、海洋などのさまざまな環境に多様な生物が生息していることを生物の何というか",a:"多様性",t:"normal"},
+  {id:30002,ch:30,q:"生物を分類する際の基本単位は何か",a:"種",t:"normal"},
+  {id:30003,ch:30,q:"「種」とは、形態などの特徴が共通し、何が可能な子が生じる生物群を指すか",a:"生殖",t:"normal"},
+  {id:30004,ch:30,q:"現在、地球上で名前がつけられている生物の種数は約何万種以上存在するか",a:"約190万種",t:"normal"},
+  {id:30005,ch:30,q:"未知の生物も含めると、地球上の生物の種数は何種にのぼると推定されているか",a:"数千万種",t:"normal"},
+  {id:30006,ch:30,q:"すべての生物のからだの基本単位は何か",a:"細胞",t:"normal"},
+  {id:30007,ch:30,q:"すべての生物は、遺伝物質として何をもっているか",a:"DNA",t:"normal"},
+  {id:30008,ch:30,q:"生物がエネルギーを利用して生命活動を営むことを何というか",a:"代謝",t:"normal"},
+  {id:30009,ch:30,q:"生物が体内の状態を一定の範囲内に保とうとする性質を何というか",a:"恒常性",t:"normal"},
+  {id:30010,ch:30,q:"世代を重ねる間に生物の形質が変化していくことを何というか",a:"進化",t:"normal"},
+  {id:30011,ch:30,q:"遺伝物質をもつが、細胞構造をもたないものは何か",a:"ウイルス ウイルスは代謝を行うか",t:"normal"},
+  {id:30012,ch:30,q:"ウイルスは代謝を行うか",a:"行わない",t:"normal"},
+  {id:30013,ch:30,q:"ウイルスは自ら増殖することが（できる・できない）",a:"できない",t:"normal"},
+  {id:30014,ch:30,q:"細胞には、核をもたない何細胞と核をもつ何細胞があるか。前者を答えよ",a:"原核細胞",t:"normal"},
+  {id:30015,ch:30,q:"細胞には、核をもたない何細胞と核をもつ何細胞があるか。後者を答えよ",a:"真核細胞 原核細胞の内部構造は複雑か、単純か",t:"normal"},
+  {id:30016,ch:30,q:"原核細胞の内部構造は複雑か、単純か",a:"単純",t:"normal"},
+  {id:30017,ch:30,q:"真核細胞の内部にある、核やミトコンドリアなどをまとめて何というか",a:"細胞小器官",t:"normal"},
+  {id:30018,ch:30,q:"原核細胞からなる生物を何というか",a:"原核生物",t:"normal"},
+  {id:30019,ch:30,q:"真核細胞からなる生物を何というか",a:"真核生物 原核細胞に細胞膜は存在するか",t:"normal"},
+  {id:30020,ch:30,q:"原核細胞に細胞膜は存在するか",a:"存在する 原核細胞に細胞質基質は存在するか",t:"normal"},
+  {id:30021,ch:30,q:"原核細胞に細胞質基質は存在するか",a:"存在する 原核細胞に染色体は存在するか",t:"normal"},
+  {id:30022,ch:30,q:"原核細胞に染色体は存在するか",a:"存在する 原核細胞に核は存在するか",t:"normal"},
+  {id:30023,ch:30,q:"原核細胞に核は存在するか",a:"存在しない 原核細胞にミトコンドリアは存在するか",t:"normal"},
+  {id:30024,ch:30,q:"原核細胞にミトコンドリアは存在するか",a:"存在しない 原核細胞に葉緑体は存在するか",t:"normal"},
+  {id:30025,ch:30,q:"原核細胞に葉緑体は存在するか",a:"存在しない 原核細胞に細胞壁は存在するか",t:"normal"},
+  {id:30026,ch:30,q:"原核細胞に細胞壁は存在するか",a:"存在する 菌類の細胞に細胞膜は存在するか",t:"normal"},
+  {id:30027,ch:30,q:"菌類の細胞に細胞膜は存在するか",a:"存在する 菌類の細胞に細胞質基質は存在するか",t:"normal"},
+  {id:30028,ch:30,q:"菌類の細胞に細胞質基質は存在するか",a:"存在する 菌類の細胞に染色体は存在するか",t:"normal"},
+  {id:30029,ch:30,q:"菌類の細胞に染色体は存在するか",a:"存在する 菌類の細胞に核は存在するか",t:"normal"},
+  {id:30030,ch:30,q:"菌類の細胞に核は存在するか",a:"存在する 菌類の細胞にミトコンドリアは存在するか",t:"normal"},
+  {id:30031,ch:30,q:"菌類の細胞にミトコンドリアは存在するか",a:"存在する 菌類の細胞に葉緑体は存在するか",t:"normal"},
+  {id:30032,ch:30,q:"菌類の細胞に葉緑体は存在するか",a:"存在しない 菌類の細胞に細胞壁は存在するか",t:"normal"},
+  {id:30033,ch:30,q:"菌類の細胞に細胞壁は存在するか",a:"存在する 植物の細胞に細胞膜は存在するか",t:"normal"},
+  {id:30034,ch:30,q:"植物の細胞に細胞膜は存在するか",a:"存在する 植物の細胞に細胞質基質は存在するか",t:"normal"},
+  {id:30035,ch:30,q:"植物の細胞に細胞質基質は存在するか",a:"存在する 植物の細胞に染色体は存在するか",t:"normal"},
+  {id:30036,ch:30,q:"植物の細胞に染色体は存在するか",a:"存在する 植物の細胞に核は存在するか",t:"normal"},
+  {id:30037,ch:30,q:"植物の細胞に核は存在するか",a:"存在する 植物の細胞にミトコンドリアは存在するか",t:"normal"},
+  {id:30038,ch:30,q:"植物の細胞にミトコンドリアは存在するか",a:"存在する 植物の細胞に葉緑体は存在するか",t:"normal"},
+  {id:30039,ch:30,q:"植物の細胞に葉緑体は存在するか",a:"存在する 植物の細胞に細胞壁は存在するか",t:"normal"},
+  {id:30040,ch:30,q:"植物の細胞に細胞壁は存在するか",a:"存在する 動物の細胞に細胞膜は存在するか",t:"normal"},
+  {id:30041,ch:30,q:"動物の細胞に細胞膜は存在するか",a:"存在する 動物の細胞に細胞質基質は存在するか",t:"normal"},
+  {id:30042,ch:30,q:"動物の細胞に細胞質基質は存在するか",a:"存在する 動物の細胞に染色体は存在するか",t:"normal"},
+  {id:30043,ch:30,q:"動物の細胞に染色体は存在するか",a:"存在する 動物の細胞に核は存在するか",t:"normal"},
+  {id:30044,ch:30,q:"動物の細胞に核は存在するか",a:"存在する 動物の細胞にミトコンドリアは存在するか",t:"normal"},
+  {id:30045,ch:30,q:"動物の細胞にミトコンドリアは存在するか",a:"存在する 動物の細胞に葉緑体は存在するか",t:"normal"},
+  {id:30046,ch:30,q:"動物の細胞に葉緑体は存在するか",a:"存在しない 動物の細胞に細胞壁は存在するか",t:"normal"},
+  {id:30047,ch:30,q:"動物の細胞に細胞壁は存在するか",a:"存在しない",t:"normal"},
+  {id:30048,ch:30,q:"細胞膜で囲まれた内部のうち、核を除く部分を何というか",a:"細胞質",t:"normal"},
+  {id:30049,ch:30,q:"核内にあり、DNAを含む構造は何か",a:"染色体",t:"normal"},
+  {id:30050,ch:30,q:"細胞質は、水にタンパク質などが溶解した粘性のある液状成分で満たされている。これを何というか",a:"細胞質基質",t:"normal"},
+  {id:30051,ch:30,q:"核を包む、二重の膜を何というか",a:"核膜",t:"normal"},
+  {id:30052,ch:30,q:"核膜にある、物質の輸送路となる小孔を何というか",a:"核膜孔",t:"normal"},
+  {id:30053,ch:30,q:"核内に1〜数個存在し、RNAを含む球状の構造体を何というか",a:"核小体",t:"normal"},
+  {id:30054,ch:30,q:"染色体は、遺伝子の本体である何とタンパク質で構成されているか",a:"DNA",t:"normal"},
+  {id:30055,ch:30,q:"染色体は、遺伝子の本体であるDNAと何で構成されているか",a:"タンパク質",t:"normal"},
+  {id:30056,ch:30,q:"染色体は何という染色液で赤く染まるか。2つあるうちの1つ（オルセイン）",a:"酢酸オルセイン",t:"normal"},
+  {id:30057,ch:30,q:"染色体は何という染色液で赤く染まるか。2つあるうちの1つ（カーミン）",a:"酢酸カーミン",t:"normal"},
+  {id:30058,ch:30,q:"細胞の最外層であり、細胞内の物質濃度を調節する薄い膜は何か",a:"細胞膜",t:"normal"},
+  {id:30059,ch:30,q:"二重の膜からなり、呼吸の場となる細胞小器官は何か",a:"ミトコンドリア",t:"normal"},
+  {id:30060,ch:30,q:"だるま状の小体で、タンパク質合成の場となる構造は何か",a:"リボソーム",t:"normal"},
+  {id:30061,ch:30,q:"2個の中心小体からなり、細胞分裂などに関与する構造は何か",a:"中心体",t:"normal"},
+  {id:30062,ch:30,q:"扁平な袋が重なった構造で、物質の分泌に関与する細胞小器官は何か",a:"ゴルジ体",t:"normal"},
+  {id:30063,ch:30,q:"膜構造をもち、合成されたタンパク質の移動経路などになる構造は何か",a:"小胞体",t:"normal"},
+  {id:30064,ch:30,q:"二重の膜からなり、クロロフィルを含み、光合成の場となる細胞小器官は何か",a:"葉緑体",t:"normal"},
+  {id:30065,ch:30,q:"細胞内の物質の濃度調節や貯蔵を行い、成長した植物細胞で発達する構造は何か",a:"液胞",t:"normal"},
+  {id:30066,ch:30,q:"植物細胞や菌類の細胞の最外層にあり、細胞の形を維持する丈夫な構造は何か",a:"細胞壁",t:"normal"},
+  {id:30067,ch:30,q:"細胞小器官のうち、光学顕微鏡では見えないものを2つ挙げよ。1つ目（リボソーム）",a:"リボソーム",t:"normal"},
+  {id:30068,ch:30,q:"細胞小器官のうち、光学顕微鏡では見えないものを2つ挙げよ。2つ目（小胞体）",a:"小胞体",t:"normal"},
+  {id:30069,ch:30,q:"肉眼で識別できる最小の長さ（分解能）は約何mmか",a:"0.1〜0.2mm",t:"normal"},
+  {id:30070,ch:30,q:"肉眼で識別できる最小の長さ（分解能）は約何µmか",a:"100〜200µm 光学顕微鏡の分解能は約何µmか",t:"normal"},
+  {id:30071,ch:30,q:"光学顕微鏡の分解能は約何µmか",a:"0.2µm 電子顕微鏡の分解能は約何nmか",t:"normal"},
+  {id:30072,ch:30,q:"電子顕微鏡の分解能は約何nmか",a:"0.2nm",t:"normal"},
+  {id:30073,ch:30,q:"インフルエンザウイルスの大きさは約何nmか",a:"約100nm 大腸菌の大きさは約何µmか",t:"normal"},
+  {id:30074,ch:30,q:"大腸菌の大きさは約何µmか",a:"約3µm ヒトの赤血球の大きさは約何µmか",t:"normal"},
+  {id:30075,ch:30,q:"ヒトの赤血球の大きさは約何µmか",a:"約8µm ヒトの精子の大きさは約何µmか",t:"normal"},
+  {id:30076,ch:30,q:"ヒトの精子の大きさは約何µmか",a:"約60µm ミドリムシの大きさは約何µmか",t:"normal"},
+  {id:30077,ch:30,q:"ミドリムシの大きさは約何µmか",a:"約80µm ヒトの卵の大きさは約何µmか",t:"normal"},
+  {id:30078,ch:30,q:"ヒトの卵の大きさは約何µmか",a:"約140µm ゾウリムシの大きさは約何µmか",t:"normal"},
+  {id:30079,ch:30,q:"ゾウリムシの大きさは約何µmか",a:"約200µm ニワトリの卵の大きさは約何mmか",t:"normal"},
+  {id:30080,ch:30,q:"ニワトリの卵の大きさは約何mmか",a:"約30mm ヒトの坐骨神経の長さは約何mか",t:"normal"},
+  {id:30081,ch:30,q:"ヒトの坐骨神経の長さは約何mか",a:"約1m",t:"normal"},
+  {id:30082,ch:30,q:"2点として識別できる最小の長さを何というか",a:"分解能 1mmは何µmか",t:"normal"},
+  {id:30083,ch:30,q:"1mmは何µmか",a:"1000µm 1µmは何nmか",t:"normal"},
+  {id:30084,ch:30,q:"1µmは何nmか",a:"1000nm",t:"normal"},
+  {id:30085,ch:30,q:"1665年、コルクの薄片を観察し、「細胞（cell）」を発見した人物は誰か",a:"フック",t:"normal"},
+  {id:30086,ch:30,q:"1674〜1677年、生きた細胞をはじめて観察し記録した人物は誰か",a:"レーウェンフック",t:"normal"},
+  {id:30087,ch:30,q:"「生物のからだは細胞からできている」という説を何というか",a:"細胞説",t:"normal"},
+  {id:30088,ch:30,q:"1838年、植物について細胞説を提唱した人物は誰か",a:"シュライデン",t:"normal"},
+  {id:30089,ch:30,q:"1839年、動物について細胞説を提唱した人物は誰か",a:"シュワン",t:"normal"},
+  {id:30090,ch:30,q:"1855年、「すべての細胞は細胞から生じる」と提唱した人物は誰か",a:"フィルヒョー",t:"normal"},
+  {id:30091,ch:30,q:"生物のからだの形や特徴が、生活環境に適するようになることを何というか",a:"適応",t:"normal"},
+  {id:30092,ch:30,q:"多様な生物が存在するのは、何の結果であるか",a:"進化",t:"normal"},
+  {id:30093,ch:30,q:"生物が進化してきた道筋を何というか",a:"系統",t:"normal"},
+  {id:30094,ch:30,q:"生物群の系統関係を樹木状に表したものを何というか",a:"系統樹",t:"normal"},
+  {id:30095,ch:30,q:"生物の共通性は、共通する何生物がもつ特徴に由来するか",a:"祖先生物",t:"normal"},
+  {id:30096,ch:30,q:"脊椎動物の系統樹で、魚類から分岐した後、四肢をもつようになった最も初期の生物群は何か",a:"両生類",t:"normal"},
+  {id:30097,ch:30,q:"ハ虫類・鳥類・哺乳類に共通する、胚を包む膜をもつ特徴を何というか",a:"羊膜をもつ",t:"normal"},
+  {id:30098,ch:30,q:"哺乳類の特徴である、母親の胎内で子を育てる性質を何というか",a:"胎生",t:"normal"},
+  {id:30099,ch:30,q:"真核生物の共通祖先と考えられているのは何生物か",a:"原核生物",t:"normal"},
+  {id:30100,ch:30,q:"生命活動に伴う化学反応を総称して何というか",a:"代謝",t:"normal"},
+  {id:30101,ch:30,q:"単純な物質から複雑な物質を合成する過程を何というか",a:"同化",t:"normal"},
+  {id:30102,ch:30,q:"同化の過程では、エネルギーの（吸収・放出）を伴う",a:"吸収",t:"normal"},
+  {id:30103,ch:30,q:"複雑な物質を単純な物質に分解する過程を何というか",a:"異化",t:"normal"},
+  {id:30104,ch:30,q:"異化の過程では、エネルギーの（吸収・放出）を伴う",a:"放出",t:"normal"},
+  {id:30105,ch:30,q:"外界から取り入れた無機物から有機物を合成できる生物を何というか",a:"独立栄養生物",t:"normal"},
+  {id:30106,ch:30,q:"無機物から有機物を直接合成できず、他の生物が合成した有機物に依存する生物を何というか",a:"従属栄養生物",t:"normal"},
+  {id:30107,ch:30,q:"すべての生物が代謝に伴うエネルギーの受け渡しに用いる物質をアルファベット3文字で何というか",a:"ATP",t:"normal"},
+  {id:30108,ch:30,q:"ATPの日本語の正式名称は何か",a:"アデノシン三リン酸",t:"normal"},
+  {id:30109,ch:30,q:"ATPは、塩基の一種である何と五炭糖が結合しているか",a:"アデニン",t:"normal"},
+  {id:30110,ch:30,q:"ATPは、塩基と五炭糖の一種である何が結合しているか",a:"リボース",t:"normal"},
+  {id:30111,ch:30,q:"アデニンとリボースが結合した化合物を何というか",a:"アデノシン",t:"normal"},
+  {id:30112,ch:30,q:"ATPはアデノシンに何分子のリン酸が結合した化合物か",a:"3分子",t:"normal"},
+  {id:30113,ch:30,q:"ATPから末端のリン酸1分子が切り離された物質をアルファベット3文字で何というか",a:"ADP",t:"normal"},
+  {id:30114,ch:30,q:"ADPの日本語の正式名称は何か",a:"アデノシン二リン酸",t:"normal"},
+  {id:30115,ch:30,q:"アデノシンに1分子のリン酸が結合した物質をアルファベット3文字で何というか",a:"AMP",t:"normal"},
+  {id:30116,ch:30,q:"ATP内のリン酸どうしの結合を何というか",a:"高エネルギーリン酸結合",t:"normal"},
+  {id:30117,ch:30,q:"高エネルギーリン酸結合が切れてADPとなるときに、何が放出されるか",a:"エネルギー",t:"normal"},
+  {id:30118,ch:30,q:"ATPは、その働きから生体内の何と呼ばれるか",a:"エネルギー通貨",t:"normal"},
+  {id:30119,ch:30,q:"呼吸などで得られたエネルギーは、ADPと何が結合してATPになる際に蓄えられるか",a:"リン酸",t:"normal"},
+  {id:30120,ch:30,q:"生物が二酸化炭素を吸収して有機物を合成する反応を何同化というか",a:"炭酸同化",t:"normal"},
+  {id:30121,ch:30,q:"光エネルギーを用いる炭酸同化を何というか",a:"光合成 光合成は植物の細胞のどこで行われるか",t:"normal"},
+  {id:30122,ch:30,q:"光合成は植物の細胞のどこで行われるか",a:"葉緑体",t:"normal"},
+  {id:30123,ch:30,q:"葉緑体に含まれ、光エネルギーを吸収する色素を何というか",a:"クロロフィル",t:"normal"},
+  {id:30124,ch:30,q:"光合成によって合成されたATPは、何から有機物が合成される際に用いられるか",a:"二酸化炭素",t:"normal"},
+  {id:30125,ch:30,q:"光合成の反応で、水と二酸化炭素と光エネルギーから作られるものは、有機物と何か",a:"酸素",t:"normal"},
+  {id:30126,ch:30,q:"光合成の反応で、水と二酸化炭素と光エネルギーから作られるものは、酸素と何か",a:"有機物（グルコース）",t:"normal"},
+  {id:30127,ch:30,q:"酸素を用いて有機物を分解し、ATPを合成する反応を何というか",a:"呼吸",t:"normal"},
+  {id:30128,ch:30,q:"呼吸において重要な役割を担う細胞小器官は何か",a:"ミトコンドリア",t:"normal"},
+  {id:30129,ch:30,q:"呼吸の反応で、有機物と酸素から作られるものは、水とエネルギー（ATP）と何か",a:"二酸化炭素",t:"normal"},
+  {id:30130,ch:30,q:"呼吸の反応で、有機物と酸素から作られるものは、二酸化炭素とエネルギー（ATP）と何か",a:"水",t:"normal"},
+  {id:30131,ch:30,q:"葉緑体の内部にある、扁平な袋状をした膜構造を何というか",a:"チラコイド",t:"normal"},
+  {id:30132,ch:30,q:"葉緑体の内部で、チラコイドの間を満たす液状の部分を何というか",a:"ストロマ",t:"normal"},
+  {id:30133,ch:30,q:"光エネルギーを吸収してATPが合成される反応は、葉緑体のどこで起こるか",a:"チラコイド",t:"normal"},
+  {id:30134,ch:30,q:"二酸化炭素を吸収して有機物を合成する反応は、葉緑体のどこで起こるか",a:"ストロマ",t:"normal"},
+  {id:30135,ch:30,q:"ストロマで起こる、二酸化炭素から有機物を合成する反応経路を何回路というか",a:"カルビン回路",t:"normal"},
+  {id:30136,ch:30,q:"呼吸において、グルコースが段階的にピルビン酸まで分解される過程を何系というか",a:"解糖系",t:"normal"},
+  {id:30137,ch:30,q:"解糖系は細胞のどこで起こるか",a:"細胞質基質",t:"normal"},
+  {id:30138,ch:30,q:"解糖系で生じたピルビン酸はミトコンドリアに運ばれ、何という過程でさらに分解されるか",a:"クエン酸回路",t:"normal"},
+  {id:30139,ch:30,q:"クエン酸回路はミトコンドリアのどの部分で起こるか",a:"マトリックス",t:"normal"},
+  {id:30140,ch:30,q:"呼吸において、多量のATPが合成される過程を何系というか",a:"電子伝達系",t:"normal"},
+  {id:30141,ch:30,q:"電子伝達系はミトコンドリアのどの部分に存在するか",a:"内膜",t:"normal"},
+  {id:30142,ch:30,q:"生体内でつくられ、触媒として働くタンパク質を主成分とする物質を何というか",a:"酵素 酵素の主成分は何か",t:"normal"},
+  {id:30143,ch:30,q:"酵素の主成分は何か",a:"タンパク質",t:"normal"},
+  {id:30144,ch:30,q:"酵素の作用を受ける物質を何というか",a:"基質",t:"normal"},
+  {id:30145,ch:30,q:"酵素が特定の物質にのみ作用する性質を何というか",a:"基質特異性",t:"normal"},
+  {id:30146,ch:30,q:"酵素は化学反応の前後で自身が（変化する・変化しない）",a:"変化しない",t:"normal"},
+  {id:30147,ch:30,q:"１つの酵素が、いくつもの基質に繰り返し作用することができるか、できないか",a:"できる",t:"normal"},
+  {id:30148,ch:30,q:"代謝の過程では、複数の反応が（連続して・単独で）進行する",a:"連続して",t:"normal"},
+  {id:30149,ch:30,q:"酵素が基質と結合し、化学反応を促進する部分を何というか",a:"活性部位",t:"normal"},
+  {id:30150,ch:30,q:"酵素と基質が結合した状態を何複合体というか",a:"酵素-基質複合体",t:"normal"},
+  {id:30151,ch:30,q:"酵素の反応速度が最も大きくなる温度を何というか",a:"最適温度",t:"normal"},
+  {id:30152,ch:30,q:"ある一定の温度を超えると、酵素のタンパク質の立体構造が変化する現象を何というか",a:"変性（熱変性）",t:"normal"},
+  {id:30153,ch:30,q:"変性した酵素は、もとの働きを取り戻すことができるか、できないか",a:"できない",t:"normal"},
+  {id:30154,ch:30,q:"酵素の反応速度が最も大きくなるpHを何というか",a:"最適pH",t:"normal"},
+  {id:30155,ch:30,q:"胃液に含まれるペプシンの最適pHは、およそいくらか",a:"2",t:"normal"},
+  {id:30156,ch:30,q:"だ液に含まれるアミラーゼの最適pHは、およそいくらか",a:"7",t:"normal"},
+  {id:30157,ch:30,q:"すい液に含まれるトリプシンの最適pHは、およそいくらか",a:"8",t:"normal"},
+  {id:30158,ch:30,q:"顕微鏡の観察倍率は、何レンズの倍率と何レンズの倍率の積で表されるか。前者を答えよ",a:"対物レンズ",t:"normal"},
+  {id:30159,ch:30,q:"顕微鏡の観察倍率は、何レンズの倍率と何レンズの倍率の積で表されるか。後者を答えよ",a:"接眼レンズ",t:"normal"},
+  {id:30160,ch:30,q:"顕微鏡の反射鏡で、通常、低倍率での観察に使用するのは何面鏡か",a:"平面鏡",t:"normal"},
+  {id:30161,ch:30,q:"顕微鏡の反射鏡で、高倍率での観察に使用するのは何面鏡か",a:"凹面鏡",t:"normal"},
+  {id:30162,ch:30,q:"レンズに入る光量を調節する装置を何というか",a:"しぼり",t:"normal"},
+  {id:30163,ch:30,q:"低倍率で観察する際、しぼりはどう調節するか",a:"しぼる",t:"normal"},
+  {id:30164,ch:30,q:"高倍率で観察する際、しぼりはどう調節するか",a:"開く",t:"normal"},
+  {id:30165,ch:30,q:"顕微鏡を持ち運ぶ際、片手でどこをしっかり握るか",a:"アーム",t:"normal"},
+  {id:30166,ch:30,q:"顕微鏡は、直射日光の当たらないどのような場所に設置するか",a:"明るく水平な場所",t:"normal"},
+  {id:30167,ch:30,q:"レンズを取り付ける際、接眼レンズと対物レンズのどちらを先に取り付けるか",a:"接眼レンズ",t:"normal"},
+  {id:30168,ch:30,q:"ピントを合わせる際、最初は最も倍率の（高い・低い）対物レンズを選ぶ",a:"低い",t:"normal"},
+  {id:30169,ch:30,q:"ピント調節時、プレパラートと対物レンズを近づけるときは、どこから見ながら調節ねじを回すか",a:"横から見ながら",t:"normal"},
+  {id:30170,ch:30,q:"顕微鏡をのぞきながらピントを合わせる際、対物レンズとプレパラートの間隔を（近づけて・広げて）合わせる",a:"広げて",t:"normal"},
+  {id:30171,ch:30,q:"スケッチを描く際、輪郭はどのような線で描くか",a:"一本線 スケッチを描く際、陰影は何で表すか",t:"normal"},
+  {id:30172,ch:30,q:"スケッチを描く際、陰影は何で表すか",a:"点の疎密",t:"normal"},
+  {id:30173,ch:30,q:"スケッチを描く際、塗りつぶしや斜線は用いるか",a:"用いない",t:"normal"},
+  {id:30174,ch:30,q:"高倍率の対物レンズは、低倍率の対物レンズに比べて長さが（長い・短い）",a:"長い",t:"normal"},
+  {id:30175,ch:30,q:"高倍率で観察すると、低倍率のときと比べて視野の明るさはどうなるか",a:"暗い",t:"normal"},
+  {id:30176,ch:30,q:"高倍率で観察すると、低倍率のときと比べて視野の広さはどうなるか",a:"狭い",t:"normal"},
+  {id:30177,ch:30,q:"高倍率で観察すると、低倍率のときと比べて焦点深度はどうなるか",a:"浅い",t:"normal"},
+  {id:30178,ch:30,q:"顕微鏡での長さを測定する際、接眼レンズ内に入れる目盛りを何というか",a:"接眼ミクロメーター",t:"normal"},
+  {id:30179,ch:30,q:"ステージ上に置き、接眼ミクロメーターの1目盛りの長さを決めるための基準となるものを何というか",a:"対物ミクロメーター",t:"normal"},
+  {id:30180,ch:30,q:"対物ミクロメーターの1目盛りの長さは何mmか",a:"0.01mm",t:"normal"},
+  {id:30181,ch:30,q:"対物ミクロメーターの1目盛りの長さは何µmか",a:"10µm",t:"normal"},
+  {id:30182,ch:30,q:"体細胞には形と大きさが同じ染色体が2本ずつ含まれている。この対をなす染色体を何というか",a:"相同染色体",t:"normal"},
+  {id:30183,ch:30,q:"相同染色体はそれぞれ父親と誰に由来するか",a:"母親 ヒトの場合、相同染色体は何対あるか",t:"normal"},
+  {id:30184,ch:30,q:"ヒトの場合、相同染色体は何対あるか",a:"23対 ヒトの場合、染色体は合計何本あるか",t:"normal"},
+  {id:30185,ch:30,q:"ヒトの場合、染色体は合計何本あるか",a:"46本",t:"normal"},
+  {id:30186,ch:30,q:"真核生物の染色体は、核内でどのような形になって分散しているか",a:"糸状",t:"normal"},
+  {id:30187,ch:30,q:"DNAの一部が、特定の働きをもち、DNAの特定の位置に存在する。これを何というか",a:"遺伝子",t:"normal"},
+  {id:30188,ch:30,q:"DNAの正式名称（日本語）は何か",a:"デオキシリボ核酸",t:"normal"},
+  {id:30189,ch:30,q:"DNAの構成成分である糖の名称は何か",a:"デオキシリボース",t:"normal"},
+  {id:30190,ch:30,q:"DNAは、糖・リン酸・および何からなるか",a:"塩基",t:"normal"},
+  {id:30191,ch:30,q:"糖、リン酸、塩基が結合した単位を何というか",a:"ヌクレオチド",t:"normal"},
+  {id:30192,ch:30,q:"多数のヌクレオチドが鎖状に結合した高分子化合物を何というか",a:"ヌクレオチド鎖",t:"normal"},
+  {id:30193,ch:30,q:"DNAのヌクレオチドを構成する塩基は、アデニン、グアニン、シトシンと何か",a:"チミン",t:"normal"},
+  {id:30194,ch:30,q:"DNAのヌクレオチドを構成する塩基のアデニンはアルファベット1文字でどう表すか",a:"A",t:"normal"},
+  {id:30195,ch:30,q:"DNAのヌクレオチドを構成する塩基のグアニンはアルファベット1文字でどう表すか",a:"G",t:"normal"},
+  {id:30196,ch:30,q:"DNAのヌクレオチドを構成する塩基のシトシンはアルファベット1文字でどう表すか",a:"C",t:"normal"},
+  {id:30197,ch:30,q:"DNAのヌクレオチドを構成する塩基のチミンはアルファベット1文字でどう表すか",a:"T",t:"normal"},
+  {id:30198,ch:30,q:"DNA分子は2本のヌクレオチド鎖からなり、ねじれた構造をしている。これを何構造というか",a:"二重らせん構造 2本の鎖は塩基間で何結合しているか",t:"normal"},
+  {id:30199,ch:30,q:"2本の鎖は塩基間で何結合しているか",a:"水素結合",t:"normal"},
+  {id:30200,ch:30,q:"塩基の結合において、Aは必ず何と結合するか",a:"T",t:"normal"},
+  {id:30201,ch:30,q:"塩基の結合において、Gは必ず何と結合するか",a:"C",t:"normal"},
+  {id:30202,ch:30,q:"特定の塩基どうしが結合する性質を何というか",a:"相補性",t:"normal"},
+  {id:30203,ch:30,q:"ヌクレオチド鎖の塩基の並び方を何というか",a:"塩基配列",t:"normal"},
+  {id:30204,ch:30,q:"DNAの遺伝情報となっているのは何か",a:"塩基配列",t:"normal"},
+  {id:30205,ch:30,q:"細菌の細胞外からDNAを取り込ませることで、その細菌の形質が変化する現象を何というか",a:"形質転換",t:"normal"},
+  {id:30206,ch:30,q:"1928年、肺炎双球菌を用いて形質転換を発見した人物は誰か",a:"グリフィス",t:"normal"},
+  {id:30207,ch:30,q:"肺炎双球菌のうち、病原性をもつのはS型菌とR型菌のどちらか",a:"S型菌",t:"normal"},
+  {id:30208,ch:30,q:"肺炎双球菌のS型菌は、菌体のまわりに何をもつか",a:"カプセル",t:"normal"},
+  {id:30209,ch:30,q:"肺炎双球菌のうち、病原性をもたないのはS型菌とR型菌のどちらか",a:"R型菌",t:"normal"},
+  {id:30210,ch:30,q:"加熱殺菌したS型菌と生きたR型菌を混ぜてネズミに注射すると、ネズミの体内から何型菌が検出されるか",a:"S型菌",t:"normal"},
+  {id:30211,ch:30,q:"1944年、S型菌の抽出液を用いて形質転換の実験を行った人物は誰か",a:"エイブリー",t:"normal"},
+  {id:30212,ch:30,q:"エイブリーの実験で、S型菌の抽出液を何分解酵素で処理すると形質転換が起きなかったか",a:"DNA分解酵素",t:"normal"},
+  {id:30213,ch:30,q:"エイブリーの実験で、S型菌の抽出液を何分解酵素で処理しても形質転換は引き起こされたか",a:"タンパク質分解酵素",t:"normal"},
+  {id:30214,ch:30,q:"エイブリーの実験により、形質転換の原因物質は何であることが示されたか",a:"DNA",t:"normal"},
+  {id:30215,ch:30,q:"バクテリオファージを用いて遺伝子の本体がDNAであることを明らかにした人物を2人答えよ（〇〇と〇〇）",a:"ハーシーとチェイス",t:"normal"},
+  {id:30216,ch:30,q:"ハーシーとチェイスが実験に用いたバクテリオファージは何ファージか",a:"T2ファージ",t:"normal"},
+  {id:30217,ch:30,q:"ハーシーとチェイスは、ファージのDNAを何の放射性同位体で標識したか",a:"32P",t:"normal"},
+  {id:30218,ch:30,q:"ハーシーとチェイスは、ファージのタンパク質殻を何の放射性同位体で標識したか",a:"35S",t:"normal"},
+  {id:30219,ch:30,q:"ファージが感染した大腸菌の菌体内から主に検出されたのは、32Pと35Sのどちらか",a:"32P",t:"normal"},
+  {id:30220,ch:30,q:"どの生物においても、DNA中のAとT、GとCの数の割合がそれぞれ等しいことを発見した人物は誰か",a:"シャルガフ",t:"normal"},
+  {id:30221,ch:30,q:"DNAのX線回折像の撮影に成功した人物はフランクリンと誰か",a:"ウィルキンス",t:"normal"},
+  {id:30222,ch:30,q:"1953年、DNAの二重らせん構造のモデルを提唱した人物を2人答えよ（〇〇と〇〇）",a:"ワトソンとクリック",t:"normal"},
+  {id:30223,ch:30,q:"細胞分裂において、DNAは母細胞で複製され、2個の何細胞に等しく分配されるか",a:"娘細胞",t:"normal"},
+  {id:30224,ch:30,q:"DNAの2本鎖がほどけ、それぞれを鋳型として新しい鎖が合成される複製方式を何というか",a:"半保存的複製",t:"normal"},
+  {id:30225,ch:30,q:"DNAの複製において、鋳型となる元のDNA鎖に結合して作られる新しいヌクレオチド鎖を何というか",a:"新生鎖",t:"normal"},
+  {id:30226,ch:30,q:"細胞分裂を行う細胞が繰り返す、分裂期と間期からなる周期を何というか",a:"細胞周期 細胞周期は、分裂期と何期からなるか",t:"normal"},
+  {id:30227,ch:30,q:"細胞周期は、分裂期と何期からなるか",a:"間期",t:"normal"},
+  {id:30228,ch:30,q:"細胞周期の間期は、G1期、S期、何期に分けられるか",a:"G2期",t:"normal"},
+  {id:30229,ch:30,q:"間期のうち、DNA合成準備期をアルファベットと数字で何期というか",a:"G1期",t:"normal"},
+  {id:30230,ch:30,q:"間期のうち、DNAが合成（複製）される時期をアルファベットで何期というか",a:"S期",t:"normal"},
+  {id:30231,ch:30,q:"間期のうち、分裂準備期をアルファベットと数字で何期というか",a:"G2期",t:"normal"},
+  {id:30232,ch:30,q:"ある種のヒトの培養細胞の場合、細胞周期の中で最も長く時間がかかるのは何期か",a:"G1期",t:"normal"},
+  {id:30233,ch:30,q:"細胞が分化したり老化したりして、細胞分裂を停止した状態の細胞は何期に入っているとされるか",a:"G0期",t:"normal"},
+  {id:30234,ch:30,q:"体細胞分裂の過程は、大きく分けて核分裂と何分裂からなるか",a:"細胞質分裂",t:"normal"},
+  {id:30235,ch:30,q:"分裂期(M期)は、前期、中期、後期、何期に分けられるか",a:"終期 体細胞分裂の前期に、染色体はどうなるか",t:"normal"},
+  {id:30236,ch:30,q:"体細胞分裂の前期に、染色体はどうなるか",a:"凝縮して太くなる",t:"normal"},
+  {id:30237,ch:30,q:"体細胞分裂の前期に消失する、核を包む膜は何か",a:"核膜",t:"normal"},
+  {id:30238,ch:30,q:"体細胞分裂の中期に、染色体は細胞のどこに並ぶか",a:"赤道面",t:"normal"},
+  {id:30239,ch:30,q:"体細胞分裂の後期に、染色体は細胞のどこへ移動するか",a:"両極",t:"normal"},
+  {id:30240,ch:30,q:"体細胞分裂の終期に、両極に集まった染色体の周りに形成されるものは何か",a:"核膜 体細胞分裂の終期に、染色体はどうなるか",t:"normal"},
+  {id:30241,ch:30,q:"体細胞分裂の終期に、染色体はどうなるか",a:"分散する（糸状に戻る）",t:"normal"},
+  {id:30242,ch:30,q:"細胞分裂後のG1期のDNA量を2としたとき、S期が終了した直後のG2期のDNA量はいくつか",a:"4",t:"normal"},
+  {id:30243,ch:30,q:"細胞周期において、DNA量が半減するのは何期の終わりか",a:"分裂期(M期)",t:"normal"},
+  {id:30244,ch:30,q:"生体内でからだをつくったり酵素として働いたりする、生命活動に重要な物質は何か",a:"タンパク質",t:"normal"},
+  {id:30245,ch:30,q:"皮膚や骨の成分となるタンパク質を何というか",a:"コラーゲン",t:"normal"},
+  {id:30246,ch:30,q:"赤血球に含まれ、酸素を運搬するタンパク質を何というか",a:"ヘモグロビン",t:"normal"},
+  {id:30247,ch:30,q:"涙や鼻水に含まれる酵素（タンパク質）を何というか",a:"リゾチーム",t:"normal"},
+  {id:30248,ch:30,q:"タンパク質は、多数の何が鎖状に結合してできた高分子化合物か",a:"アミノ酸",t:"normal"},
+  {id:30249,ch:30,q:"タンパク質を構成するアミノ酸は何種類あるか",a:"20種類",t:"normal"},
+  {id:30250,ch:30,q:"タンパク質の種類は、アミノ酸の種類や配列順序、および何の違いによって決まるか",a:"総数",t:"normal"},
+  {id:30251,ch:30,q:"アミノ酸は、炭素原子にアミノ基、水素原子、側鎖、および何基が結合したものか",a:"カルボキシ基",t:"normal"},
+  {id:30252,ch:30,q:"アミノ酸の炭素原子に結合する-NH2を何基というか",a:"アミノ基",t:"normal"},
+  {id:30253,ch:30,q:"アミノ酸の炭素原子に結合する-COOHを何基というか",a:"カルボキシ基",t:"normal"},
+  {id:30254,ch:30,q:"20種類のアミノ酸は、それぞれ特有の何をもつことで区別されるか",a:"側鎖",t:"normal"},
+  {id:30255,ch:30,q:"隣り合うアミノ酸の間で、水分子が取れて結合する結合様式を何というか",a:"ペプチド結合",t:"normal"},
+  {id:30256,ch:30,q:"多数のアミノ酸がペプチド結合で長い鎖状につながった分子を何というか",a:"ポリペプチド",t:"normal"},
+  {id:30257,ch:30,q:"RNAの正式名称（日本語）は何か",a:"リボ核酸",t:"normal"},
+  {id:30258,ch:30,q:"RNAのヌクレオチドを構成する糖は何か",a:"リボース",t:"normal"},
+  {id:30259,ch:30,q:"RNAを構成する塩基は、アデニン、グアニン、シトシンと何か",a:"ウラシル",t:"normal"},
+  {id:30260,ch:30,q:"RNAに含まれ、DNAには含まれない塩基をアルファベット1文字で答えよ",a:"U",t:"normal"},
+  {id:30261,ch:30,q:"DNAに含まれ、RNAには含まれない塩基をアルファベット1文字で答えよ",a:"T RNAは通常、何本鎖の構造をしているか",t:"normal"},
+  {id:30262,ch:30,q:"RNAは通常、何本鎖の構造をしているか",a:"1本鎖",t:"normal"},
+  {id:30263,ch:30,q:"DNAからRNAが合成される過程を転写というが、これはどこで行われるか",a:"核",t:"normal"},
+  {id:30264,ch:30,q:"DNAの塩基配列に基づいてRNAが合成されたり、タンパク質が合成されたりすることを遺伝子の何というか",a:"発現",t:"normal"},
+  {id:30265,ch:30,q:"生物のもつ遺伝情報は、DNA→RNA→タンパク質へと一方向に流れる。この原則を何というか",a:"セントラルドグマ",t:"normal"},
+  {id:30266,ch:30,q:"DNAの塩基配列を写し取ってRNAが合成される過程を何というか",a:"転写",t:"normal"},
+  {id:30267,ch:30,q:"転写によって合成され、遺伝情報をリボソームに伝えるRNAを何というか",a:"mRNA（伝令RNA）",t:"normal"},
+  {id:30268,ch:30,q:"mRNAの塩基配列に基づいてアミノ酸が結合し、タンパク質が合成される過程を何というか",a:"翻訳",t:"normal"},
+  {id:30269,ch:30,q:"翻訳は細胞質基質にある何という細胞小器官で行われるか",a:"リボソーム",t:"normal"},
+  {id:30270,ch:30,q:"mRNAの連続した3つの塩基の並びで、1つのアミノ酸を指定する単位を何というか",a:"コドン",t:"normal"},
+  {id:30271,ch:30,q:"アミノ酸と結合し、それをリボソームへ運ぶRNAを何というか",a:"tRNA（転移RNA）",t:"normal"},
+  {id:30272,ch:30,q:"tRNAがもつ、mRNAのコドンと相補的に結合する3塩基の配列を何というか",a:"アンチコドン",t:"normal"},
+  {id:30273,ch:30,q:"mRNAのコドンは、4種類の塩基の3つの並び方の組み合わせで何通り存在するか",a:"64通り",t:"normal"},
+  {id:30274,ch:30,q:"コドンとアミノ酸の対応をまとめた表を何というか",a:"遺伝暗号表",t:"normal"},
+  {id:30275,ch:30,q:"翻訳の開始を指定し、メチオニンを指定するコドン（AUG）を何というか",a:"開始コドン",t:"normal"},
+  {id:30276,ch:30,q:"翻訳を終了させる役割をもつ、アミノ酸を指定しないコドンを何というか",a:"終止コドン",t:"normal"},
+  {id:30277,ch:30,q:"メチオニンを指定するコドンの塩基配列をアルファベット3文字で答えよ",a:"AUG",t:"normal"},
+  {id:30278,ch:30,q:"遺伝暗号を解明した科学者を2人答えよ（〇〇と〇〇）",a:"ニーレンバーグとコラーナ",t:"normal"},
+  {id:30279,ch:30,q:"生物が自らを形成・維持するのに必要な1組の遺伝情報を何というか",a:"ゲノム",t:"normal"},
+  {id:30280,ch:30,q:"大腸菌のゲノムの総塩基対数は約いくらか",a:"約500万",t:"normal"},
+  {id:30281,ch:30,q:"大腸菌の遺伝子数は約いくつか",a:"約4500",t:"normal"},
+  {id:30282,ch:30,q:"酵母のゲノムの総塩基対数は約いくらか",a:"約1200万",t:"normal"},
+  {id:30283,ch:30,q:"酵母の遺伝子数は約いくつか",a:"約7000",t:"normal"},
+  {id:30284,ch:30,q:"ショウジョウバエのゲノムの総塩基対数は約いくらか",a:"約1億2000万",t:"normal"},
+  {id:30285,ch:30,q:"ショウジョウバエの遺伝子数は約いくつか",a:"約1万4000",t:"normal"},
+  {id:30286,ch:30,q:"シロイヌナズナのゲノムの総塩基対数は約いくらか",a:"約1億3000万",t:"normal"},
+  {id:30287,ch:30,q:"シロイヌナズナの遺伝子数は約いくつか",a:"約2万7000",t:"normal"},
+  {id:30288,ch:30,q:"ヒトのゲノムの総塩基対数は約いくらか",a:"約30億",t:"normal"},
+  {id:30289,ch:30,q:"ヒトの遺伝子数は約いくつか",a:"約2万",t:"normal"},
+  {id:30290,ch:30,q:"ヒトのゲノム中で、タンパク質に翻訳される部分の割合は約何％か",a:"約1.5%",t:"normal"},
+  {id:30291,ch:30,q:"多細胞生物のからだを構成する個々の細胞は、基本的にすべて同じ何をもっているか",a:"ゲノム",t:"normal"},
+  {id:30292,ch:30,q:"細胞が特定の形や働きをもつようになることを、細胞の何というか",a:"分化",t:"normal"},
+  {id:30293,ch:30,q:"細胞の分化は、細胞の種類ごとに特定の何が発現するためか",a:"遺伝子",t:"normal"},
+  {id:30294,ch:30,q:"カやハエなどの幼虫の唾液腺にみられる巨大な染色体を何というか",a:"だ腺染色体",t:"normal"},
+  {id:30295,ch:30,q:"だ腺染色体の横じまは、何の存在位置の目安になるか",a:"遺伝子",t:"normal"},
+  {id:30296,ch:30,q:"だ腺染色体にみられる、膨らんだ部分を何というか",a:"パフ",t:"normal"},
+  {id:30297,ch:30,q:"パフでは、凝縮したDNAがほどけて何の合成が盛んに行われているか",a:"mRNA（転写）",t:"normal"},
+  {id:30298,ch:30,q:"DNAのヌクレオチドを構成する成分を3つ答えよ（糖、リン酸、〇〇）",a:"塩基",t:"normal"},
+  {id:30299,ch:30,q:"DNAのヌクレオチドを構成する成分を3つ答えよ（糖、〇〇、塩基）",a:"リン酸",t:"normal"},
+  {id:30300,ch:30,q:"DNAのヌクレオチドを構成する成分を3つ答えよ（〇〇、リン酸、塩基）",a:"デオキシリボース",t:"normal"},
+  {id:30301,ch:30,q:"ある生物のDNAにアデニンが20％含まれているとき、チミンは何％含まれるか",a:"20%",t:"normal"},
+  {id:30302,ch:30,q:"ある生物のDNAにアデニンが20％含まれているとき、グアニンは何％含まれるか",a:"30%",t:"normal"},
+  {id:30303,ch:30,q:"ヒトの場合、1個の生殖細胞に含まれる染色体の数は何本か",a:"23本",t:"normal"},
+  {id:30304,ch:30,q:"ヒトの1個の体細胞には、何組のゲノムが存在するか",a:"2組",t:"normal"},
+  {id:30305,ch:30,q:"タンパク質を構成するアミノ酸が多数結合してできるペプチド結合は、隣り合うアミノ酸のカルボキシ基と何基の間に形成されるか",a:"アミノ基",t:"normal"},
+  {id:30306,ch:30,q:"タンパク質の立体構造が変化する熱変性が起こると、酵素は再び活性を取り戻すことが（できる・できない）",a:"できない",t:"normal"},
+  {id:30307,ch:30,q:"セントラルドグマにおいて、遺伝情報が向かう最終的な物質は何か",a:"タンパク質",t:"normal"},
+  {id:30308,ch:30,q:"体内の細胞が浸されている液体を何というか",a:"体液 体液は別の言葉で何環境と呼ばれるか",t:"normal"},
+  {id:30309,ch:30,q:"体液は別の言葉で何環境と呼ばれるか",a:"体内環境",t:"normal"},
+  {id:30310,ch:30,q:"体内環境の別名を漢字4文字で何というか",a:"内部環境",t:"normal"},
+  {id:30311,ch:30,q:"生物のからだを取り巻く環境を何環境というか",a:"外部環境",t:"normal"},
+  {id:30312,ch:30,q:"常に変化している外部環境におかれながら、体内の状態を安定に保とうとする性質を何というか",a:"恒常性",t:"normal"},
+  {id:30313,ch:30,q:"恒常性の別名（カタカナ）は何か",a:"ホメオスタシス",t:"normal"},
+  {id:30314,ch:30,q:"脊椎動物の体液は大きく分けて何種類あるか",a:"3種類",t:"normal"},
+  {id:30315,ch:30,q:"脊椎動物の体液のうち、血管内を流れるものを何というか",a:"血液",t:"normal"},
+  {id:30316,ch:30,q:"脊椎動物の体液のうち、組織の細胞の間を流れるものを何というか",a:"組織液",t:"normal"},
+  {id:30317,ch:30,q:"脊椎動物の体液のうち、リンパ管内を流れるものを何というか",a:"リンパ液",t:"normal"},
+  {id:30318,ch:30,q:"体内環境を一定の範囲内で保つしくみは、自律神経系と何系によって行われるか",a:"内分泌系 神経が直接器官に情報を伝えるのは何系か",t:"normal"},
+  {id:30319,ch:30,q:"神経が直接器官に情報を伝えるのは何系か",a:"自律神経系",t:"normal"},
+  {id:30320,ch:30,q:"自律神経系が作用する速度はすばやいか、ゆっくりか",a:"すばやい",t:"normal"},
+  {id:30321,ch:30,q:"自律神経系の効果の持続時間は短いか、長いか",a:"短い",t:"normal"},
+  {id:30322,ch:30,q:"血液を介して標的器官にホルモンが運ばれるのは何系か",a:"内分泌系",t:"normal"},
+  {id:30323,ch:30,q:"内分泌系が作用する速度はすばやいか、ゆっくりか",a:"ゆっくり",t:"normal"},
+  {id:30324,ch:30,q:"内分泌系の効果の持続時間は短いか、長い（持続的）か",a:"長い（持続的）",t:"normal"},
+  {id:30325,ch:30,q:"ヒトの神経系は、中枢神経系と何神経系に分けられるか",a:"末梢神経系",t:"normal"},
+  {id:30326,ch:30,q:"中枢神経系は、脳と何からなるか",a:"脊髄",t:"normal"},
+  {id:30327,ch:30,q:"末梢神経系は、体性神経系と何神経系に分けられるか",a:"自律神経系",t:"normal"},
+  {id:30328,ch:30,q:"体性神経系は、感覚神経と何神経に分けられるか",a:"運動神経",t:"normal"},
+  {id:30329,ch:30,q:"自律神経系は、交感神経と何神経に分けられるか",a:"副交感神経",t:"normal"},
+  {id:30330,ch:30,q:"中枢神経系の脳は、大きく分けて大脳、小脳と何に分けられるか",a:"脳幹",t:"normal"},
+  {id:30331,ch:30,q:"脳幹は、間脳、中脳と何からなるか",a:"延髄",t:"normal"},
+  {id:30332,ch:30,q:"生命維持の中枢として重要な働きを担っている脳の部位はどこか",a:"脳幹",t:"normal"},
+  {id:30333,ch:30,q:"間脳は、視床と何からなるか",a:"視床下部",t:"normal"},
+  {id:30334,ch:30,q:"ほとんどの感覚神経の中継点となるのは脳のどの部位か",a:"視床",t:"normal"},
+  {id:30335,ch:30,q:"自律神経系と脳下垂体を調節するのは脳のどの部位か",a:"視床下部",t:"normal"},
+  {id:30336,ch:30,q:"体温の調節中枢が存在するのは脳のどの部位か",a:"視床下部",t:"normal"},
+  {id:30337,ch:30,q:"血糖濃度の調節の中枢が存在するのは脳のどの部位か",a:"視床下部",t:"normal"},
+  {id:30338,ch:30,q:"姿勢保持の中枢が存在するのは脳のどの部位か",a:"中脳",t:"normal"},
+  {id:30339,ch:30,q:"瞳孔の大きさを調節する中枢が存在するのは脳のどの部位か",a:"中脳",t:"normal"},
+  {id:30340,ch:30,q:"呼吸の調節中枢が存在するのは脳のどの部位か",a:"延髄",t:"normal"},
+  {id:30341,ch:30,q:"心臓の拍動を調節する中枢が存在するのは脳のどの部位か",a:"延髄",t:"normal"},
+  {id:30342,ch:30,q:"消化管運動を調節する中枢が存在するのは脳のどの部位か",a:"延髄",t:"normal"},
+  {id:30343,ch:30,q:"だ液分泌を調節する中枢が存在するのは脳のどの部位か",a:"延髄 感覚の中枢が存在するのは脳のどの部位か",t:"normal"},
+  {id:30344,ch:30,q:"感覚の中枢が存在するのは脳のどの部位か",a:"大脳",t:"normal"},
+  {id:30345,ch:30,q:"随意運動の中枢が存在するのは脳のどの部位か",a:"大脳 記憶の中枢が存在するのは脳のどの部位か",t:"normal"},
+  {id:30346,ch:30,q:"記憶の中枢が存在するのは脳のどの部位か",a:"大脳",t:"normal"},
+  {id:30347,ch:30,q:"思考などの中枢が存在するのは脳のどの部位か",a:"大脳",t:"normal"},
+  {id:30348,ch:30,q:"からだの平衡を保つ中枢が存在するのは脳のどの部位か",a:"小脳",t:"normal"},
+  {id:30349,ch:30,q:"脳幹を含む脳全体の機能が不可逆的に消失した状態を何というか",a:"脳死",t:"normal"},
+  {id:30350,ch:30,q:"大脳の機能を失っても脳幹の機能が維持され、生命維持の機能が残った状態を何というか",a:"植物状態",t:"normal"},
+  {id:30351,ch:30,q:"間脳の視床下部などによって支配され、意思とは直接関係なく働く神経系は何か",a:"自律神経系",t:"normal"},
+  {id:30352,ch:30,q:"自律神経系は互いに拮抗的に作用する交感神経と何神経からなるか",a:"副交感神経",t:"normal"},
+  {id:30353,ch:30,q:"からだを活動的方向に調節する自律神経はどちらか",a:"交感神経",t:"normal"},
+  {id:30354,ch:30,q:"からだを疲労回復的方向に調節する自律神経はどちらか",a:"副交感神経 交感神経が働くと瞳孔はどうなるか",t:"normal"},
+  {id:30355,ch:30,q:"交感神経が働くと瞳孔はどうなるか",a:"拡大する 副交感神経が働くと瞳孔はどうなるか",t:"normal"},
+  {id:30356,ch:30,q:"副交感神経が働くと瞳孔はどうなるか",a:"縮小する 交感神経が働くと皮膚の血管はどうなるか",t:"normal"},
+  {id:30357,ch:30,q:"交感神経が働くと皮膚の血管はどうなるか",a:"収縮する 交感神経が働くと立毛筋はどうなるか",t:"normal"},
+  {id:30358,ch:30,q:"交感神経が働くと立毛筋はどうなるか",a:"収縮する 交感神経が働くと心臓の拍動はどうなるか",t:"normal"},
+  {id:30359,ch:30,q:"交感神経が働くと心臓の拍動はどうなるか",a:"促進される",t:"normal"},
+  {id:30360,ch:30,q:"副交感神経が働くと心臓の拍動はどうなるか",a:"抑制される 交感神経が働くと気管支はどうなるか",t:"normal"},
+  {id:30361,ch:30,q:"交感神経が働くと気管支はどうなるか",a:"拡張する 副交感神経が働くと気管支はどうなるか",t:"normal"},
+  {id:30362,ch:30,q:"副交感神経が働くと気管支はどうなるか",a:"縮小する",t:"normal"},
+  {id:30363,ch:30,q:"交感神経が働くと胃のぜん動運動はどうなるか",a:"抑制される",t:"normal"},
+  {id:30364,ch:30,q:"副交感神経が働くと胃のぜん動運動はどうなるか",a:"促進される",t:"normal"},
+  {id:30365,ch:30,q:"交感神経が働くと副腎髄質からのホルモン分泌はどうなるか",a:"促進される",t:"normal"},
+  {id:30366,ch:30,q:"交感神経が働くとぼうこうはどうなるか（排尿に関して）",a:"抑制される（拡張する）",t:"normal"},
+  {id:30367,ch:30,q:"副交感神経が働くとぼうこうはどうなるか（排尿に関して）",a:"促進される（収縮する）",t:"normal"},
+  {id:30368,ch:30,q:"心臓の拍動の起点となる部分を何というか",a:"ペースメーカー ペースメーカーは心臓のどこにあるか",t:"normal"},
+  {id:30369,ch:30,q:"ペースメーカーは心臓のどこにあるか",a:"右心房 心臓の拍動中枢は脳のどこにあるか",t:"normal"},
+  {id:30370,ch:30,q:"心臓の拍動中枢は脳のどこにあるか",a:"延髄",t:"normal"},
+  {id:30371,ch:30,q:"ペースメーカーで生じた興奮は、何という系を経て左右の心房と心室に伝えられるか",a:"刺激伝導系",t:"normal"},
+  {id:30372,ch:30,q:"血液中の何濃度が上昇すると、交感神経が働き心拍数が上がるか",a:"CO2濃度（二酸化炭素濃度）",t:"normal"},
+  {id:30373,ch:30,q:"他のニューロンや細胞に接している部分を何というか",a:"シナプス",t:"normal"},
+  {id:30374,ch:30,q:"シナプスの末端から放出される物質を何というか",a:"神経伝達物質",t:"normal"},
+  {id:30375,ch:30,q:"副交感神経の末端から放出される神経伝達物質は何か",a:"アセチルコリン",t:"normal"},
+  {id:30376,ch:30,q:"交感神経の末端から放出される神経伝達物質は何か",a:"ノルアドレナリン",t:"normal"},
+  {id:30377,ch:30,q:"ニューロンの細胞体から伸びる短い突起を何というか",a:"樹状突起",t:"normal"},
+  {id:30378,ch:30,q:"ニューロンの細胞体から伸びる長い突起を何というか",a:"軸索",t:"normal"},
+  {id:30379,ch:30,q:"神経伝達物質が入っている、シナプス末端の小さな袋状の構造を何というか",a:"シナプス小胞",t:"normal"},
+  {id:30380,ch:30,q:"シナプスには何という細胞小器官が多く存在するか",a:"ミトコンドリア",t:"normal"},
+  {id:30381,ch:30,q:"ホルモンはどこから直接体液に分泌されるか",a:"内分泌腺 ホルモンは何によって標的器官へ運ばれるか",t:"normal"},
+  {id:30382,ch:30,q:"ホルモンは何によって標的器官へ運ばれるか",a:"血液",t:"normal"},
+  {id:30383,ch:30,q:"ホルモンの主成分はタンパク質、ステロイド、および何か",a:"アミノ酸",t:"normal"},
+  {id:30384,ch:30,q:"ホルモンの主成分はタンパク質、アミノ酸、および何か",a:"ステロイド",t:"normal"},
+  {id:30385,ch:30,q:"ホルモンが作用する特定の器官を何というか",a:"標的器官",t:"normal"},
+  {id:30386,ch:30,q:"標的器官の細胞には、特定のホルモンを受け取る何があるか",a:"受容体",t:"normal"},
+  {id:30387,ch:30,q:"ホルモンはごく多量で作用するか、微量で作用するか",a:"微量",t:"normal"},
+  {id:30388,ch:30,q:"分泌物を消化管などの体外に出す腺を何というか",a:"外分泌腺",t:"normal"},
+  {id:30389,ch:30,q:"外分泌腺が分泌物を出すための管を何というか",a:"排出管 汗腺は内分泌腺か外分泌腺か",t:"normal"},
+  {id:30390,ch:30,q:"汗腺は内分泌腺か外分泌腺か",a:"外分泌腺 消化腺は内分泌腺か外分泌腺か",t:"normal"},
+  {id:30391,ch:30,q:"消化腺は内分泌腺か外分泌腺か",a:"外分泌腺",t:"normal"},
+  {id:30392,ch:30,q:"排出管をもたず、分泌物を体液中に直接出す腺を何というか",a:"内分泌腺",t:"normal"},
+  {id:30393,ch:30,q:"視床下部から分泌され、脳下垂体のホルモン分泌を調節するホルモンは何か",a:"放出ホルモン（および放出抑制ホルモン）",t:"normal"},
+  {id:30394,ch:30,q:"脳下垂体は前葉と何に分けられるか",a:"後葉",t:"normal"},
+  {id:30395,ch:30,q:"タンパク質の合成促進や骨・筋肉などの成長促進をするホルモンは何か",a:"成長ホルモン",t:"normal"},
+  {id:30396,ch:30,q:"成長ホルモンはどこから分泌されるか",a:"脳下垂体前葉",t:"normal"},
+  {id:30397,ch:30,q:"チロキシンの分泌を促進するホルモンは何か",a:"甲状腺刺激ホルモン",t:"normal"},
+  {id:30398,ch:30,q:"甲状腺刺激ホルモンはどこから分泌されるか",a:"脳下垂体前葉",t:"normal"},
+  {id:30399,ch:30,q:"糖質コルチコイドの分泌を促進するホルモンは何か",a:"副腎皮質刺激ホルモン",t:"normal"},
+  {id:30400,ch:30,q:"副腎皮質刺激ホルモンはどこから分泌されるか",a:"脳下垂体前葉",t:"normal"},
+  {id:30401,ch:30,q:"腎臓の集合管における水分の再吸収を促進し、血圧を上昇させるホルモンは何か",a:"バソプレシン",t:"normal"},
+  {id:30402,ch:30,q:"バソプレシンはどこから分泌されるか",a:"脳下垂体後葉",t:"normal"},
+  {id:30403,ch:30,q:"代謝を促進するホルモンは何か",a:"チロキシン",t:"normal"},
+  {id:30404,ch:30,q:"チロキシンはどこから分泌されるか",a:"甲状腺",t:"normal"},
+  {id:30405,ch:30,q:"体液中のカルシウム量を増加させるホルモンは何か",a:"パラトルモン",t:"normal"},
+  {id:30406,ch:30,q:"パラトルモンはどこから分泌されるか",a:"副甲状腺",t:"normal"},
+  {id:30407,ch:30,q:"すい臓のランゲルハンス島は、A細胞と何細胞からなるか",a:"B細胞",t:"normal"},
+  {id:30408,ch:30,q:"血糖濃度を上昇させる、すい臓から分泌されるホルモンは何か",a:"グルカゴン",t:"normal"},
+  {id:30409,ch:30,q:"グルカゴンはすい臓のランゲルハンス島のどの細胞から分泌されるか",a:"A細胞",t:"normal"},
+  {id:30410,ch:30,q:"血糖濃度を減少させるホルモンは何か",a:"インスリン",t:"normal"},
+  {id:30411,ch:30,q:"インスリンはすい臓のランゲルハンス島のどの細胞から分泌されるか",a:"B細胞 副腎は皮質と何に分けられるか",t:"normal"},
+  {id:30412,ch:30,q:"副腎は皮質と何に分けられるか",a:"髄質",t:"normal"},
+  {id:30413,ch:30,q:"タンパク質からの糖の合成を促進し、血糖濃度を上昇させるホルモンは何か",a:"糖質コルチコイド",t:"normal"},
+  {id:30414,ch:30,q:"糖質コルチコイドは副腎のどこから分泌されるか",a:"皮質",t:"normal"},
+  {id:30415,ch:30,q:"体液中のイオン濃度を調節するホルモンは何か",a:"鉱質コルチコイド",t:"normal"},
+  {id:30416,ch:30,q:"鉱質コルチコイドは副腎のどこから分泌されるか",a:"皮質",t:"normal"},
+  {id:30417,ch:30,q:"グリコーゲンの分解を促進し、血糖濃度を上昇させ、心臓の拍動も促進するホルモンは何か",a:"アドレナリン",t:"normal"},
+  {id:30418,ch:30,q:"アドレナリンは副腎のどこから分泌されるか",a:"髄質",t:"normal"},
+  {id:30419,ch:30,q:"脳の神経細胞がホルモンを分泌する現象を何というか",a:"神経分泌",t:"normal"},
+  {id:30420,ch:30,q:"神経分泌を行う細胞を何というか",a:"神経分泌細胞",t:"normal"},
+  {id:30421,ch:30,q:"ある結果が原因にさかのぼって作用する調節のしくみを何というか",a:"フィードバック",t:"normal"},
+  {id:30422,ch:30,q:"結果が原因を抑制するフィードバックを何のフィードバックというか",a:"負のフィードバック",t:"normal"},
+  {id:30423,ch:30,q:"結果が原因を促進するフィードバックを何のフィードバックというか",a:"正のフィードバック",t:"normal"},
+  {id:30424,ch:30,q:"チロキシンの分泌量が過剰になると、視床下部や脳下垂体前葉の働きはどうなるか",a:"抑制される",t:"normal"},
+  {id:30425,ch:30,q:"腎臓を構成する機能上の単位を何というか",a:"ネフロン ネフロンの別名は何か",t:"normal"},
+  {id:30426,ch:30,q:"ネフロンの別名は何か",a:"腎単位 ネフロンは、腎小体と何から構成されるか",t:"normal"},
+  {id:30427,ch:30,q:"ネフロンは、腎小体と何から構成されるか",a:"細尿管 腎小体は、糸球体と何から構成されるか",t:"normal"},
+  {id:30428,ch:30,q:"腎小体は、糸球体と何から構成されるか",a:"ボーマンのう",t:"normal"},
+  {id:30429,ch:30,q:"腎臓において、血液成分がろ過されてできる液体を何というか",a:"原尿",t:"normal"},
+  {id:30430,ch:30,q:"原尿から必要な成分が毛細血管に再び吸収される過程を何というか",a:"再吸収",t:"normal"},
+  {id:30431,ch:30,q:"血しょう中に含まれるが、原尿にはほとんど含まれない成分は血球と何か",a:"タンパク質",t:"normal"},
+  {id:30432,ch:30,q:"原尿から再吸収される成分は水、イオンなどと何か",a:"グルコース",t:"normal"},
+  {id:30433,ch:30,q:"再吸収が行われた後、集合管を経て生成される液体を何というか",a:"尿 肝臓は、血液中に含まれる何の分解を行うか",t:"normal"},
+  {id:30434,ch:30,q:"肝臓は、血液中に含まれる何の分解を行うか",a:"毒素 肝臓ではアンモニアから何が合成されるか",t:"normal"},
+  {id:30435,ch:30,q:"肝臓ではアンモニアから何が合成されるか",a:"尿素",t:"normal"},
+  {id:30436,ch:30,q:"脂質の消化吸収に関わる胆汁はどこで生成されるか",a:"肝臓 肝臓はグルコースを何という形で貯蔵するか",t:"normal"},
+  {id:30437,ch:30,q:"肝臓はグルコースを何という形で貯蔵するか",a:"グリコーゲン",t:"normal"},
+  {id:30438,ch:30,q:"消化管から吸収された物質は、まず何という血管を通って肝臓に送られるか",a:"肝門脈",t:"normal"},
+  {id:30439,ch:30,q:"心臓から送られた血液の約何分の1が肝臓に送られるか",a:"3分の1",t:"normal"},
+  {id:30440,ch:30,q:"代謝に伴って熱が発生するため、肝臓は何の調節にも関わるか",a:"体温調節",t:"normal"},
+  {id:30441,ch:30,q:"健康なヒトの血液には、空腹時に100mL当たり約何mgのグルコースが含まれているか",a:"100mg",t:"normal"},
+  {id:30442,ch:30,q:"健康なヒトの血液のグルコース濃度は約何%か",a:"0.1%",t:"normal"},
+  {id:30443,ch:30,q:"血液中のグルコースを何というか",a:"血糖 血糖濃度の調節の中枢は脳のどこにあるか",t:"normal"},
+  {id:30444,ch:30,q:"血糖濃度の調節の中枢は脳のどこにあるか",a:"間脳の視床下部",t:"normal"},
+  {id:30445,ch:30,q:"低血糖のとき、視床下部から指令を伝える自律神経は何か",a:"交感神経",t:"normal"},
+  {id:30446,ch:30,q:"高血糖のとき、視床下部から指令を伝える自律神経は何か",a:"副交感神経",t:"normal"},
+  {id:30447,ch:30,q:"交感神経は副腎髄質に働きかけ、何の分泌を促進するか",a:"アドレナリン",t:"normal"},
+  {id:30448,ch:30,q:"交感神経はすい臓ランゲルハンス島A細胞に働きかけ、何の分泌を促進するか",a:"グルカゴン",t:"normal"},
+  {id:30449,ch:30,q:"副交感神経はすい臓ランゲルハンス島B細胞に働きかけ、何の分泌を促進するか",a:"インスリン",t:"normal"},
+  {id:30450,ch:30,q:"低血糖のとき、視床下部から脳下垂体前葉を経て分泌されるホルモンは副腎皮質を刺激する。この前葉のホルモンは何か",a:"副腎皮質刺激ホルモン",t:"normal"},
+  {id:30451,ch:30,q:"アドレナリンやグルカゴンは、肝臓で何を何に分解するか",a:"グリコーゲンをグルコースに分解",t:"normal"},
+  {id:30452,ch:30,q:"糖質コルチコイドは、何をグルコースに変化させるか",a:"タンパク質 インスリンは、肝臓で何を何に合成するか",t:"normal"},
+  {id:30453,ch:30,q:"インスリンは、肝臓で何を何に合成するか",a:"グルコースをグリコーゲンに合成",t:"normal"},
+  {id:30454,ch:30,q:"インスリンは、細胞でのグルコースの吸収と何を促進するか",a:"分解",t:"normal"},
+  {id:30455,ch:30,q:"インスリンの過剰注射などによって血糖濃度が低くなりすぎると、けいれんや何を生じるか",a:"意識喪失",t:"normal"},
+  {id:30456,ch:30,q:"血糖濃度が高くなったまま正常値に戻らない病気を何というか",a:"糖尿病",t:"normal"},
+  {id:30457,ch:30,q:"糖尿病において、腎臓での再吸収が間に合わなくなり、尿中に排出される物質は何か",a:"グルコース",t:"normal"},
+  {id:30458,ch:30,q:"免疫細胞によってランゲルハンス島B細胞が破壊され、インスリンが分泌されなくなる免疫疾患を何型糖尿病というか",a:"1型糖尿病",t:"normal"},
+  {id:30459,ch:30,q:"1型以外の原因でインスリンの分泌量が減少したり、標的細胞の反応が低下したりする疾患を何型糖尿病というか",a:"2型糖尿病",t:"normal"},
+  {id:30460,ch:30,q:"健康なヒトが食事をすると、血糖濃度の上昇に伴い何というホルモンの濃度も上昇するか",a:"インスリン",t:"normal"},
+  {id:30461,ch:30,q:"哺乳類や鳥類などの恒温動物で、体温調節の中枢は脳のどこにあるか",a:"間脳の視床下部",t:"normal"},
+  {id:30462,ch:30,q:"低温環境下で、発熱量を増加させるために交感神経の刺激によって分泌される副腎髄質のホルモンは何か",a:"アドレナリン",t:"normal"},
+  {id:30463,ch:30,q:"低温環境下で、発熱量を増加させるために脳下垂体前葉からのホルモンを経て分泌される甲状腺のホルモンは何か",a:"チロキシン",t:"normal"},
+  {id:30464,ch:30,q:"アドレナリンやチロキシンは、肝臓や筋肉での何を促進するか",a:"代謝",t:"normal"},
+  {id:30465,ch:30,q:"低温環境下で、熱の放散を防ぐために皮膚の血管はどうなるか",a:"収縮する",t:"normal"},
+  {id:30466,ch:30,q:"低温環境下で、熱の放散を防ぐために立毛筋はどうなるか",a:"収縮する",t:"normal"},
+  {id:30467,ch:30,q:"低温環境下で、交感神経の働きにより発汗はどうなるか",a:"減少する（起こらない）",t:"normal"},
+  {id:30468,ch:30,q:"夏毛と冬毛が生え変わることを何というか",a:"換毛",t:"normal"},
+  {id:30469,ch:30,q:"血液は、細胞成分である血球と液体成分である何からなるか",a:"血しょう",t:"normal"},
+  {id:30470,ch:30,q:"血球のうち、酸素の運搬に関わるものは何か",a:"赤血球",t:"normal"},
+  {id:30471,ch:30,q:"血球のうち、免疫に関わるものは何か",a:"白血球",t:"normal"},
+  {id:30472,ch:30,q:"血球のうち、血液凝固に関わるものは何か",a:"血小板 赤血球の大きさ（直径）は約何µmか",t:"normal"},
+  {id:30473,ch:30,q:"赤血球の大きさ（直径）は約何µmか",a:"7〜8µm 白血球の大きさ（直径）は約何µmか",t:"normal"},
+  {id:30474,ch:30,q:"白血球の大きさ（直径）は約何µmか",a:"6〜15µm 血小板の大きさ（直径）は約何µmか",t:"normal"},
+  {id:30475,ch:30,q:"血小板の大きさ（直径）は約何µmか",a:"2〜4µm",t:"normal"},
+  {id:30476,ch:30,q:"ヒトの血液1µL中に含まれる赤血球の数は約何万〜何万個か",a:"380万〜570万",t:"normal"},
+  {id:30477,ch:30,q:"ヒトの血液1µL中に含まれる白血球の数は約何〜何個か",a:"4000〜9000",t:"normal"},
+  {id:30478,ch:30,q:"ヒトの血液1µL中に含まれる血小板の数は約何万〜何万個か",a:"15万〜40万",t:"normal"},
+  {id:30479,ch:30,q:"すべての血球は、骨の内部の骨髄に存在する何からつくられるか",a:"造血幹細胞 赤血球に核はあるか",t:"normal"},
+  {id:30480,ch:30,q:"赤血球に核はあるか",a:"ない 血小板に核はあるか",t:"normal"},
+  {id:30481,ch:30,q:"血小板に核はあるか",a:"ない 白血球に核はあるか",t:"normal"},
+  {id:30482,ch:30,q:"白血球に核はあるか",a:"ある",t:"normal"},
+  {id:30483,ch:30,q:"血管が損傷して出血した際に、傷が小さければ自然に出血が止まる一連の現象を何というか",a:"血液凝固",t:"normal"},
+  {id:30484,ch:30,q:"血液凝固の過程で、最初に集まって塊をつくる血球は何か",a:"血小板",t:"normal"},
+  {id:30485,ch:30,q:"血液凝固の過程で、血小板や血しょう中の凝固因子などが反応して生じる繊維状のタンパク質を何というか",a:"フィブリン",t:"normal"},
+  {id:30486,ch:30,q:"フィブリンが血球を絡めてつくる塊を何というか",a:"血ぺい",t:"normal"},
+  {id:30487,ch:30,q:"血管が修復されるころに、血ぺいが酵素によって溶解することを何というか",a:"線溶（フィブリン溶解）",t:"normal"},
+  {id:30488,ch:30,q:"血液を試験管などに入れ静置した際に、血ぺい以外の淡黄色の液体を何というか",a:"血清 血清には、抗体などの何が含まれるか",t:"normal"},
+  {id:30489,ch:30,q:"血清には、抗体などの何が含まれるか",a:"タンパク質",t:"normal"},
+  {id:30490,ch:30,q:"皮膚や粘膜による病原体の侵入の阻止や、体内に侵入した病原体を排除する反応を何というか",a:"生体防御",t:"normal"},
+  {id:30491,ch:30,q:"生体防御のうち、体内に侵入した病原体を排除して体を守る反応を何というか",a:"免疫 免疫は、自然免疫と何免疫に分けられるか",t:"normal"},
+  {id:30492,ch:30,q:"免疫は、自然免疫と何免疫に分けられるか",a:"獲得免疫",t:"normal"},
+  {id:30493,ch:30,q:"皮膚や消化管の上皮は、細胞どうしが密着して異物が侵入しにくい。これを何的な生体防御というか",a:"物理的（な生体防御）",t:"normal"},
+  {id:30494,ch:30,q:"死細胞が隙間なく重なる皮膚の表面の層を何層というか",a:"角質層",t:"normal"},
+  {id:30495,ch:30,q:"気管や消化管などの粘膜は、何を分泌して微生物の付着を防いでいるか",a:"粘液",t:"normal"},
+  {id:30496,ch:30,q:"気管の粘膜では、何の運動によって異物を体外に送り出すか",a:"線毛",t:"normal"},
+  {id:30497,ch:30,q:"皮膚や粘膜上皮に含まれ、細菌の細胞膜を破壊するタンパク質を何というか",a:"ディフェンシン",t:"normal"},
+  {id:30498,ch:30,q:"涙やだ液に含まれ、細菌の細胞壁を分解する酵素を何というか",a:"リゾチーム",t:"normal"},
+  {id:30499,ch:30,q:"汗や皮脂、胃酸は（酸性・中性・アルカリ性）であるため、微生物の繁殖を防ぐ効果がある",a:"酸性",t:"normal"},
+  {id:30500,ch:30,q:"マクロファージや好中球、樹状細胞などが病原体を取り込んで殺菌・分解する働きを何というか",a:"食作用",t:"normal"},
+  {id:30501,ch:30,q:"食作用を行う白血球を総称して何細胞というか",a:"食細胞",t:"normal"},
+  {id:30502,ch:30,q:"白血球中で最も多数存在する食細胞は何か",a:"好中球",t:"normal"},
+  {id:30503,ch:30,q:"食作用によって取り込んだ抗原の情報をヘルパーT細胞に提示する細胞は何か",a:"樹状細胞",t:"normal"},
+  {id:30504,ch:30,q:"食作用を行い、体内に侵入した異物を排除する、単球から分化した細胞は何か",a:"マクロファージ",t:"normal"},
+  {id:30505,ch:30,q:"細胞質が少なく、大きな核をもつ白血球は何か",a:"リンパ球",t:"normal"},
+  {id:30506,ch:30,q:"リンパ球のうち、胸腺で分化・成熟し、獲得免疫で働く細胞を何細胞というか",a:"T細胞",t:"normal"},
+  {id:30507,ch:30,q:"T細胞のうち、B細胞や自然免疫細胞を活性化する細胞は何か",a:"ヘルパーT細胞",t:"normal"},
+  {id:30508,ch:30,q:"T細胞のうち、感染細胞などを直接攻撃して破壊する細胞は何か",a:"キラーT細胞",t:"normal"},
+  {id:30509,ch:30,q:"リンパ球のうち、抗体を産生する細胞を何細胞というか",a:"B細胞 B細胞はどこで分化・成熟するか",t:"normal"},
+  {id:30510,ch:30,q:"B細胞はどこで分化・成熟するか",a:"骨髄",t:"normal"},
+  {id:30511,ch:30,q:"自然免疫で働き、感染細胞などを単独で攻撃して排除するリンパ球は何か",a:"ナチュラルキラー(NK)細胞",t:"normal"},
+  {id:30512,ch:30,q:"すべての白血球がつくられる組織はどこか",a:"骨髄",t:"normal"},
+  {id:30513,ch:30,q:"骨髄でつくられた未熟なT細胞が成熟する器官はどこか",a:"胸腺",t:"normal"},
+  {id:30514,ch:30,q:"リンパ球や病原体を取り込んだ樹状細胞などが集まる、リンパ管の途中のふくらみを何というか",a:"リンパ節",t:"normal"},
+  {id:30515,ch:30,q:"血液が多く分布し、血液に侵入した病原体の排除に関わる器官はどこか",a:"ひ臓",t:"normal"},
+  {id:30516,ch:30,q:"腸管に分布し、腸管から侵入した病原体の排除に関わる組織を何というか",a:"パイエル板",t:"normal"},
+  {id:30517,ch:30,q:"病原体が共通してもつ特徴を幅広く認識し、食作用などで排除する生まれつき備わった免疫を何というか",a:"自然免疫",t:"normal"},
+  {id:30518,ch:30,q:"感染部位にマクロファージや好中球などを集める物質を総称して何というか",a:"サイトカイン",t:"normal"},
+  {id:30519,ch:30,q:"自然免疫の反応により、局所が赤くはれ、熱や痛みをもつことを何というか",a:"炎症",t:"normal"},
+  {id:30520,ch:30,q:"特定の物質を認識したリンパ球が特異的に病原体を排除する免疫を何というか",a:"獲得免疫",t:"normal"},
+  {id:30521,ch:30,q:"獲得免疫の別名を何免疫というか",a:"適応免疫",t:"normal"},
+  {id:30522,ch:30,q:"リンパ球によって認識される異物などの物質を何というか",a:"抗原",t:"normal"},
+  {id:30523,ch:30,q:"樹状細胞などが、細胞内で分解した病原体の断片を細胞表面に示すことを何というか",a:"抗原提示",t:"normal"},
+  {id:30524,ch:30,q:"提示された抗原を認識して活性化することで獲得免疫がはじまるのは何T細胞と何T細胞か",a:"ヘルパーT細胞とキラーT細胞",t:"normal"},
+  {id:30525,ch:30,q:"個々のリンパ球は、何種類の抗原しか認識できないか",a:"1種類（特定の抗原）",t:"normal"},
+  {id:30526,ch:30,q:"抗体は、何というタンパク質でできているか",a:"免疫グロブリン",t:"normal"},
+  {id:30527,ch:30,q:"抗体は、B細胞が分化した何細胞によってつくられるか",a:"抗体産生細胞（形質細胞）",t:"normal"},
+  {id:30528,ch:30,q:"抗体産生細胞の別名は何か",a:"形質細胞",t:"normal"},
+  {id:30529,ch:30,q:"抗体が抗原と特異的に結合する反応を何というか",a:"抗原抗体反応",t:"normal"},
+  {id:30530,ch:30,q:"抗体のY字形の構造のうち、抗原と結合する先端部分を何部というか",a:"可変部",t:"normal"},
+  {id:30531,ch:30,q:"抗体のY字形の構造のうち、根本の部分を何部というか",a:"定常部",t:"normal"},
+  {id:30532,ch:30,q:"ある抗原に対して獲得免疫の反応がみられない状態を何というか",a:"免疫寛容",t:"normal"},
+  {id:30533,ch:30,q:"免疫寛容の例として、自己の成分に対する反応が抑制されている状態があるが、これを「何の細胞」などに対するものというか",a:"自己の細胞",t:"normal"},
+  {id:30534,ch:30,q:"抗体による病原体の排除において、樹状細胞が提示した抗原を認識し活性化するのは何細胞か",a:"ヘルパーT細胞",t:"normal"},
+  {id:30535,ch:30,q:"活性化したヘルパーT細胞は、同じ抗原を認識した何細胞を活性化させるか",a:"B細胞",t:"normal"},
+  {id:30536,ch:30,q:"活性化されたB細胞は増殖し、何細胞に分化して抗体をつくるか",a:"抗体産生細胞（形質細胞）",t:"normal"},
+  {id:30537,ch:30,q:"抗体が抗原と結合することで病原体はどうなるか",a:"無毒化される",t:"normal"},
+  {id:30538,ch:30,q:"抗体と結合した病原体は、何細胞やNK細胞による排除が促進されるか",a:"食細胞",t:"normal"},
+  {id:30539,ch:30,q:"活性化して増殖したヘルパーT細胞は、感染部位に移動してマクロファージなどの細胞を活性化させる。これを何免疫細胞の活性化というか",a:"自然免疫細胞",t:"normal"},
+  {id:30540,ch:30,q:"キラーT細胞による病原体の排除において、樹状細胞が提示した抗原を認識して活性化・増殖するのは何細胞か",a:"キラーT細胞",t:"normal"},
+  {id:30541,ch:30,q:"活性化したキラーT細胞は、何を特異的に攻撃・破壊するか",a:"感染細胞",t:"normal"},
+  {id:30542,ch:30,q:"自然免疫が効果を現すまでの時間はどれくらいか",a:"数時間",t:"normal"},
+  {id:30543,ch:30,q:"獲得免疫が効果を現すまでの時間はどれくらいか",a:"一週間以上",t:"normal"},
+  {id:30544,ch:30,q:"一度排除した病原体と同じ病原体が再び侵入したときに起こる急速で強い免疫反応を何というか",a:"二次応答",t:"normal"},
+  {id:30545,ch:30,q:"二次応答は、活性化されたB細胞やT細胞の一部が何細胞として体内に残ることで起こるか",a:"記憶細胞",t:"normal"},
+  {id:30546,ch:30,q:"自然免疫には、免疫記憶のしくみがあるか、ないか",a:"ない",t:"normal"},
+  {id:30547,ch:30,q:"別の個体の皮膚や臓器を移植した際に、定着しないで脱落する反応を何というか",a:"拒絶反応",t:"normal"},
+  {id:30548,ch:30,q:"拒絶反応は、移植された細胞に対する抗体がつくられたり、何細胞が活性化されて攻撃したりすることによって起こるか",a:"キラーT細胞",t:"normal"},
+  {id:30549,ch:30,q:"皮膚を移植して脱落した個体に、再度同じ皮膚を移植すると、1回目の移植のときよりも拒絶反応が早く起こるか遅く起こるか",a:"早く起こる",t:"normal"},
+  {id:30550,ch:30,q:"自己の成分に対して免疫反応が起こり、組織の障害や機能異常が起こる疾患を何というか",a:"自己免疫疾患",t:"normal"},
+  {id:30551,ch:30,q:"自己免疫疾患は、何のしくみに異常が生じたことが原因と考えられるか",a:"免疫寛容",t:"normal"},
+  {id:30552,ch:30,q:"自己免疫疾患の例である、関節が攻撃される病気は何か",a:"関節リウマチ",t:"normal"},
+  {id:30553,ch:30,q:"自己免疫疾患の例である、インスリン分泌細胞が攻撃される病気は何か",a:"1型糖尿病",t:"normal"},
+  {id:30554,ch:30,q:"病原体以外の異物に繰り返し接触した際に起こる、異常な獲得免疫の反応を何というか",a:"アレルギー",t:"normal"},
+  {id:30555,ch:30,q:"アレルギーを引き起こす物質を何というか",a:"アレルゲン",t:"normal"},
+  {id:30556,ch:30,q:"アレルゲンが2回目以降に入ったときに、特に激しい症状となる現象を何というか",a:"アナフィラキシーショック",t:"normal"},
+  {id:30557,ch:30,q:"HIVの正式名称（日本語）は何か",a:"ヒト免疫不全ウイルス",t:"normal"},
+  {id:30558,ch:30,q:"HIVが感染し、破壊する細胞は何か",a:"ヘルパーT細胞",t:"normal"},
+  {id:30559,ch:30,q:"HIVの感染により、免疫が機能しなくなり発症する病気は何か",a:"エイズ（後天性免疫不全症候群）",t:"normal"},
+  {id:30560,ch:30,q:"エイズ患者では免疫が低下するため、健康な人なら感染しないような病原体によって何感染症が発症しやすくなるか",a:"日和見感染症",t:"normal"},
+  {id:30561,ch:30,q:"無毒化または弱毒化した病原体や毒素を何というか",a:"ワクチン",t:"normal"},
+  {id:30562,ch:30,q:"ワクチンを接種して記憶細胞を形成させ、病気の予防に役立てることを何というか",a:"予防接種",t:"normal"},
+  {id:30563,ch:30,q:"予防接種は獲得免疫の何応答を利用しているか",a:"二次応答",t:"normal"},
+  {id:30564,ch:30,q:"ウマなどの動物に抗原を注射して抗体を産生させ、その抗体を含む血清を患者に接種する治療法を何というか",a:"血清療法",t:"normal"},
+  {id:30565,ch:30,q:"抗体を医薬品として用いる治療薬を何というか",a:"抗体医薬",t:"normal"},
+  {id:30566,ch:30,q:"異なるヒトの血液を混ぜ合わせたとき、赤血球どうしが集まって塊をつくることを何というか",a:"血液の凝集",t:"normal"},
+  {id:30567,ch:30,q:"赤血球の凝集は、血しょう中に存在する凝集素と、赤血球の表面に存在する何が反応して起こるか",a:"凝集原",t:"normal"},
+  {id:30568,ch:30,q:"ABO式血液型で、赤血球表面の凝集原には何と何の2種類があるか",a:"AとB",t:"normal"},
+  {id:30569,ch:30,q:"ABO式血液型で、血しょう中の凝集素には何抗体と何抗体の2種類があるか",a:"抗A抗体と抗B抗体",t:"normal"},
+  {id:30570,ch:30,q:"抗A抗体をギリシャ文字で何と表すか",a:"α 抗B抗体をギリシャ文字で何と表すか",t:"normal"},
+  {id:30571,ch:30,q:"抗B抗体をギリシャ文字で何と表すか",a:"β",t:"normal"},
+  {id:30572,ch:30,q:"A型の人の赤血球がもつ凝集原は何か",a:"A",t:"normal"},
+  {id:30573,ch:30,q:"A型の人の血しょうがもつ凝集素は何か",a:"抗B抗体（β）",t:"normal"},
+  {id:30574,ch:30,q:"B型の人の赤血球がもつ凝集原は何か",a:"B",t:"normal"},
+  {id:30575,ch:30,q:"B型の人の血しょうがもつ凝集素は何か",a:"抗A抗体（α）",t:"normal"},
+  {id:30576,ch:30,q:"AB型の人の赤血球がもつ凝集原は何か",a:"A、B",t:"normal"},
+  {id:30577,ch:30,q:"AB型の人の血しょうがもつ凝集素は何か",a:"なし",t:"normal"},
+  {id:30578,ch:30,q:"O型の人の赤血球がもつ凝集原は何か",a:"なし",t:"normal"},
+  {id:30579,ch:30,q:"O型の人の血しょうがもつ凝集素は何か",a:"抗A抗体（α）、抗B抗体（β）",t:"normal"},
+  {id:30580,ch:30,q:"A型の凝集原と抗A抗体が混ざると凝集するか、しないか",a:"する",t:"normal"},
+  {id:30581,ch:30,q:"ある場所に生育する植物すべてをまとめて何というか",a:"植生",t:"normal"},
+  {id:30582,ch:30,q:"樹木が密に生えた植生を何というか",a:"森林",t:"normal"},
+  {id:30583,ch:30,q:"森林が成立しない低温・少雨地域に成立する植生を何というか",a:"草原",t:"normal"},
+  {id:30584,ch:30,q:"草原も成立しないような極端に厳しい地域に成立する植生を何というか",a:"荒原",t:"normal"},
+  {id:30585,ch:30,q:"植生の中で個体数が多く、占有する空間も最も大きい植物を何というか",a:"優占種",t:"normal"},
+  {id:30586,ch:30,q:"優占種によって特徴づけられる、植生の外観上の様相を何というか",a:"相観",t:"normal"},
+  {id:30587,ch:30,q:"植物が生活する環境に適応した生活様式を反映した生物の形態を何というか",a:"生活形",t:"normal"},
+  {id:30588,ch:30,q:"植物は土壌に根を張ることで、地上部を支えるとともに、水と何を吸収して生育しているか",a:"栄養塩類",t:"normal"},
+  {id:30589,ch:30,q:"岩石が風化して細かい粒状になったものに、生物由来の有機物が混入してできるものを何というか",a:"土壌",t:"normal"},
+  {id:30590,ch:30,q:"落葉・落枝や動物の遺骸などが分解され、黒褐色に変化した有機物を何というか",a:"腐植",t:"normal"},
+  {id:30591,ch:30,q:"砂や腐植がミミズなどの活動によって塊になった粒状構造を何というか",a:"団粒構造",t:"normal"},
+  {id:30592,ch:30,q:"団粒構造が発達した土壌は、通気性と何性が高いか",a:"保水性",t:"normal"},
+  {id:30593,ch:30,q:"森林で、高さの異なる植物が混在することによってつくられる垂直方向の構造を何というか",a:"階層構造",t:"normal"},
+  {id:30594,ch:30,q:"森林の階層構造で最も高い層を何というか",a:"高木層",t:"normal"},
+  {id:30595,ch:30,q:"高木層の下にあり、高木になりきれない高さの樹木からなる層を何というか",a:"亜高木層",t:"normal"},
+  {id:30596,ch:30,q:"亜高木層の下にあり、さらに低い樹木からなる層を何というか",a:"低木層",t:"normal"},
+  {id:30597,ch:30,q:"低木層の下にあり、シダ植物や草本類からなる層を何というか",a:"草本層",t:"normal"},
+  {id:30598,ch:30,q:"地表面に生えるコケ植物などからなる層を何というか",a:"地表層",t:"normal"},
+  {id:30599,ch:30,q:"高木の枝や葉が見かけ上つながりあって森林の表面をおおっている部分を何というか",a:"林冠",t:"normal"},
+  {id:30600,ch:30,q:"地表に近い下層の部分で、林床植物が生育する場所を何というか",a:"林床",t:"normal"},
+  {id:30601,ch:30,q:"光合成速度は、一定時間に光合成によって吸収される何の量で示されるか",a:"二酸化炭素（CO2）",t:"normal"},
+  {id:30602,ch:30,q:"植物は光合成と同時に何を行っているか",a:"呼吸",t:"normal"},
+  {id:30603,ch:30,q:"見かけの光合成速度は、光合成速度から何を引いたものか",a:"呼吸速度",t:"normal"},
+  {id:30604,ch:30,q:"光合成速度と呼吸速度が等しくなるときの光の強さを何というか",a:"光補償点",t:"normal"},
+  {id:30605,ch:30,q:"光補償点における見かけの光合成速度はいくらか",a:"0",t:"normal"},
+  {id:30606,ch:30,q:"光の強さが増しても光合成速度がそれ以上増加しなくなるときの光の強さを何というか",a:"光飽点（光飽和点）",t:"normal"},
+  {id:30607,ch:30,q:"光飽和点が高い植物で、日なたで成長が速い植物を何というか",a:"陽生植物",t:"normal"},
+  {id:30608,ch:30,q:"光補償点が低く、暗い日陰でも生育できる植物を何というか",a:"陰生植物",t:"normal"},
+  {id:30609,ch:30,q:"光補償点や光飽和点が高い樹木を何というか",a:"陽樹",t:"normal"},
+  {id:30610,ch:30,q:"光補償点や光飽和点が低い樹木を何というか",a:"陰樹",t:"normal"},
+  {id:30611,ch:30,q:"1本の木で、光がよく当たる位置につく葉を何というか",a:"陽葉",t:"normal"},
+  {id:30612,ch:30,q:"1本の木で、光が当たりにくい位置につく葉を何というか",a:"陰葉",t:"normal"},
+  {id:30613,ch:30,q:"陽葉は陰葉に比べて葉面積が大きいか、小さいか",a:"小さい 陽葉は陰葉に比べて葉肉が厚いか、薄いか",t:"normal"},
+  {id:30614,ch:30,q:"陽葉は陰葉に比べて葉肉が厚いか、薄いか",a:"厚い クロマツやススキは陽生植物か、陰生植物か",t:"normal"},
+  {id:30615,ch:30,q:"クロマツやススキは陽生植物か、陰生植物か",a:"陽生植物",t:"normal"},
+  {id:30616,ch:30,q:"ブナやミヤマカタバミは陽生植物か、陰生植物か",a:"陰生植物",t:"normal"},
+  {id:30617,ch:30,q:"植生が長い年月の間に変化していくことを何というか",a:"遷移",t:"normal"},
+  {id:30618,ch:30,q:"裸地からはじまる遷移を何というか",a:"一次遷移",t:"normal"},
+  {id:30619,ch:30,q:"火山活動でできた溶岩地帯などから始まる一次遷移を何遷移というか",a:"乾性遷移",t:"normal"},
+  {id:30620,ch:30,q:"遷移の初期段階で、土壌がない裸地に侵入する植物を何種というか",a:"先駆種（パイオニア種）",t:"normal"},
+  {id:30621,ch:30,q:"乾性遷移の順序において、裸地・荒原の次は何か",a:"草原",t:"normal"},
+  {id:30622,ch:30,q:"乾性遷移の順序において、草原の次は何か",a:"低木林",t:"normal"},
+  {id:30623,ch:30,q:"乾性遷移の順序において、低木林の次は何か",a:"陽樹林",t:"normal"},
+  {id:30624,ch:30,q:"乾性遷移の順序において、陽樹林の次は何か",a:"混交林",t:"normal"},
+  {id:30625,ch:30,q:"乾性遷移の順序において、混交林の次は何か",a:"陰樹林",t:"normal"},
+  {id:30626,ch:30,q:"ススキやイタドリは遷移のどの段階で優占するか",a:"草原",t:"normal"},
+  {id:30627,ch:30,q:"ヌルデ、タニウツギなどは遷移のどの段階で優占するか",a:"低木林",t:"normal"},
+  {id:30628,ch:30,q:"コナラやアカマツは遷移のどの段階で優占するか",a:"陽樹林",t:"normal"},
+  {id:30629,ch:30,q:"シイ、カシ、クスノキなどは遷移のどの段階で優占するか",a:"陰樹林",t:"normal"},
+  {id:30630,ch:30,q:"陽樹林が形成されると林床が暗くなるため、陽生植物よりも何植物が優位に生育するようになるか",a:"陰生植物",t:"normal"},
+  {id:30631,ch:30,q:"遷移の最終段階で、ほとんど構成種の変化がみられなくなった植生を何というか",a:"極相（クライマックス）",t:"normal"},
+  {id:30632,ch:30,q:"湿潤な気候での極相林は何樹林か",a:"陰樹林",t:"normal"},
+  {id:30633,ch:30,q:"森林内の高木が枯れたり倒れたりして、林冠が途切れた空間を何というか",a:"ギャップ",t:"normal"},
+  {id:30634,ch:30,q:"ギャップが大きいと、外部から飛来した何の種子が発芽・成長するか",a:"陽樹",t:"normal"},
+  {id:30635,ch:30,q:"新しくできた湖沼などからはじまる一次遷移を何遷移というか",a:"湿性遷移",t:"normal"},
+  {id:30636,ch:30,q:"湿性遷移の順序において、貧栄養湖の次は何か",a:"富栄養湖",t:"normal"},
+  {id:30637,ch:30,q:"湿性遷移の順序において、富栄養湖の次は何か",a:"湿原",t:"normal"},
+  {id:30638,ch:30,q:"すでに形成されていた植生が破壊された場所でみられる遷移を何というか",a:"二次遷移",t:"normal"},
+  {id:30639,ch:30,q:"二次遷移の進行が一次遷移に比べて速いのは、すでに何が存在しているからか",a:"土壌",t:"normal"},
+  {id:30640,ch:30,q:"二次遷移によってできた森林を何林というか",a:"二次林",t:"normal"},
+  {id:30641,ch:30,q:"植物や動物などの生物が、環境に適応して形成する特徴ある集団を何というか",a:"バイオーム（生物群系）",t:"normal"},
+  {id:30642,ch:30,q:"陸上のバイオームは、主にその地域の何と何によって決定されるか。2つ答えよ",a:"年降水量と年平均気温",t:"normal"},
+  {id:30643,ch:30,q:"極地を除き、木本の生育に十分な降水量があれば極相は何になるか",a:"森林 極端に乾燥した地域では、何が極相となるか",t:"normal"},
+  {id:30644,ch:30,q:"極端に乾燥した地域では、何が極相となるか",a:"荒原（砂漠）",t:"normal"},
+  {id:30645,ch:30,q:"極端に気温が低い地域では、何が極相となるか",a:"荒原（ツンドラ）",t:"normal"},
+  {id:30646,ch:30,q:"熱帯で降水量が多い地域に分布し、巨大な高木など多様な植物がみられるバイオームは何か",a:"熱帯多雨林 熱帯多雨林の代表的な植物を1つ答えよ",t:"normal"},
+  {id:30647,ch:30,q:"熱帯多雨林の代表的な植物を1つ答えよ",a:"フタバガキ",t:"normal"},
+  {id:30648,ch:30,q:"熱帯多雨林よりやや気温が低くなる時期がある地域に分布するバイオームは何か",a:"亜熱帯多雨林",t:"normal"},
+  {id:30649,ch:30,q:"亜熱帯多雨林の代表的な植物を1つ答えよ",a:"アコウ（またはガジュマル、ヘゴ）",t:"normal"},
+  {id:30650,ch:30,q:"雨季と乾季が明瞭な地域に分布し、乾季に落葉する広葉樹が優占するバイオームは何か",a:"雨緑樹林 雨緑樹林の代表的な植物を1つ答えよ",t:"normal"},
+  {id:30651,ch:30,q:"雨緑樹林の代表的な植物を1つ答えよ",a:"チーク",t:"normal"},
+  {id:30652,ch:30,q:"温帯のうち、一年を通して降水量が多い地域に分布し、常緑広葉樹が優占するバイオームは何か",a:"照葉樹林 照葉樹林の代表的な植物を1つ答えよ",t:"normal"},
+  {id:30653,ch:30,q:"照葉樹林の代表的な植物を1つ答えよ",a:"シイ類（またはカシ類、タブノキ、クスノキ）",t:"normal"},
+  {id:30654,ch:30,q:"温帯のうち、夏に乾燥し冬に雨が多い地域に分布し、硬く小さい葉をもつ常緑広葉樹が優占するバイオームは何か",a:"硬葉樹林 硬葉樹林の代表的な植物を1つ答えよ",t:"normal"},
+  {id:30655,ch:30,q:"硬葉樹林の代表的な植物を1つ答えよ",a:"オリーブ（またはコルクガシ）",t:"normal"},
+  {id:30656,ch:30,q:"冷温帯に分布し、冬季に落葉する広葉樹が優占するバイオームは何か",a:"夏緑樹林 夏緑樹林の代表的な植物を1つ答えよ",t:"normal"},
+  {id:30657,ch:30,q:"夏緑樹林の代表的な植物を1つ答えよ",a:"ブナ（またはミズナラ）",t:"normal"},
+  {id:30658,ch:30,q:"亜寒帯や寒帯に分布し、常緑針葉樹が優占するバイオームは何か",a:"針葉樹林 針葉樹林の代表的な植物を1つ答えよ",t:"normal"},
+  {id:30659,ch:30,q:"針葉樹林の代表的な植物を1つ答えよ",a:"モミ類（またはトウヒ類、エゾマツなど）",t:"normal"},
+  {id:30660,ch:30,q:"熱帯の乾季が長い地域に分布し、イネのなかまの草本が優占し、樹木がまばらに生えるバイオームは何か",a:"サバンナ",t:"normal"},
+  {id:30661,ch:30,q:"サバンナに生える代表的な樹木は何か",a:"アカシア",t:"normal"},
+  {id:30662,ch:30,q:"温帯の内陸部で降水量が少ない地域に分布し、イネのなかまの草本が優占するバイオームは何か",a:"ステップ",t:"normal"},
+  {id:30663,ch:30,q:"降水量が極めて少なく、乾燥に強いサボテンなどの多肉植物がまばらに生えるバイオームは何か",a:"砂漠",t:"normal"},
+  {id:30664,ch:30,q:"極端に寒冷で、土壌が未発達な地域に分布し、地衣類やコケ植物が優占するバイオームは何か",a:"ツンドラ",t:"normal"},
+  {id:30665,ch:30,q:"照葉樹林の葉の表面に発達している層を何というか",a:"クチクラ層",t:"normal"},
+  {id:30666,ch:30,q:"熱帯や亜熱帯の河口付近などに生育する森林を何というか",a:"マングローブ",t:"normal"},
+  {id:30667,ch:30,q:"マングローブの植物が発達させている、泥の中でも呼吸ができる組織を何組織というか",a:"通気組織",t:"normal"},
+  {id:30668,ch:30,q:"緯度の違いに伴う水平方向のバイオームの分布を何というか",a:"水平分布",t:"normal"},
+  {id:30669,ch:30,q:"日本の水平分布において、沖縄などの亜熱帯に分布するバイオームは何か",a:"亜熱帯多雨林",t:"normal"},
+  {id:30670,ch:30,q:"日本の水平分布において、九州から関東地方までの暖温帯に分布するバイオームは何か",a:"照葉樹林",t:"normal"},
+  {id:30671,ch:30,q:"日本の水平分布において、東北地方や北海道南部などの冷温帯に分布するバイオームは何か",a:"夏緑樹林",t:"normal"},
+  {id:30672,ch:30,q:"日本の水平分布において、北海道東北部などの亜寒帯に分布するバイオームは何か",a:"針葉樹林",t:"normal"},
+  {id:30673,ch:30,q:"標高の違いに伴うバイオームの分布を何というか",a:"垂直分布",t:"normal"},
+  {id:30674,ch:30,q:"気温は標高が100m高くなるごとに約何度下がるか",a:"0.5〜0.6℃",t:"normal"},
+  {id:30675,ch:30,q:"日本の本州中部の垂直分布で、標高約500mまでの丘陵帯のバイオームは何か",a:"照葉樹林",t:"normal"},
+  {id:30676,ch:30,q:"日本の本州中部の垂直分布で、標高約500〜1500mの山地帯のバイオームは何か",a:"夏緑樹林",t:"normal"},
+  {id:30677,ch:30,q:"日本の本州中部の垂直分布で、標高約1500〜2500mの亜高山帯のバイオームは何か",a:"針葉樹林",t:"normal"},
+  {id:30678,ch:30,q:"日本の本州中部の垂直分布で、標高約2500m以上の高山帯のバイオームは何か",a:"高山草原・高山低木林",t:"normal"},
+  {id:30679,ch:30,q:"高木が森林を形成できなくなる標高の限界を何というか",a:"森林限界",t:"normal"},
+  {id:30680,ch:30,q:"月平均気温が5℃以上の各月について、5℃を引いた値を合計したものを何というか",a:"暖かさの指数",t:"normal"},
+  {id:30681,ch:30,q:"タンパク質や核酸の構成元素として重要なものは何か",a:"窒素",t:"normal"},
+  {id:30682,ch:30,q:"大気中に最も多く含まれる気体は何か",a:"窒素（窒素ガス） 大気中の窒素ガスの割合は約何％か",t:"normal"},
+  {id:30683,ch:30,q:"大気中の窒素ガスの割合は約何％か",a:"約78％ 窒素の元素記号は何か",t:"normal"},
+  {id:30684,ch:30,q:"窒素の元素記号は何か",a:"N",t:"normal"},
+  {id:30685,ch:30,q:"窒素ガスの分子式は何か",a:"N2",t:"normal"},
+  {id:30686,ch:30,q:"大部分の生物は、大気中の窒素ガスを直接利用できるか",a:"できない",t:"normal"},
+  {id:30687,ch:30,q:"植物が根から吸収する窒素は、主にどのような形態か",a:"無機窒素化合物",t:"normal"},
+  {id:30688,ch:30,q:"植物が吸収する無機窒素化合物の代表例（NH4+）は何か",a:"アンモニウムイオン",t:"normal"},
+  {id:30689,ch:30,q:"植物が吸収する無機窒素化合物の代表例（NO3-）は何か",a:"硝酸イオン",t:"normal"},
+  {id:30690,ch:30,q:"アンモニウムイオンの化学式は何か",a:"NH4+",t:"normal"},
+  {id:30691,ch:30,q:"硝酸イオンの化学式は何か",a:"NO3-",t:"normal"},
+  {id:30692,ch:30,q:"植物が吸収した無機窒素化合物から有機窒素化合物を合成する働きを何というか",a:"窒素同化",t:"normal"},
+  {id:30693,ch:30,q:"窒素同化によって作られる代表的な有機物は何か（タから始まるもの）",a:"タンパク質",t:"normal"},
+  {id:30694,ch:30,q:"窒素同化によって作られる代表的な有機物は何か（カから始まるもの）",a:"核酸 動物は自ら窒素同化を行うことができるか",t:"normal"},
+  {id:30695,ch:30,q:"動物は自ら窒素同化を行うことができるか",a:"できない",t:"normal"},
+  {id:30696,ch:30,q:"動物はどのようにして有機窒素化合物を取り込むか",a:"植物や他の動物を食べる（食物連鎖）",t:"desc"},
+  {id:30697,ch:30,q:"動物の体内で、タンパク質が分解されて生じる窒素を含む排出物は何か",a:"尿素（または尿酸、アンモニア）",t:"normal"},
+  {id:30698,ch:30,q:"生物の遺骸や排出物に含まれる窒素は、どのような形態か",a:"有機窒素化合物",t:"normal"},
+  {id:30699,ch:30,q:"遺骸や排出物中の有機窒素化合物を、無機窒素化合物に分解する生物を何というか",a:"分解者",t:"normal"},
+  {id:30700,ch:30,q:"大気中の窒素を直接取り込み、アンモニウムイオンに変える働きを何というか",a:"窒素固定",t:"normal"},
+  {id:30701,ch:30,q:"窒素固定を行う細菌を総称して何というか",a:"窒素固定細菌",t:"normal"},
+  {id:30702,ch:30,q:"窒素固定細菌の例で、土壌中で単独で生活する好気性細菌は何か",a:"アゾトバクター",t:"normal"},
+  {id:30703,ch:30,q:"窒素固定細菌の例で、土壌中で単独で生活する嫌気性細菌は何か",a:"クロストリジウム",t:"normal"},
+  {id:30704,ch:30,q:"窒素固定細菌の例で、光合成を行う真正細菌は何か",a:"シアノバクテリア",t:"normal"},
+  {id:30705,ch:30,q:"窒素固定を行うシアノバクテリアの例を1つ挙げよ",a:"ネンジュモ（またはアナベナ）",t:"normal"},
+  {id:30706,ch:30,q:"マメ科植物の根に共生する窒素固定細菌は何か",a:"根粒菌",t:"normal"},
+  {id:30707,ch:30,q:"根粒菌がマメ科植物の根に作るこぶ状の構造を何というか",a:"根粒",t:"normal"},
+  {id:30708,ch:30,q:"根粒菌とマメ科植物のように、互いに利益を得る関係を何というか",a:"相利共生 根粒菌は植物から何を得ているか",t:"normal"},
+  {id:30709,ch:30,q:"根粒菌は植物から何を得ているか",a:"光合成の産物（有機物）",t:"normal"},
+  {id:30710,ch:30,q:"マメ科植物は根粒菌から何を得ているか",a:"窒素化合物（アンモニウムイオン）",t:"normal"},
+  {id:30711,ch:30,q:"アンモニウムイオンを亜硝酸イオンに変える細菌を何というか",a:"亜硝酸菌",t:"normal"},
+  {id:30712,ch:30,q:"亜硝酸イオンを硝酸イオンに変える細菌を何というか",a:"硝酸菌",t:"normal"},
+  {id:30713,ch:30,q:"亜硝酸菌や硝酸菌をまとめて何というか",a:"硝化菌",t:"normal"},
+  {id:30714,ch:30,q:"アンモニウムイオンが硝酸イオンに変わる過程を何というか",a:"硝化",t:"normal"},
+  {id:30715,ch:30,q:"硝化菌は、何という反応のエネルギーを使って有機物を合成するか",a:"化学反応（酸化反応）",t:"normal"},
+  {id:30716,ch:30,q:"土壌中の硝酸イオンなどが、大気中の窒素ガスに戻る過程を何というか",a:"脱窒",t:"normal"},
+  {id:30717,ch:30,q:"脱窒を行う細菌を何というか",a:"脱窒素細菌",t:"normal"},
+  {id:30718,ch:30,q:"脱窒素細菌は、どのような環境で脱窒を行うか",a:"酸素の少ない土壌中",t:"normal"},
+  {id:30719,ch:30,q:"植物の根に共生し、土壌中のリンや窒素などの吸収を助ける菌類を何というか",a:"菌根菌",t:"normal"},
+  {id:30720,ch:30,q:"菌根菌と植物の根が結合した構造を何というか",a:"菌根 陸上植物の約何％が菌根菌と共生しているか",t:"normal"},
+  {id:30721,ch:30,q:"陸上植物の約何％が菌根菌と共生しているか",a:"約80％（8割）",t:"normal"},
+  {id:30722,ch:30,q:"空中で放電（雷）が起こることで生成される無機窒素化合物は何か",a:"硝酸イオン",t:"normal"},
+  {id:30723,ch:30,q:"人間が工業的に窒素ガスからアンモニアを合成する手法を何というか",a:"ハーバー・ボッシュ法",t:"normal"},
+  {id:30724,ch:30,q:"肥料の過剰な流入により、河川や湖沼の窒素濃度が高くなる現象を何というか",a:"富栄養化",t:"normal"},
+  {id:30725,ch:30,q:"生態系内を循環するものは「物質」だが、一方通行で流れていくものは何か",a:"エネルギー",t:"normal"},
+  {id:30726,ch:30,q:"生態系に入ってくるエネルギーの主な源は何か",a:"太陽光（光エネルギー）",t:"normal"},
+  {id:30727,ch:30,q:"光エネルギーを化学エネルギー（有機物）に変換する生物群は何か",a:"生産者",t:"normal"},
+  {id:30728,ch:30,q:"生産者が合成した有機物は、何を通じて消費者に移動するか",a:"食物連鎖（食性段階）",t:"normal"},
+  {id:30729,ch:30,q:"生物が生命活動のために有機物を分解し、エネルギーを取り出す働きは何か",a:"呼吸",t:"normal"},
+  {id:30730,ch:30,q:"各栄養段階の生物は、呼吸によってエネルギーを何の形で放出するか",a:"熱エネルギー",t:"normal"},
+  {id:30731,ch:30,q:"熱エネルギーは、再び光合成に利用することができるか",a:"できない",t:"normal"},
+  {id:30732,ch:30,q:"熱エネルギーは、最終的にどこへ逃げていくか",a:"宇宙空間",t:"normal"},
+  {id:30733,ch:30,q:"各栄養段階における個体数やエネルギー量を積み上げた図を何というか",a:"生態ピラミッド",t:"normal"},
+  {id:30734,ch:30,q:"高次の消費者へ行くほど、エネルギー量はどうなるか",a:"減少する エネルギー量が上位ほど減少するのはなぜか",t:"normal"},
+  {id:30735,ch:30,q:"エネルギー量が上位ほど減少するのはなぜか",a:"呼吸による熱としての消失や、死滅・不消化のため",t:"desc"},
+  {id:30736,ch:30,q:"食物連鎖が複雑に絡み合った網目状の構造を何というか",a:"食物網",t:"normal"},
+  {id:30737,ch:30,q:"食物網が複雑なほど、生態系のバランスはどうなりやすいか",a:"崩れにくい（安定する）",t:"normal"},
+  {id:30738,ch:30,q:"ある生物が減少しても、別の生物を食べることで維持されることを何というか",a:"代償作用",t:"normal"},
+  {id:30739,ch:30,q:"生態系が攪乱を受けても、元の状態に戻ろうとする力を何というか",a:"復元力（レジリエンス）",t:"normal"},
+  {id:30740,ch:30,q:"河川に流れ込んだ有機物が、沈殿や微生物の分解によって減少する現象を何というか",a:"自然浄化",t:"normal"},
+  {id:30741,ch:30,q:"自然浄化の限界を超えて汚れが溜まることを何というか",a:"水質汚濁",t:"normal"},
+  {id:30742,ch:30,q:"個体数は少ないが、生態系の構造に大きな影響を与える種を何というか",a:"キーストーン種",t:"normal"},
+  {id:30743,ch:30,q:"北米の太平洋岸におけるキーストーン種の代表例は何か",a:"ラッコ",t:"normal"},
+  {id:30744,ch:30,q:"ラッコが捕食することで、増えすぎを抑えられている生物は何か",a:"ウニ",t:"normal"},
+  {id:30745,ch:30,q:"ラッコがいなくなると、ウニによって食い尽くされてしまう海藻は何か",a:"ジャイアントケルプ",t:"normal"},
+  {id:30746,ch:30,q:"ジャイアントケルプの森が消失し、多くの生物がいなくなる現象を何というか",a:"磯焼け キーストーン種の概念を提唱した人物は誰か",t:"normal"},
+  {id:30747,ch:30,q:"キーストーン種の概念を提唱した人物は誰か",a:"ペイン",t:"normal"},
+  {id:30748,ch:30,q:"地球上に多様な環境があり、様々な生物が存在している状態を何というか",a:"生物多様性",t:"normal"},
+  {id:30749,ch:30,q:"生物多様性の3つの階層とは、遺伝子、種、あと1つは何か",a:"生態系（多様性）",t:"normal"},
+  {id:30750,ch:30,q:"同じ種の中でも、個体ごとに遺伝子が異なることによる多様性を何というか",a:"遺伝的多様性",t:"normal"},
+  {id:30751,ch:30,q:"遺伝的多様性が高いと、環境の変化に対して種がどうなりやすいか",a:"絶滅しにくい",t:"normal"},
+  {id:30752,ch:30,q:"ある地域に多種多様な生物種が存在することを何というか",a:"種多様性",t:"normal"},
+  {id:30753,ch:30,q:"森林、草原、河川など、地域ごとに様々な環境が存在することを何というか",a:"生態系多様性",t:"normal"},
+  {id:30754,ch:30,q:"人間が生態系から受ける恩恵を何というか",a:"生態系サービス",t:"normal"},
+  {id:30755,ch:30,q:"生態系サービスのうち、食料や水、木材などを供給する機能を何というか",a:"供給サービス",t:"normal"},
+  {id:30756,ch:30,q:"生態系サービスのうち、気候の調節や水の浄化などを行う機能を何というか",a:"調整サービス",t:"normal"},
+  {id:30757,ch:30,q:"生態系サービスのうち、精神的な充足やレクリエーションを提供する機能を何というか",a:"文化的サービス",t:"normal"},
+  {id:30758,ch:30,q:"生態系サービスのうち、光合成や栄養塩類循環など、全サービスの基礎となる機能を何というか",a:"基盤サービス",t:"normal"},
+  {id:30759,ch:30,q:"人間活動によって絶滅の危機に瀕している種をまとめたリストを何というか",a:"レッドリスト",t:"normal"},
+  {id:30760,ch:30,q:"レッドリストに掲載された種のうち、特に絶滅の恐れがある種を何というか",a:"絶滅危惧種",t:"normal"},
+  {id:30761,ch:30,q:"元々その地域にいなかったが、人間によって持ち込まれた生物を何というか",a:"外来生物（外来種）",t:"normal"},
+  {id:30762,ch:30,q:"外来種のうち、地域の生態系に重大な影響を及ぼす恐れがあるものを何というか",a:"特定外来生物",t:"normal"},
+  {id:30763,ch:30,q:"特定外来生物を規制している法律は何か",a:"外来生物法",t:"normal"},
+  {id:30764,ch:30,q:"特定外来生物の例として挙げられる、北米原産の肉食魚は何か",a:"オオクチバス（ブラックバス）",t:"normal"},
+  {id:30765,ch:30,q:"特定外来生物の例として挙げられる、攻撃性の強いアリは何か",a:"ヒアリ",t:"normal"},
+  {id:30766,ch:30,q:"人間活動により、温室効果ガスの濃度が上昇して起こる現象を何というか",a:"地球温暖化",t:"normal"},
+  {id:30767,ch:30,q:"代表的な温室効果ガスは何か",a:"二酸化炭素（CO2）",t:"normal"},
+  {id:30768,ch:30,q:"地球温暖化により、高山帯の生物はどうなると予想されるか",a:"生息場所を失い絶滅しやすくなる",t:"normal"},
+  {id:30769,ch:30,q:"森林破壊などにより、生息地が細かく分断されることを何というか",a:"生息地の分断化",t:"normal"},
+  {id:30770,ch:30,q:"分断化により、個体群が孤立すると何が低下するか",a:"遺伝的多様性",t:"normal"},
+  {id:30771,ch:30,q:"環境を保全しつつ、将来にわたって資源を利用し続けることができる社会を何というか",a:"持続可能な社会",t:"normal"},
+  {id:30772,ch:30,q:"アゾトバクターの名称の由来となった、窒素を意味するフランス語は何か",a:"アゾト",t:"normal"},
+  {id:30773,ch:30,q:"「アゾト」という言葉の元々の意味は何か",a:"生命がない",t:"normal"},
+  {id:30774,ch:30,q:"大気中の窒素を「固定」するとは、どういう意味か",a:"利用しやすい化合物に変えること",t:"normal"},
+  {id:30775,ch:30,q:"根粒菌は、マメ科植物のどこから侵入するか",a:"根毛",t:"normal"},
+  {id:30776,ch:30,q:"根粒の中で根粒菌が変形した状態を何というか",a:"バクテロイド",t:"normal"},
+  {id:30777,ch:30,q:"根粒が赤く見えるのは、酸素を運ぶ何というタンパク質が含まれるからか",a:"レグヘモグロビン",t:"normal"},
+  {id:30778,ch:30,q:"化学合成細菌は、光エネルギーの代わりに何のエネルギーを利用するか",a:"化学エネルギー",t:"normal"},
+  {id:30779,ch:30,q:"硝化菌が行う硝化は、酸化反応か、還元反応か",a:"酸化反応",t:"normal"},
+  {id:30780,ch:30,q:"脱窒素細菌が行う脱窒は、酸素がないときに行われる何の一種か",a:"呼吸",t:"normal"},
+  {id:30781,ch:30,q:"アンモニウムイオン（NH4+）の「アンモニウム」の語源は何か",a:"アモン神殿（リビアの砂漠）",t:"normal"},
+  {id:30782,ch:30,q:"生態系における「物質」の動きを特徴づける言葉は何か",a:"循環",t:"normal"},
+  {id:30783,ch:30,q:"生態系における「エネルギー」の動きを特徴づける言葉は何か",a:"一方通行（の流れ）",t:"normal"},
+  {id:30784,ch:30,q:"光合成の反応式において、光エネルギーは何エネルギーに変換されるか",a:"化学エネルギー",t:"normal"},
+  {id:30785,ch:30,q:"生産者が呼吸で使うエネルギー量と、成長に使うエネルギー量を合わせたものを何というか",a:"純生産量",t:"normal"},
+  {id:30786,ch:30,q:"消費者が食べたもののうち、消化されずに排出されたものを何というか",a:"不消化排出量",t:"normal"},
+  {id:30787,ch:30,q:"消費者の同化量から呼吸量を引いたものを何というか",a:"生産量",t:"normal"},
+  {id:30788,ch:30,q:"ピラミッドの上位ほど、農薬などの有害物質が濃縮される現象を何というか",a:"生物濃縮",t:"normal"},
+  {id:30789,ch:30,q:"食物網において、1つの種が複数の種を食べることを何というか",a:"多食性",t:"normal"},
+  {id:30790,ch:30,q:"ラッコがいなくなった後の海で、ウニが異常繁殖することを何というか",a:"ウニの爆発的増加",t:"normal"},
+  {id:30791,ch:30,q:"ペインの実験で、ヒトデを取り除いた岩礁海岸では何が優占したか",a:"イガイ（ムラサキイガイ）",t:"normal"},
+  {id:30792,ch:30,q:"ペインの実験により、捕食者がいなくなると全体の種数はどうなったか",a:"減少した（多様性が低下した）",t:"normal"},
+  {id:30793,ch:30,q:"遺伝的多様性が低い個体群は、何という現象により絶滅のリスクが高まるか",a:"近交弱勢（近親交配の影響）",t:"normal"},
+  {id:30794,ch:30,q:"里山のように、人間が適度に介入することで維持される生態系を何というか",a:"二次林（または里山生態系）",t:"normal"},
+  {id:30795,ch:30,q:"マングローブ林が持つ、津波や高潮の被害を和らげるサービスは何か",a:"調整サービス",t:"normal"},
+  {id:30796,ch:30,q:"湿原が持つ、栄養分を吸収して水をきれいにするサービスは何か",a:"調整サービス",t:"normal"},
+  {id:30797,ch:30,q:"外来種による被害の3区分は、生態系への影響、人の生命・身体への影響、あと1つは何か",a:"農林水産業への影響",t:"desc"},
+  {id:30798,ch:30,q:"オオクチバスが放流された池で、激減する生き物の例は何か",a:"在来魚（モツゴなど）",t:"normal"},
+  {id:30799,ch:30,q:"ヒアリが持つ、毒液を出す器官は何か",a:"毒針",t:"normal"},
+  {id:30800,ch:30,q:"温暖化で海面が上昇する原因は、氷河の融解と、海水の何によるものか",a:"熱膨張",t:"normal"},
+  {id:30801,ch:30,q:"二酸化炭素が海水に溶け込むことで、海水の性質がどう変化するか",a:"酸性化（海洋酸性化）",t:"normal"},
+  {id:30802,ch:30,q:"海洋酸性化は、サンゴなどの何という物質の骨格形成を阻害するか",a:"炭酸カルシウム",t:"normal"},
+  {id:30803,ch:30,q:"生息地の分断化を防ぐために、孤立した生息地同士をつなぐ道を何というか",a:"生態回路（コリドー）",t:"normal"},
+  {id:30804,ch:30,q:"国際的に絶滅のおそれのある野生動植物の取引を規制する条約は何か",a:"ワシントン条約",t:"normal"},
+  {id:30805,ch:30,q:"特に水鳥の生息地として重要な湿地を保護する条約は何か",a:"ラムサール条約",t:"normal"},
+  {id:30806,ch:30,q:"生物多様性を包括的に保護することを目的とした条約は何か",a:"生物多様性条約",t:"normal"},
+  {id:30807,ch:30,q:"日本の国立公園などを指定し、自然保護を推進する法律は何か",a:"自然公園法",t:"normal"},
+  {id:30808,ch:30,q:"絶滅のおそれのある野生動植物の種の保存に関する法律の略称は何か",a:"種の保存法",t:"normal"},
+  {id:30809,ch:30,q:"植物が光合成によって二酸化炭素を取り込むことは、何の循環の一部か",a:"炭素循環",t:"normal"},
+  {id:30810,ch:30,q:"炭素循環において、炭素はどのような形で大気中に戻るか",a:"二酸化炭素（CO2）",t:"normal"},
+  {id:30811,ch:30,q:"窒素循環において、土壌から大気へ戻る物質の化学式は何か",a:"N2",t:"normal"},
+  {id:30812,ch:30,q:"窒素循環において、大気から土壌（生物）へ取り込まれる過程は何か",a:"窒素固定",t:"normal"},
+  {id:30813,ch:30,q:"根粒菌の共生により、マメ科植物は肥料の少ない土地でも育つことができるか",a:"できる",t:"normal"},
+  {id:30814,ch:30,q:"菌根菌と共生していない陸上植物は、全体の何％程度か",a:"約20％",t:"normal"},
+  {id:30815,ch:30,q:"エネルギーのピラミッドが逆転することはあるか",a:"ない 個体数ピラミッドが逆転することはあるか",t:"normal"},
+  {id:30816,ch:30,q:"個体数ピラミッドが逆転することはあるか",a:"ある（例：1本の木に多数の昆虫）",t:"normal"},
+  {id:30817,ch:30,q:"生態系のバランスを保つためのキーワード「フィードバック」とは何か",a:"結果が原因に作用して調節すること",t:"normal"},
+  {id:30818,ch:30,q:"水質汚濁によりプランクトンが異常発生し、海が赤っぽくなる現象を何というか",a:"赤潮",t:"normal"},
+  {id:30819,ch:30,q:"赤潮が発生すると、水中の何が不足して魚などが死ぬか",a:"溶存酸素",t:"normal"},
+  {id:30820,ch:30,q:"ラッコの毛皮目的の乱獲は、いつ頃行われたか",a:"18〜19世紀",t:"normal"},
+  {id:30821,ch:30,q:"ラッコの保護が始まったことで、ジャイアントケルプの森はどうなったか",a:"再生した",t:"normal"},
+  {id:30822,ch:30,q:"サンゴ礁は、海洋における「何の熱帯雨林」と呼ばれることがあるか",a:"種の宝庫",t:"normal"},
+  {id:30823,ch:30,q:"日本に生息する外来種（特定外来生物以外も含む）の数は、およそ何種以上か",a:"2000種以上",t:"normal"},
+  {id:30824,ch:30,q:"マングースは、もともと何の駆除のために沖縄などに持ち込まれたか",a:"ハブ",t:"normal"},
+  {id:30825,ch:30,q:"マングースはハブを食べずに、何を食べて問題になったか",a:"ヤンバルクイナなどの希少種",t:"normal"},
+  {id:30826,ch:30,q:"気候変動に関する政府間パネルの略称は何か",a:"IPCC",t:"normal"},
+  {id:30827,ch:30,q:"温室効果ガスの放出を減らす努力を「緩和」というのに対し、変化に備えることを何というか",a:"適応",t:"normal"},
+  {id:30828,ch:30,q:"SDGs（持続可能な開発目標）の目標数はいくつか",a:"17の目標",t:"normal"},
+  {id:30829,ch:30,q:"生物基礎の学習において、生態系を「システム」として捉える視点は重要か",a:"重要である",t:"normal"}
+];
+
+// ══════════════════════════════════════════════
 //  公共 一問一答データ
 // ══════════════════════════════════════════════
 const KOKYOU = [
@@ -8058,6 +9125,308 @@ const PATAN1 = [
   {id:1596,en:'repetitive',ja:'繰り返しの'},
   {id:1597,en:'respiratory',ja:'呼吸器に関する'},
   {id:1598,en:'coherent',ja:'一貫した、筋の通った'},
+  {id:1599,en:'account for ~',ja:'(割合・分量など)を占める、～の理由を説明する'},
+  {id:1600,en:'accuse A of B',ja:'AをBの罪で告訴する、AをBの理由で非難する'},
+  {id:1601,en:'act on ~',ja:'忠告・情報などに従って行動する、～に影響を及ぼす'},
+  {id:1602,en:'act out ~',ja:'物語・経験などを身振りで実演する'},
+  {id:1603,en:'add up to ~',ja:'合計が～になる、結局～ということになる'},
+  {id:1604,en:'adhere to ~',ja:'信念・規則などを順守する、～に固執する'},
+  {id:1605,en:'air out ~',ja:'部屋などを換気する、衣類・寝具などを外気に当てる'},
+  {id:1606,en:'all but',ja:'ほとんど'},
+  {id:1607,en:'allow for ~',ja:'～を考慮に入れる、～を見込む'},
+  {id:1608,en:'answer for ~',ja:'～の責任を負う、～の罰を受ける'},
+  {id:1609,en:'aspire to do ~',ja:'～することを熱望する'},
+  {id:1610,en:'attribute A to B',ja:'AをBのせいと考える'},
+  {id:1611,en:'back down',ja:'撤回する、敗北を認める'},
+  {id:1612,en:'back off',ja:'手を引く、撤回する、後退する'},
+  {id:1613,en:'back up ~',ja:'～を裏付ける、～を支援する'},
+  {id:1614,en:'bank on ~',ja:'～を当てにする'},
+  {id:1615,en:'be committed to ~',ja:'～に献身している'},
+  {id:1616,en:'be destined to do ~',ja:'～する運命である'},
+  {id:1617,en:'be free of ~',ja:'料金・税金などがない、免除されている'},
+  {id:1618,en:'be obsessed with ~',ja:'妄想・固定観念などに取りつかれている'},
+  {id:1619,en:'be subject to ~',ja:'病気などにかかりやすい、影響などを受けやすい'},
+  {id:1620,en:'blast off',ja:'打ち上げられる、発射される'},
+  {id:1621,en:'blow up',ja:'かんかんに怒る、爆発する'},
+  {id:1622,en:'bounce back',ja:'打撃・病気などから回復する、立ち直る'},
+  {id:1623,en:'branch off',ja:'話題が変わる、わき道にそれる'},
+  {id:1624,en:'break away from ~',ja:'伝統・習慣などを断つ、束縛などから逃れる'},
+  {id:1625,en:'break down',ja:'決裂する、失敗する、故障する'},
+  {id:1626,en:'break off ~',ja:'～を中断する、～を急にやめる'},
+  {id:1627,en:'break out',ja:'勃発する、伝染病などが発生する'},
+  {id:1628,en:'bring about ~',ja:'～を引き起こす、～を招く'},
+  {id:1629,en:'bring down ~',ja:'人・政府などを打ち倒す'},
+  {id:1630,en:'bring off ~',ja:'～をやってのける、成し遂げる'},
+  {id:1631,en:'bring on ~',ja:'災い・病気などをもたらす'},
+  {id:1632,en:'bring out ~',ja:'才能・性質などを引き出す、発揮させる'},
+  {id:1633,en:'bump into ~',ja:'～にばったり出会う'},
+  {id:1634,en:'burn out ~',ja:'人を疲れ果てさせる、燃え尽きさせる'},
+  {id:1635,en:'by means of ~',ja:'～を用いて、～によって'},
+  {id:1636,en:'call for ~',ja:'～を必要とする、～を要求する'},
+  {id:1637,en:'call off ~',ja:'～を中止する'},
+  {id:1638,en:'call on ~',ja:'～を訪ねる、人に頼む'},
+  {id:1639,en:'carry away ~',ja:'無我夢中になる、～を持ち去る'},
+  {id:1640,en:'carry through ~',ja:'～を成し遂げる、成就させる'},
+  {id:1641,en:'catch up on ~',ja:'近況などについて新しい情報を知る、遅れを取り戻す'},
+  {id:1642,en:'check off ~',ja:'～にチェックマークをつける'},
+  {id:1643,en:'chip in ~',ja:'金・労力などを出し合う'},
+  {id:1644,en:'clean out ~',ja:'～の中をきれいにする、～を空にする'},
+  {id:1645,en:'clear out ~',ja:'～の中身を出してきれいに片付ける、空にする'},
+  {id:1646,en:'clear up',ja:'誤解などを解く、問題などを解明する、晴れる'},
+  {id:1647,en:'close in',ja:'包囲する、追ってくる'},
+  {id:1648,en:'come after ~',ja:'～の後をつける、～を追跡する'},
+  {id:1649,en:'come before ~',ja:'問題などが法廷などで審議される'},
+  {id:1650,en:'come down to ~',ja:'要するに～ということになる'},
+  {id:1651,en:'come down with ~',ja:'軽い病気にかかる'},
+  {id:1652,en:'come into ~',ja:'～の状態になる'},
+  {id:1653,en:'come off',ja:'結局～になる、行われる'},
+  {id:1654,en:'come through',ja:'要求に応える、伝えられる'},
+  {id:1655,en:'comply with ~',ja:'規則・基準などに従う'},
+  {id:1656,en:'contribute to ~',ja:'～の一因となる、～に寄与する、寄付する'},
+  {id:1657,en:'cope with ~',ja:'～をうまく処理する、～に対処する'},
+  {id:1658,en:'count for ~',ja:'～の価値がある'},
+  {id:1659,en:'count on ~',ja:'～を当てにする'},
+  {id:1660,en:'cover for ~',ja:'～の代わりを務める'},
+  {id:1661,en:'cover up ~',ja:'～の事実を隠す、秘密にする'},
+  {id:1662,en:'crack up',ja:'神経が参る、大笑いする'},
+  {id:1663,en:'cross out ~',ja:'～を線を引いて消す'},
+  {id:1664,en:'cut back on ~',ja:'～を削減する'},
+  {id:1665,en:'cut down on ~',ja:'～を減らす'},
+  {id:1666,en:'cut in on ~',ja:'話などに割り込む、さえぎる'},
+  {id:1667,en:'deal in ~',ja:'商品を商う、仕事などに従事する'},
+  {id:1668,en:'deprive A of B',ja:'AからBを奪う'},
+  {id:1669,en:'die down',ja:'静まる、衰える'},
+  {id:1670,en:'die out',ja:'絶滅する'},
+  {id:1671,en:'dispose of ~',ja:'～を処分する、捨てる'},
+  {id:1672,en:'do away with ~',ja:'～を廃止する、取り除く'},
+  {id:1673,en:'drag on',ja:'会議などがだらだらと長引く'},
+  {id:1674,en:'drag out ~',ja:'～を必要以上に長引かせる'},
+  {id:1675,en:'draw on ~',ja:'技術・経験などに頼る、～を利用する'},
+  {id:1676,en:'draw up ~',ja:'計画を立てる、報告書などを作成する'},
+  {id:1677,en:'dream up ~',ja:'奇抜な考えなどを思いつく'},
+  {id:1678,en:'drive off ~',ja:'～を追い払う'},
+  {id:1679,en:'drive up ~',ja:'価格などを急速に上昇させる'},
+  {id:1680,en:'drop back',ja:'後退する、順位が下がる'},
+  {id:1681,en:'drop out of ~',ja:'活動・集団から身を引く、学校を中途退学する'},
+  {id:1682,en:'ease into ~',ja:'仕事などに徐々に慣れる'},
+  {id:1683,en:'eat up ~',ja:'～を使い果たす、食べ尽くす'},
+  {id:1684,en:'embark on ~',ja:'事業などに乗り出す、着手する'},
+  {id:1685,en:'endear A to B',ja:'AをBに慕わせる'},
+  {id:1686,en:'even up ~',ja:'～を等しくする、均等にする'},
+  {id:1687,en:'face off',ja:'対決する'},
+  {id:1688,en:'fall away',ja:'減少する、弱まる、衰える'},
+  {id:1689,en:'fall back on ~',ja:'～を当てにする'},
+  {id:1690,en:'fall for ~',ja:'うまい話・売り込みなどに乗せられる、強く引きつけられる'},
+  {id:1691,en:'fall off',ja:'数・量が減少する、質が低下する'},
+  {id:1692,en:'fall on ~',ja:'責任・仕事などが～に降りかかる、記念日などが～に当たる'},
+  {id:1693,en:'fall through',ja:'計画などが駄目になる、失敗する'},
+  {id:1694,en:'fall under ~',ja:'影響・監督などを受ける'},
+  {id:1695,en:'feel for ~',ja:'～に同情する、思いやる'},
+  {id:1696,en:'figure out ~',ja:'～を理解する、解決する'},
+  {id:1697,en:'fill out ~',ja:'書類に必要事項を記入する'},
+  {id:1698,en:'fire up ~',ja:'～を始動させる、火をつける'},
+  {id:1699,en:'fit into ~',ja:'～に溶け込む、収まる'},
+  {id:1700,en:'fix up ~',ja:'～を修理する、改装する'},
+  {id:1701,en:'for all ~',ja:'～にもかかわらず、考慮しても'},
+  {id:1702,en:'for the time being',ja:'当分の間、さしあたり'},
+  {id:1703,en:'force down ~',ja:'感情などを抑える'},
+  {id:1704,en:'free up ~',ja:'～を自由化する、解放する'},
+  {id:1705,en:'frown on ~',ja:'～に難色を示す、不賛成の意を表す'},
+  {id:1706,en:'gear up ~',ja:'準備をする'},
+  {id:1707,en:'get around ~',ja:'あちこち動き回る、～をうまく避ける'},
+  {id:1708,en:'get around to doing ~',ja:'～をする余裕ができる'},
+  {id:1709,en:'get away with ~',ja:'～を罰などを受けずにうまくやる'},
+  {id:1710,en:'get by ~',ja:'何とかやっていく、通り抜ける'},
+  {id:1711,en:'get down to ~',ja:'～に本気で取りかかる'},
+  {id:1712,en:'get in on ~',ja:'～に参加する、加わる'},
+  {id:1713,en:'get into ~',ja:'本・映画・音楽などに夢中になる'},
+  {id:1714,en:'get on with ~',ja:'仕事などを続ける、人とうまくやっていく'},
+  {id:1715,en:'give away ~',ja:'秘密・答えなどをばらす、ただで与える'},
+  {id:1716,en:'give in to ~',ja:'～に降参する、屈する'},
+  {id:1717,en:'give off ~',ja:'光・音・においなどを発する'},
+  {id:1718,en:'give A over to B',ja:'AをBに預ける、引き渡す'},
+  {id:1719,en:'give rise to ~',ja:'～の原因となる'},
+  {id:1720,en:'go back on ~',ja:'約束などを破る'},
+  {id:1721,en:'go for ~',ja:'～を選ぶ'},
+  {id:1722,en:'grow into ~',ja:'成長して服などを着られるようになる'},
+  {id:1723,en:'grow on ~',ja:'人の気にいるようになる'},
+  {id:1724,en:'grow out of ~',ja:'成長して行為・習慣などから脱する'},
+  {id:1725,en:'hand down ~',ja:'伝統・慣習などを後世に伝える'},
+  {id:1726,en:'hand off ~',ja:'～を任せる、引き渡す'},
+  {id:1727,en:'hand out A to B',ja:'BにAを配る'},
+  {id:1728,en:'hang around ~',ja:'～をぶらつく、うろつく'},
+  {id:1729,en:'hang on',ja:'少し待つ、電話を切らずにおく'},
+  {id:1730,en:'hang up ~',ja:'電話を切る'},
+  {id:1731,en:'head off ~',ja:'～を阻止する、出かける'},
+  {id:1732,en:'head out',ja:'出かける、立ち去る'},
+  {id:1733,en:'hold back ~',ja:'～を抑えておく'},
+  {id:1734,en:'hold off ~',ja:'～を引き延ばす、延期する'},
+  {id:1735,en:'hold out ~',ja:'敵・逆境・圧力などにもちこたえる'},
+  {id:1736,en:'hold over ~',ja:'続映される、～を延期する'},
+  {id:1737,en:'in a row',ja:'連続で'},
+  {id:1738,en:'in favor of ~',ja:'～に賛成して、支持して'},
+  {id:1739,en:'in response to ~',ja:'～に応えて、応じて'},
+  {id:1740,en:'in terms of ~',ja:'～の観点から'},
+  {id:1741,en:'in the event of ~',ja:'万一～の場合には'},
+  {id:1742,en:'in vain',ja:'無駄に、効果なく'},
+  {id:1743,en:'jump at ~',ja:'～にすぐ飛びつく'},
+  {id:1744,en:'keep track of ~',ja:'人の動向・情勢などに注意している'},
+  {id:1745,en:'keep up with ~',ja:'時勢・流行・仕事などに遅れずについていく'},
+  {id:1746,en:'kick around ~',ja:'計画・提案などをあれこれ検討する'},
+  {id:1747,en:'kick in',ja:'薬などが効き始める、機能し始める'},
+  {id:1748,en:'kick off A',ja:'Aを開始する'},
+  {id:1749,en:'kick A out of B',ja:'BからAを追い出す'},
+  {id:1750,en:'knock down ~',ja:'～を取り壊す、殴り倒す'},
+  {id:1751,en:'lay into ~',ja:'～を厳しく非難する、攻撃する'},
+  {id:1752,en:'lay off ~',ja:'一時的にまたは永久に～を解雇する'},
+  {id:1753,en:'leave off ~',ja:'～をやめる'},
+  {id:1754,en:'let alone ~',ja:'まして～、～は言うまでもなく'},
+  {id:1755,en:'let down ~',ja:'～を失望させる、期待を裏切る'},
+  {id:1756,en:'let out ~',ja:'声などを出す、感情を表す'},
+  {id:1757,en:'let up',ja:'手を緩める、弱まる、やむ'},
+  {id:1758,en:'level off',ja:'横ばいになる、安定する'},
+  {id:1759,en:'lift off',ja:'飛行機などが離陸する'},
+  {id:1760,en:'live up to ~',ja:'期待などに応える、規範などに従って行動する'},
+  {id:1761,en:'lock in ~',ja:'～を固定する、閉じ込める'},
+  {id:1762,en:'look down on ~',ja:'～を見下す、軽蔑する'},
+  {id:1763,en:'make ends meet',ja:'収支を合わせて収入内でやりくりする'},
+  {id:1764,en:'make do with ~',ja:'あり合わせのもので済ます'},
+  {id:1765,en:'make it',ja:'間に合う、成功する、出席できる'},
+  {id:1766,en:'make out ~',ja:'～を理解する、うまくやる'},
+  {id:1767,en:'make over ~',ja:'～を作り変える、変身させる'},
+  {id:1768,en:'mark down ~',ja:'～を値下げする、書き留める'},
+  {id:1769,en:'mark out ~',ja:'線などで～を区画する'},
+  {id:1770,en:'miss out on ~',ja:'機会・好機などを逸する'},
+  {id:1771,en:'narrow down ~',ja:'範囲などを制限する、狭くする'},
+  {id:1772,en:'on a ~ basis',ja:'～の基準で、原則で'},
+  {id:1773,en:'on behalf of A',ja:'Aを代表して、Aに代わって'},
+  {id:1774,en:'on the contrary',ja:'それどころか、まるで反対で'},
+  {id:1775,en:'on the spot',ja:'その場で、即座に'},
+  {id:1776,en:'on the verge of ~',ja:'～の間際で'},
+  {id:1777,en:'over the hump',ja:'難局を脱して、峠を越して'},
+  {id:1778,en:'owing to ~',ja:'～のために、理由で'},
+  {id:1779,en:'pack up',ja:'持ち物をまとめる、荷造りする'},
+  {id:1780,en:'pass for ~',ja:'～で通る、見なされる'},
+  {id:1781,en:'pass off A as B',ja:'AをBだと偽る'},
+  {id:1782,en:'pass A on to B',ja:'AをBに伝える'},
+  {id:1783,en:'pass out',ja:'気絶する'},
+  {id:1784,en:'pay off ~',ja:'借金などを全部支払う'},
+  {id:1785,en:'phase out ~',ja:'～を段階的に廃止する'},
+  {id:1786,en:'pick over ~',ja:'～を念入りに調べて選ぶ'},
+  {id:1787,en:'pick through ~',ja:'～の中をくまなく探す'},
+  {id:1788,en:'pile up',ja:'仕事・借金などがどんどんたまる'},
+  {id:1789,en:'pin down ~',ja:'～を押さえつける、動けなくする'},
+  {id:1790,en:'play down ~',ja:'～を重要でないように見せようとする'},
+  {id:1791,en:'play out ~',ja:'物事・状況が展開する'},
+  {id:1792,en:'play up ~',ja:'～を誇張する、強調する'},
+  {id:1793,en:'point to ~',ja:'状況・証拠などが～を示す'},
+  {id:1794,en:'pull back ~',ja:'後退する、～を後退させる'},
+  {id:1795,en:'pull in ~',ja:'観客・客などを引きつける'},
+  {id:1796,en:'pull off ~',ja:'困難なことをやってのける'},
+  {id:1797,en:'pull through ~',ja:'病気・苦境などを切り抜ける'},
+  {id:1798,en:'push for ~',ja:'～を要求する、得ようと努める'},
+  {id:1799,en:'push through ~',ja:'議案などを通す、突き進む'},
+  {id:1800,en:'put down ~',ja:'金額を手付金として払う、書き留める'},
+  {id:1801,en:'put forth ~',ja:'力などを発揮する'},
+  {id:1802,en:'put in ~',ja:'設備などを備え付ける、金・時間などをつぎ込む'},
+  {id:1803,en:'put A through to B',ja:'Aの電話をBにつなぐ'},
+  {id:1804,en:'read off ~',ja:'リストなどを読み上げる'},
+  {id:1805,en:'refrain from doing ~',ja:'～するのを控える'},
+  {id:1806,en:'regardless of ~',ja:'～にかかわらず'},
+  {id:1807,en:'roll in ~',ja:'金などがたくさんある、転がり込む'},
+  {id:1808,en:'roll up ~',ja:'～をくるくると巻く、そでをまくり上げる'},
+  {id:1809,en:'round off ~',ja:'～を締めくくる、うまく終える'},
+  {id:1810,en:'round up ~',ja:'散らばった人などを集める、逮捕する'},
+  {id:1811,en:'rule out ~',ja:'～を排除する、除外する'},
+  {id:1812,en:'run against ~',ja:'～に不利になる'},
+  {id:1813,en:'run down ~',ja:'車・運転手が～をひく、悪く言う'},
+  {id:1814,en:'run through ~',ja:'ざっと～に目を通す'},
+  {id:1815,en:'scoop up ~',ja:'～を抱き上げる、すくい上げる'},
+  {id:1816,en:'scratch out ~',ja:'～を削除する'},
+  {id:1817,en:'see about ~',ja:'～を検討する、手配する'},
+  {id:1818,en:'see A off',ja:'空港・駅などでAを見送る'},
+  {id:1819,en:'see through ~',ja:'～を見抜く、見破る'},
+  {id:1820,en:'sell out',ja:'期待を裏切る、ものが売り切れる'},
+  {id:1821,en:'send for ~',ja:'人・助けなどを呼ぶ'},
+  {id:1822,en:'send out for ~',ja:'食べ物の出前を頼む'},
+  {id:1823,en:'set aside ~',ja:'時間・金などをとっておく'},
+  {id:1824,en:'set down ~',ja:'～を書き留める'},
+  {id:1825,en:'set in',ja:'季節・流行・好ましくないものなどが始まる'},
+  {id:1826,en:'set off ~',ja:'出発する、～を引き起こす'},
+  {id:1827,en:'set out to do ~',ja:'～することに着手する'},
+  {id:1828,en:'set up ~',ja:'会合などを準備する、設置する'},
+  {id:1829,en:'settle down',ja:'ゆったりとくつろぐ、落ち着く、定住する'},
+  {id:1830,en:'settle up with ~',ja:'～と精算する、勘定を支払う'},
+  {id:1831,en:'shake up ~',ja:'～を刷新する、動揺させる'},
+  {id:1832,en:'show off ~',ja:'いいところを見せる、見せびらかす'},
+  {id:1833,en:'show up',ja:'現れる、やってくる'},
+  {id:1834,en:'sign up for ~',ja:'署名して～に参加する'},
+  {id:1835,en:'single out ~',ja:'～を特に選び出す'},
+  {id:1836,en:'sink in',ja:'十分に理解される、分かってもらう'},
+  {id:1837,en:'sit back',ja:'何もしないでいる、くつろぐ'},
+  {id:1838,en:'sit by',ja:'悪い事態を黙って見ている、傍観する'},
+  {id:1839,en:'sit in',ja:'参加する、見学する、代理を務める'},
+  {id:1840,en:'skim over ~',ja:'～をざっと見る'},
+  {id:1841,en:'slip by',ja:'時・機会がいつの間にか過ぎる'},
+  {id:1842,en:'smooth over ~',ja:'問題・困難などを処理しやすくする'},
+  {id:1843,en:'speak for ~',ja:'～を代表して意見を述べる、代弁する'},
+  {id:1844,en:'split up ~',ja:'別れる、分裂する、分裂させる'},
+  {id:1845,en:'spring from ~',ja:'～から生じる'},
+  {id:1846,en:'spring up',ja:'急に生まれる、急成長する'},
+  {id:1847,en:'stand down',ja:'公職などを辞任する'},
+  {id:1848,en:'stand for ~',ja:'～の略である、意味する、支持する'},
+  {id:1849,en:'stand up to ~',ja:'～に抵抗する、立ち向かう'},
+  {id:1850,en:'stay off ~',ja:'健康のため～を控える'},
+  {id:1851,en:'step down',ja:'辞任する'},
+  {id:1852,en:'stick around',ja:'そこらで待つ、帰らずにいる'},
+  {id:1853,en:'stick to ~',ja:'主義などを堅持する、やり続ける'},
+  {id:1854,en:'stick up for ~',ja:'～をあくまでも擁護する'},
+  {id:1855,en:'stick with ~',ja:'～を最後までやり抜く'},
+  {id:1856,en:'stir up ~',ja:'騒ぎなどを引き起こす、想像力などをかき立てる'},
+  {id:1857,en:'sum up ~',ja:'～を要約する'},
+  {id:1858,en:'take in ~',ja:'～を摂取する、光景などを観察する、だます'},
+  {id:1859,en:'take on ~',ja:'きつい仕事・責任を引き受ける'},
+  {id:1860,en:'take over ~',ja:'～を引き継ぐ、買収する'},
+  {id:1861,en:'take up ~',ja:'～を趣味として始める'},
+  {id:1862,en:'talk down to A',ja:'Aを見下した調子で話す'},
+  {id:1863,en:'talk A into doing ~',ja:'Aを説得して～させる'},
+  {id:1864,en:'talk up ~',ja:'人・ものを実際以上に面白いもののように話す'},
+  {id:1865,en:'tear down ~',ja:'～を取り壊す'},
+  {id:1866,en:'tell on ~',ja:'特に子供が～のことを告げ口する、こたえる'},
+  {id:1867,en:'the other way around',ja:'方角・事情などが逆に'},
+  {id:1868,en:'throw off ~',ja:'衣服などをさっと脱ぐ、払いのける'},
+  {id:1869,en:'throw up ~',ja:'嘔吐する、食べ物を吐く'},
+  {id:1870,en:'tidy up ~',ja:'部屋・家・机などを片付ける'},
+  {id:1871,en:'tie up ~',ja:'忙しくて身動きできない、固く縛る'},
+  {id:1872,en:'tip over ~',ja:'ひっくり返る、倒れる'},
+  {id:1873,en:'touch up ~',ja:'絵・文章・化粧などを手直しする'},
+  {id:1874,en:'track down ~',ja:'～を追跡して捕らえる'},
+  {id:1875,en:'trip up A',ja:'Aをつまずかせる、しくじる'},
+  {id:1876,en:'try out ~',ja:'～を試してみる'},
+  {id:1877,en:'tune in to ~',ja:'テレビ・ラジオのチャンネルを合わせる'},
+  {id:1878,en:'tune up ~',ja:'楽器を調律する、エンジンなどを整備する'},
+  {id:1879,en:'turn around ~',ja:'商売・経済などを好転させる'},
+  {id:1880,en:'turn away ~',ja:'～を追い払う、入場を断る'},
+  {id:1881,en:'turn in ~',ja:'～を提出する、寝る'},
+  {id:1882,en:'turn out',ja:'であることがわかる、集まる'},
+  {id:1883,en:'turn to ~',ja:'～に頼る、犯罪・悪習などに走る'},
+  {id:1884,en:'walk off with ~',ja:'～を盗む、賞などをあっさり手に入れる'},
+  {id:1885,en:'wander off',ja:'はぐれる、主題から脱線する'},
+  {id:1886,en:'want for ~',ja:'～を欠いている'},
+  {id:1887,en:'wash away ~',ja:'～を洗い流す、記憶・感情などを洗い去る'},
+  {id:1888,en:'wash down ~',ja:'食べ物などを流し込む、洗い流す'},
+  {id:1889,en:'watch over ~',ja:'～の世話をする、見守る'},
+  {id:1890,en:'wear off',ja:'薬効・印象・痛みなどがしだいに弱まる'},
+  {id:1891,en:'wear out ~',ja:'～を疲れ果てさせる'},
+  {id:1892,en:'weigh on ~',ja:'～に重くのしかかる、苦しめる'},
+  {id:1893,en:'win over ~',ja:'～を説得する'},
+  {id:1894,en:'wipe out ~',ja:'～を消滅させる、撲滅する'},
+  {id:1895,en:'work out ~',ja:'計画・対策などを練る、問題を解決する'},
+  {id:1896,en:'wrap up ~',ja:'仕事・交渉などを滞りなく終える'},
+  {id:1897,en:'put toward ~',ja:'～を提案する、提出する'},
+  {id:1898,en:'stir in ~',ja:'～を入れてかき混ぜる'},
+  {id:1899,en:'tale on ~',ja:'特にきつい仕事・責任を引き受ける'},
+  {id:1900,en:'carry on ~',ja:'（仕事など）を続ける、続行する'},
 ];
 
 
@@ -8067,6 +9436,7 @@ const PATAN1 = [
 const DECKS = [
   {
     id: 'yumetan',
+    subject:'英語',
     name: '赤ユメタン',
     tag: 'yumetan',
     sub: '英単語 1000語',
@@ -8075,6 +9445,7 @@ const DECKS = [
   },
   {
     id: 'yumetan2',
+    subject:'英語',
     name: '青ユメタン',
     tag: 'yumetan2',
     sub: '英単語 1000語',
@@ -8083,6 +9454,7 @@ const DECKS = [
   },
   {
     id: 'nextstage',
+    subject:'英語',
     name: 'ネクステ基本イディオム',
     tag: 'nextstage',
     sub: '基本イディオム 70',
@@ -8091,6 +9463,7 @@ const DECKS = [
   },
   {
     id: 'kogo',
+    subject:'国語',
     name: '古文単語',
     tag: 'kogo',
     sub: typeof KOGO !== 'undefined' ? `古文単語 ${KOGO.length}語` : '古文単語（準備中）',
@@ -8099,6 +9472,7 @@ const DECKS = [
   },
   {
     id: 'patan1',
+    subject:'英語',
     name: 'パス単準1級',
     tag: 'patan1',
     sub: typeof PATAN1 !== 'undefined' ? `パス単準1級 ${PATAN1.length}語` : 'パス単準1級',
@@ -8107,6 +9481,7 @@ const DECKS = [
   },
   {
     id: 'jp-hist',
+    subject:'社会',
     name: '日本史',
     tag: 'jp-hist',
     sub: `日本史 一問一答 ${QDALL.length}問`,
@@ -8114,7 +9489,17 @@ const DECKS = [
     items: QDALL.map(i => ({ id:i.id, ch:i.ch, q:i.q, a:i.a, type:i.t, set:i.set||false, img:i.img||false })),
   },
   {
+    id: 'biology',
+    subject:'理科',
+    name: '生物基礎',
+    tag: 'biology',
+    sub: typeof BIOLOGY !== 'undefined' ? `生物基礎 ${BIOLOGY.length}問` : '生物基礎',
+    type: 'kokyou',
+    items: (typeof BIOLOGY !== 'undefined' ? BIOLOGY : []).map(i => ({ id:i.id, ch:i.ch, q:i.q, a:i.a, type:i.t })),
+  },
+  {
     id: 'kokyou',
+    subject:'社会',
     name: '公共',
     tag: 'kokyou',
     sub: `公共 一問一答 ${KOKYOU.length}問`,
@@ -8139,6 +9524,10 @@ const JP_CHAPTERS = [
 // 公共は全問 ch:20 なので「全問まとめて」1章として扱う
 const KOKYOU_CHAPTERS = [
   { id:20, name:'全範囲' },
+];
+// 生物基礎は全問 ch:30 なので「全問まとめて」1章として扱う
+const BIOLOGY_CHAPTERS = [
+  { id:30, name:'全範囲' },
 ];
 
 
@@ -8172,6 +9561,190 @@ function emptyState() {
 //  XP / LEVEL システム
 // ══════════════════════════════════════════════
 const MAX_LEVEL = 50;
+
+// ══════════════════════════════════════════════
+//  総合レベル (GLOBAL LEVEL)  必要XP = 50×(L-1)²
+// ══════════════════════════════════════════════
+const GLOBAL_KEY = 'lexis_global_v1';
+let globalSt = { xp:0 };
+
+function xpForNextGlobal(lv) { return 50 * lv * lv; } // lv→lv+1
+function totalXpForGlobal(lv) {
+  let t=0; for(let i=1;i<lv;i++) t+=xpForNextGlobal(i); return t;
+}
+function getGlobalLv(xp) {
+  let lv=1;
+  while(true){ if(xp < totalXpForGlobal(lv+1)) break; lv++; if(lv>=9999)break; }
+  return lv;
+}
+function saveGlobal(){ try{localStorage.setItem(GLOBAL_KEY,JSON.stringify(globalSt));}catch(e){} }
+function loadGlobal(){
+  try{const d=localStorage.getItem(GLOBAL_KEY); if(d) globalSt={...globalSt,...JSON.parse(d)};}catch(e){}
+  // ── XP引継ぎ：初回ロード時に全デッキの累計XPを総合XPに反映 ──
+  // GLOBAL_KEYが未存在（初回）または migrated フラグがない場合のみ実行
+  if (!globalSt.migrated) {
+    let totalDeckXp = 0;
+    DECKS.forEach(d => {
+      const st = stateMap[d.id];
+      if (st && st.xp) totalDeckXp += st.xp;
+    });
+    // 既存のglobalSt.xpより大きければ上書き（古いglobalStがあっても正しい値に修正）
+    if (totalDeckXp > (globalSt.xp || 0)) {
+      globalSt.xp = totalDeckXp;
+    }
+    globalSt.migrated = true;
+    saveGlobal();
+  }
+}
+function addGlobalXp(xp){
+  const prev = getGlobalLv(globalSt.xp||0);
+  globalSt.xp = (globalSt.xp||0)+xp;
+  saveGlobal();
+  updateGlobalLvBar();
+  const next = getGlobalLv(globalSt.xp);
+  if(next > prev) showGlobalLvUp(next);
+}
+function updateGlobalLvBar(){
+  const xp  = globalSt.xp||0;
+  const lv  = getGlobalLv(xp);
+  const cur = xp - totalXpForGlobal(lv);
+  const need= xpForNextGlobal(lv);
+  const pct = need>0 ? Math.min(100, cur/need*100) : 100;
+  const badge = document.getElementById('g-lv-badge');
+  const bar   = document.getElementById('g-lv-bar');
+  const label = document.getElementById('g-lv-label');
+  if(badge) badge.textContent = 'Lv.'+lv;
+  if(bar)   bar.style.width   = pct+'%';
+  if(label) label.textContent = cur+' / '+need+' XP';
+}
+
+// ── グローバルLvUp演出：全画面フラッシュ ──
+let _gLvupTimer=null;
+function showGlobalLvUp(newLv){
+  const ov  = document.getElementById('g-lvup-overlay');
+  const num = document.getElementById('g-lvup-num');
+  const sub = document.getElementById('g-lvup-sub');
+  if(!ov) return;
+  if(num) num.textContent = newLv;
+  if(sub) sub.textContent = 'LEVEL '+newLv+' REACHED';
+  ov.classList.add('flash');
+  setTimeout(()=>ov.classList.add('show'),10);
+  if(_gLvupTimer) clearTimeout(_gLvupTimer);
+  _gLvupTimer = setTimeout(closeGlobalLvUp, 4000);
+}
+function closeGlobalLvUp(){
+  const ov=document.getElementById('g-lvup-overlay');
+  if(ov){ ov.classList.remove('show'); setTimeout(()=>ov.classList.remove('flash'),350); }
+  if(_gLvupTimer) clearTimeout(_gLvupTimer);
+}
+
+// ── デッキLvUp演出：コンパクトポップアップ ──
+let _dLvupTimer=null;
+function showDeckLvUp(newLv, deckName, xpGained){
+  const popup = document.getElementById('deck-lvup-popup');
+  const lvEl  = document.getElementById('deck-lvup-lv');
+  const nameEl= document.getElementById('deck-lvup-name');
+  const xpEl  = document.getElementById('deck-lvup-xp');
+  if(!popup) return;
+  if(lvEl)   lvEl.textContent   = newLv;
+  if(nameEl) nameEl.textContent = deckName;
+  if(xpEl)   xpEl.textContent   = '+'+xpGained+' XP';
+  popup.classList.add('show');
+  if(_dLvupTimer) clearTimeout(_dLvupTimer);
+  _dLvupTimer = setTimeout(closeDeckLvUp, 2800);
+}
+function closeDeckLvUp(){
+  const popup=document.getElementById('deck-lvup-popup');
+  if(popup) popup.classList.remove('show');
+  if(_dLvupTimer) clearTimeout(_dLvupTimer);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  設定システム
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const SETTINGS_KEY = 'lexis_settings_v1';
+const PRESETS = {
+  pc:     { qsize:36, uisize:13, pad:24 },
+  tablet: { qsize:28, uisize:13, pad:18 },
+  phone:  { qsize:22, uisize:12, pad:12 },
+};
+let settings = { qsize:36, uisize:13, pad:24, autonext:false };
+
+function loadSettings(){
+  try{ const d=localStorage.getItem(SETTINGS_KEY); if(d) settings={...settings,...JSON.parse(d)}; }catch(e){}
+  _applySettingsToDOM();
+}
+function saveSettings(){ try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}catch(e){} }
+
+function _applySettingsToDOM(){
+  const r=document.documentElement.style;
+  r.setProperty('--q-font-size', settings.qsize+'px');
+  // ui font: カード・ボタン等の基底フォントサイズを変える
+  // main, .card, .nb などに fontSize を適用
+  document.querySelectorAll('.nb').forEach(el=>el.style.fontSize=settings.uisize+'px');
+  document.querySelectorAll('.card-label').forEach(el=>el.style.fontSize=Math.max(9,settings.uisize-4)+'px');
+  document.querySelectorAll('.card').forEach(el=>el.style.padding=settings.pad+'px');
+}
+
+function applySettings(){
+  const gv = id => document.getElementById(id);
+  settings.qsize   = +(gv('set-qsize')?.value   || 36);
+  settings.uisize  = +(gv('set-uisize')?.value  || 13);
+  settings.pad     = +(gv('set-pad')?.value      || 24);
+  settings.autonext= gv('set-autonext')?.checked || false;
+  if(gv('set-qsize-v'))  gv('set-qsize-v').textContent  = settings.qsize;
+  if(gv('set-uisize-v')) gv('set-uisize-v').textContent = settings.uisize;
+  if(gv('set-pad-v'))    gv('set-pad-v').textContent    = settings.pad;
+  _applySettingsToDOM();
+  saveSettings();
+}
+
+function applyPreset(name){
+  const p=PRESETS[name]; if(!p) return;
+  Object.assign(settings, p);
+  const gv = id => document.getElementById(id);
+  if(gv('set-qsize'))   { gv('set-qsize').value  = p.qsize;  gv('set-qsize-v').textContent  = p.qsize; }
+  if(gv('set-uisize'))  { gv('set-uisize').value = p.uisize; gv('set-uisize-v').textContent = p.uisize; }
+  if(gv('set-pad'))     { gv('set-pad').value     = p.pad;   gv('set-pad-v').textContent    = p.pad; }
+  _applySettingsToDOM();
+  saveSettings();
+}
+
+function openSettings(){
+  const gv = id => document.getElementById(id);
+  if(gv('set-qsize'))   { gv('set-qsize').value  = settings.qsize;  gv('set-qsize-v').textContent  = settings.qsize; }
+  if(gv('set-uisize'))  { gv('set-uisize').value = settings.uisize; gv('set-uisize-v').textContent = settings.uisize; }
+  if(gv('set-pad'))     { gv('set-pad').value     = settings.pad;   gv('set-pad-v').textContent    = settings.pad; }
+  if(gv('set-autonext')) gv('set-autonext').checked = settings.autonext;
+  document.getElementById('settings-overlay').classList.add('show');
+}
+function closeSettings(){ document.getElementById('settings-overlay').classList.remove('show'); }
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  デッキLVカード（ホーム表示）
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function renderDeckLvCard(){
+  const wrap = document.getElementById('home-deck-lv-card');
+  if(!wrap) return;
+  const deck = getDeck();
+  const st   = getState();
+  if(!st) return;
+  const savedId = currentDeckId;
+  const xp   = st.xp||0;
+  const lv   = getLevelFromXpByDeck(xp, deck.id);
+  const cur  = xp - totalXpForLevelByDeck(lv, deck.id);
+  const need = lv>=MAX_LEVEL ? 0 : xpForNextLevelByDeck(lv, deck.id);
+  const pct  = need>0 ? Math.min(100, cur/need*100) : 100;
+  wrap.innerHTML = `
+    <div class="deck-lv-card">
+      <div class="deck-lv-num">Lv.${lv}${lv>=MAX_LEVEL?'<span style="font-size:14px;color:var(--warn);margin-left:4px;">MAX</span>':''}</div>
+      <div class="deck-lv-info">
+        <div class="deck-lv-name">${deck.name} // デッキレベル</div>
+        <div class="deck-lv-bar-bg"><div class="deck-lv-bar-fill" style="width:${pct}%"></div></div>
+        <div class="deck-lv-xp">${lv>=MAX_LEVEL?'MAX LEVEL REACHED':cur+' / '+need+' XP'}</div>
+      </div>
+    </div>`;
+}
 
 // デッキIDからXP計算が青チャート式か判定
 function isChartDeckId(deckId) {
@@ -8499,11 +10072,9 @@ function isMissionUnlocked(deckId, requireLv) {
 
 // レベルキャップ付きのXP加算
 function addXpCapped(state, deckId, xp) {
-  const prevDeck = currentDeckId;
-  // XP計算のために一時的にdeckIdを設定
   const savedDeck = currentDeckId;
   currentDeckId = deckId;
-  // 40・50にキャップがある場合は超えさせない（チャートはキャップなし）
+  const oldLv = getLevelFromXp(state.xp || 0);
   let newXp = (state.xp || 0) + xp;
   if (!isChartDeckId(deckId)) {
     for (const capLv of [30, 40, 50]) {
@@ -8515,9 +10086,16 @@ function addXpCapped(state, deckId, xp) {
     }
   }
   state.xp = newXp;
-  const result = getLevelFromXp(state.xp);
+  const newLv = getLevelFromXp(state.xp);
   currentDeckId = savedDeck;
-  return result;
+  // デッキレベルアップ演出
+  if (newLv > oldLv && newLv <= MAX_LEVEL) {
+    const deckObj = DECKS.find(d => d.id === deckId);
+    showDeckLvUp(newLv, deckObj ? deckObj.name : deckId, xp);
+  }
+  // 総合XPにも同量を加算
+  addGlobalXp(xp);
+  return newLv;
 }
 
 function renderMissions() {
@@ -8599,21 +10177,75 @@ function migrateOldData() {
 }
 
 // ── DECK SWITCHER ──
+// 現在開いている教科タブ
+let activeSubject = null;
+
 function renderDeckBar() {
-  const bar = document.getElementById('deck-bar');
-  bar.innerHTML = '<span class="deck-bar-label">DECK</span>';
-  DECKS.forEach(deck => {
-    const btn = document.createElement('button');
-    btn.className = 'deck-btn' + (deck.id === currentDeckId ? ' on' : '');
-    const countBadge = `<span class="deck-tag ${deck.tag}">${deck.items.length}</span>`;
-    btn.innerHTML = `${deck.name} ${countBadge}`;
-    btn.onclick = () => switchDeck(deck.id);
-    bar.appendChild(btn);
+  const tabBar  = document.getElementById('subject-tab-bar');
+  const panelWrap = document.getElementById('deck-panel-wrap');
+  if (!tabBar || !panelWrap) return;
+  tabBar.innerHTML = '';
+  panelWrap.innerHTML = '';
+
+  const ORDER = ['英語','国語','理科','社会'];
+  const groups = {};
+  DECKS.forEach(d => {
+    const s = d.subject || 'その他';
+    if (!groups[s]) groups[s] = [];
+    groups[s].push(d);
+  });
+  const subjList = ORDER.filter(s => groups[s])
+    .concat(Object.keys(groups).filter(s => !ORDER.includes(s)));
+
+  // 現在のデッキが属する教科をデフォルトで開く
+  const curSubj = DECKS.find(d => d.id === currentDeckId)?.subject || subjList[0];
+  if (!activeSubject || !groups[activeSubject]) activeSubject = curSubj;
+
+  subjList.forEach(subj => {
+    // タブボタン
+    const tab = document.createElement('button');
+    tab.className = 'subject-tab' + (subj === activeSubject ? ' on' : '');
+    tab.textContent = subj;
+    tab.onclick = () => toggleSubjectTab(subj);
+    tabBar.appendChild(tab);
+
+    // デッキパネル
+    const panel = document.createElement('div');
+    panel.className = 'deck-panel' + (subj === activeSubject ? ' on' : '');
+    panel.dataset.subject = subj;
+    groups[subj].forEach(deck => {
+      const btn = document.createElement('button');
+      btn.className = 'deck-btn' + (deck.id === currentDeckId ? ' on' : '');
+      btn.innerHTML = `${deck.name} <span class="deck-tag ${deck.tag}">${deck.items.length}</span>`;
+      btn.onclick = () => { switchDeck(deck.id); };
+      panel.appendChild(btn);
+    });
+    panelWrap.appendChild(panel);
+  });
+}
+
+function toggleSubjectTab(subj) {
+  if (activeSubject === subj) {
+    // 同じタブを押したら閉じる
+    activeSubject = null;
+  } else {
+    activeSubject = subj;
+  }
+  // タブのon更新
+  document.querySelectorAll('.subject-tab').forEach(t => {
+    t.classList.toggle('on', t.textContent === activeSubject);
+  });
+  // パネルのon更新
+  document.querySelectorAll('.deck-panel').forEach(p => {
+    p.classList.toggle('on', p.dataset.subject === activeSubject);
   });
 }
 
 function switchDeck(deckId) {
   currentDeckId = deckId;
+  // 選択したデッキの教科をactiveSubjectに
+  const selDeck = getDeck();
+  if (selDeck?.subject) activeSubject = selDeck.subject;
   const deck = getDeck();
   document.getElementById('logo-sub').textContent = deck.sub;
   const pgSub = document.getElementById('test-pg-sub');
@@ -8628,9 +10260,12 @@ function switchDeck(deckId) {
   // 日本史フィルターUI切り替え
   const isJp = deck.type === 'jphist' || deck.type === 'kokyou';
   document.getElementById('jphist-filters').style.display = isJp ? '' : 'none';
-  // 公共はタイプフィルター不要なので非表示
+  // タイプフィルターの表示制御
   const typeFilterEl = document.querySelector('#jphist-filters .card:last-child');
-  if (typeFilterEl) typeFilterEl.style.display = deck.type === 'kokyou' ? 'none' : '';
+  if (typeFilterEl) typeFilterEl.style.display = '';  // 常に表示
+  // 年号問題ボタンは日本史のみ表示
+  const yearBtn = document.querySelector('.jphist-type-btn[data-type="year"]');
+  if (yearBtn) yearBtn.style.display = deck.type === 'jphist' ? '' : 'none';
   if (isJp) { jphistChapters = new Set(); renderJphistFilters(); }
   // 現在のビューを再描画
   const views = ['home','ranking','words','history','data'];
@@ -8718,7 +10353,10 @@ let jphistTypes    = new Set(['normal','year','desc']); // 全タイプON
 function getAvailableChapters() {
   const deck = getDeck();
   const ids = new Set(deck.items.map(i => i.ch));
-  const chapterList = deck.type === 'kokyou' ? KOKYOU_CHAPTERS : JP_CHAPTERS;
+  let chapterList;
+  if (deck.type === 'kokyou' && deck.id === 'biology') chapterList = BIOLOGY_CHAPTERS;
+  else if (deck.type === 'kokyou') chapterList = KOKYOU_CHAPTERS;
+  else chapterList = JP_CHAPTERS;
   return chapterList.filter(c => ids.has(c.id));
 }
 
@@ -8757,11 +10395,8 @@ function toggleJphistType(type, btn) {
 
 function getJphistPool() {
   const deck = getDeck();
-  if (deck.type === 'kokyou') {
-    // 公共は全問 normal なので type フィルター不要
-    return deck.items.filter(i => jphistChapters.has(i.ch));
-  }
-  return deck.items.filter(i => jphistChapters.has(i.ch) && jphistTypes.has(i.type));
+  // 全タイプ（kokyou・biology含む）でtypeフィルターを適用
+  return deck.items.filter(i => jphistChapters.has(i.ch) && jphistTypes.has(i.type || 'normal'));
 }
 
 function updateSetupInfo() {
@@ -8919,8 +10554,9 @@ function renderQuestion() {
   const xpPatternBadge = isFlashMode()
     ? ' <span class="q-mode-tag" style="font-size:9px;background:rgba(63,221,138,.1);color:var(--success);border:1px solid rgba(63,221,138,.3)">🃏フラッシュ</span>'
     : ' <span class="q-mode-tag" style="font-size:9px;background:rgba(79,142,247,.1);color:var(--accent);border:1px solid rgba(79,142,247,.3)">📝記述</span>';
-  const qtypeBadge = ((deck.type==='jphist'||deck.type==='kokyou') && q.type==='year') ? ' <span class="q-mode-tag range" style="font-size:9px">📅年号</span>'
-                   : ((deck.type==='jphist'||deck.type==='kokyou') && q.type==='desc') ? ' <span class="q-mode-tag" style="font-size:9px;background:rgba(180,100,255,.15);color:#c97fff;border:1px solid rgba(180,100,255,.3)">📖記述</span>'
+  const _isQA = deck.type==='jphist'||deck.type==='kokyou';
+  const qtypeBadge = (_isQA && q.type==='year') ? ' <span class="q-mode-tag range" style="font-size:9px">📅年号</span>'
+                   : (q.type==='desc') ? ' <span class="q-mode-tag" style="font-size:9px;background:rgba(180,100,255,.15);color:#c97fff;border:1px solid rgba(180,100,255,.3)">📖記述</span>'
                    : (q.set) ? ' <span class="q-mode-tag" style="font-size:9px;background:rgba(100,200,255,.1);color:#7bd;border:1px solid rgba(100,200,255,.3)">🔀順不同</span>'
                    : '';
   document.getElementById('q-mode-tag-wrap').innerHTML =
@@ -9094,7 +10730,7 @@ function fcAnswer(isOk) {
     const rect = card.getBoundingClientRect();
     showXpPopup(xpEarned, rect.left + rect.width / 2, rect.top + 20);
     if (newLv > oldLv && newLv <= MAX_LEVEL) showLevelUp(newLv, xpEarned);
-    updateXpBar();
+    updateGlobalLvBar();
     // カードを緑フラッシュ
     card.style.transition = 'box-shadow .2s';
     card.style.boxShadow = '0 0 0 3px var(--success)';
@@ -9238,7 +10874,7 @@ function submitAnswer() {
     showXpPopup(xpEarned, rect.left + rect.width / 2, rect.top);
     // レベルアップ
     if (newLv > oldLv && newLv <= MAX_LEVEL) showLevelUp(newLv, xpEarned);
-    updateXpBar();
+    updateGlobalLvBar();
   } else {
     testState.streak = 0;
     state.mistakes[q.a] = (state.mistakes[q.a]||0) + 1;
@@ -9305,7 +10941,7 @@ function showResult() {
 
   state.history.unshift({ date:new Date().toISOString(), mode:testState.mode, total, correct, wrong:testState.wrong.map(w=>w.a) });
   if (state.history.length > 100) state.history = state.history.slice(0,100);
-  saveState(); updateXpBar();
+  saveState(); updateGlobalLvBar();
 
   const ul = document.getElementById('res-wrong-list');
   ul.innerHTML='';
@@ -9519,6 +11155,12 @@ function nukeAllData() {
   showToast('全データを削除しました','s');
 }
 
+function dismissResetBanner() {
+  const banner = document.getElementById('home-reset-banner');
+  if (banner) banner.innerHTML = '';
+  try { sessionStorage.setItem('reset_dismissed_' + currentDeckId, '1'); } catch(e){}
+}
+
 function quickReset() {
   stateMap[currentDeckId] = emptyState();
   saveState(); updateHeaderStats(); renderHome();
@@ -9538,20 +11180,26 @@ function renderHome() {
     ...Object.keys(state.lastSeen)
   ].filter(k => !currentAns.has(k));
   const resetBanner = document.getElementById('home-reset-banner');
-  if (oldKeys.length > 0 && state.totalAsked > 0 && Object.keys(state.lastSeen).filter(k => currentAns.has(k)).length === 0) {
+  let _dismissed = false;
+  try { _dismissed = !!sessionStorage.getItem('reset_dismissed_' + currentDeckId); } catch(e){}
+  if (!_dismissed && oldKeys.length > 0 && state.totalAsked > 0 && Object.keys(state.lastSeen).filter(k => currentAns.has(k)).length === 0) {
     resetBanner.innerHTML = `
       <div class="stale-banner" style="border-color:rgba(255,178,48,.35);background:rgba(255,178,48,.07);margin-bottom:12px;">
         <div class="sb-ico">⚠️</div>
         <div class="sb-text">
           <div class="sb-title" style="color:var(--warn)">以前のデータの記録が残っています</div>
-          <div class="sb-sub">データが入れ替わったため、古い学習記録をリセットしてください。</div>
+          <div class="sb-sub">古い学習記録をリセットするか、非表示にできます。</div>
         </div>
-        <button class="btn btn-outline" style="border-color:rgba(255,178,48,.5);color:var(--warn);white-space:nowrap;" onclick="quickReset()">今すぐリセット</button>
+        <div style="display:flex;gap:8px;flex-shrink:0;">
+          <button class="btn btn-ghost" style="border:1px solid rgba(255,178,48,.3);color:var(--muted);white-space:nowrap;" onclick="dismissResetBanner()">非表示</button>
+          <button class="btn btn-outline" style="border-color:rgba(255,178,48,.5);color:var(--warn);white-space:nowrap;" onclick="quickReset()">リセット</button>
+        </div>
       </div>`;
   } else {
     resetBanner.innerHTML = '';
   }
 
+  renderDeckLvCard();
   const staleCount=getStaleItems(STALE_DEFAULT_DAYS).length;
   const banner=document.getElementById('home-stale-banner');
   banner.innerHTML = staleCount>0 ? `
@@ -9791,7 +11439,7 @@ function refreshExport() {
 }
 
 function updateHeaderStats() {
-  updateXpBar();
+  updateGlobalLvBar();
   const deck = getDeck();
   const state = getState();
   document.getElementById('hs-total').textContent = state.totalAsked;
@@ -9884,7 +11532,7 @@ function setChartGrade(book, num, grade) {
       showXpPopup(xpEarned, rect.right - 60, rect.top);
     }
     if (newLv > oldLv && newLv <= MAX_LEVEL) showLevelUp(newLv, xpEarned);
-    updateXpBar();
+    updateGlobalLvBar();
   }
   startChartCooldown();
 }
@@ -10197,7 +11845,7 @@ function setChartGradeDeck(book, num, grade) {
       showXpPopup(xpEarned, rect.right - 60, rect.top);
     }
     if (newLv > oldLv && newLv <= MAX_LEVEL) showLevelUp(newLv, xpEarned);
-    updateXpBar();
+    updateGlobalLvBar();
   }
   startChartCooldown();
 }
@@ -10241,6 +11889,8 @@ function renderChartStatsDeck() {
 // ── INIT ──
 migrateOldData();
 loadState();
+loadGlobal();
+loadSettings();
 renderDeckBar();
 (function() {
   const deck = getDeck();
@@ -10249,6 +11899,7 @@ renderDeckBar();
   document.getElementById('range-start').max = deck.items.length;
 })();
 updateHeaderStats();
+updateGlobalLvBar();
 updateSetupInfo();
 applyDefaultInputMode();
 ['range-start','range-end','q-count','stale-days','sq-count','vq-count'].forEach(id=>{
