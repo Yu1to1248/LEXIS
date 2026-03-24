@@ -546,6 +546,90 @@ body::before {
   .header-stats { gap:14px; }
 }
 
+/* ── テスト前モード ── */
+.exam-card {
+  border-radius:14px; padding:18px 20px; margin-bottom:12px;
+  border:1px solid var(--border); background:var(--surface);
+  position:relative; overflow:hidden;
+}
+.exam-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg,var(--danger),var(--warn));
+}
+.exam-card-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.exam-name { font-size:15px; font-weight:700; color:var(--text); }
+.exam-date-row { font-size:11px; color:var(--muted); font-family:var(--font-mono); margin-top:2px; }
+.exam-countdown {
+  text-align:right; flex-shrink:0;
+}
+.exam-days-n {
+  font-family:'Bebas Neue',sans-serif; font-size:38px; line-height:1;
+  color:var(--danger);
+}
+.exam-days-n.safe { color:var(--warn); }
+.exam-days-n.ok   { color:var(--success); }
+.exam-days-l { font-size:9px; color:var(--muted); font-family:var(--font-mono); letter-spacing:1px; }
+.exam-progress-wrap { margin-bottom:12px; }
+.exam-progress-bar { height:5px; background:rgba(255,255,255,.08); border-radius:3px; overflow:hidden; margin-bottom:4px; }
+.exam-progress-fill { height:5px; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:3px; transition:width .6s; }
+.exam-progress-label { font-size:10px; color:var(--muted); font-family:var(--font-mono); display:flex; justify-content:space-between; }
+.exam-today-box {
+  background:rgba(79,142,247,.08); border:1px solid rgba(79,142,247,.2);
+  border-radius:10px; padding:10px 14px;
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  margin-bottom:10px;
+}
+.exam-today-label { font-size:11px; color:var(--muted); font-family:var(--font-mono); }
+.exam-today-n { font-family:'Bebas Neue',sans-serif; font-size:28px; color:var(--accent); line-height:1; }
+.exam-today-unit { font-size:10px; color:var(--muted); font-family:var(--font-mono); }
+.exam-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.exam-delete-btn {
+  background:none; border:none; color:rgba(255,255,255,.2);
+  font-size:16px; cursor:pointer; padding:4px; line-height:1;
+  transition:color .2s; position:absolute; top:12px; right:14px;
+}
+.exam-delete-btn:hover { color:var(--danger); }
+
+/* ホームのテスト前バナー */
+.exam-home-banner {
+  border-radius:14px; padding:16px 18px; margin-bottom:16px;
+  background:linear-gradient(135deg,rgba(255,79,106,.07),rgba(255,178,48,.05));
+  border:1px solid rgba(255,79,106,.25);
+  cursor:pointer; transition:border-color .2s;
+}
+.exam-home-banner:hover { border-color:rgba(255,79,106,.5); }
+.exam-home-banner-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.exam-home-name { font-size:13px; font-weight:700; color:var(--text); }
+.exam-home-days { font-family:'Bebas Neue',sans-serif; font-size:22px; color:var(--danger); line-height:1; }
+.exam-home-days.safe { color:var(--warn); }
+.exam-home-days.ok   { color:var(--success); }
+.exam-home-progress { height:3px; background:rgba(255,255,255,.08); border-radius:2px; overflow:hidden; margin-bottom:6px; }
+.exam-home-fill { height:3px; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:2px; transition:width .6s; }
+.exam-home-meta { font-size:10px; color:var(--muted); font-family:var(--font-mono); display:flex; justify-content:space-between; }
+.exam-home-today { font-size:11px; color:var(--accent); font-family:var(--font-mono); font-weight:700; }
+
+/* テスト前設定フォーム */
+.exam-form { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:18px; margin-bottom:16px; }
+.exam-form-title { font-size:11px; color:var(--muted); font-family:var(--font-mono); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:14px; }
+.exam-form-row { margin-bottom:12px; }
+.exam-form-label { font-size:10px; color:var(--muted); font-family:var(--font-mono); letter-spacing:1px; text-transform:uppercase; margin-bottom:6px; }
+.exam-form-input {
+  width:100%; background:var(--bg); border:1px solid var(--border);
+  border-radius:7px; padding:9px 12px; color:var(--text);
+  font-family:var(--font-ja); font-size:14px; transition:border-color .2s;
+}
+.exam-form-input:focus { outline:none; border-color:var(--accent); }
+.exam-deck-select { display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
+.exam-deck-opt {
+  padding:5px 12px; border-radius:20px; border:1px solid var(--border);
+  background:none; color:var(--muted); font-family:var(--font-ja); font-size:11px;
+  cursor:pointer; transition:all .2s; white-space:nowrap;
+}
+.exam-deck-opt.on { background:rgba(79,142,247,.12); border-color:rgba(79,142,247,.5); color:var(--accent); font-weight:700; }
+.exam-range-row { display:flex; gap:8px; align-items:center; }
+.exam-range-row input { flex:1; }
+.exam-range-sep { color:var(--muted); font-size:12px; flex-shrink:0; }
+
 </style>
 </head>
 <body>
@@ -692,6 +776,7 @@ body::before {
   <button class="nb"     id="nb-ranking" onclick="goView('ranking')">🏆 苦手TOP100</button>
   <button class="nb"     id="nb-words"   onclick="goView('words')">📚 単語一覧</button>
   <button class="nb"     id="nb-history" onclick="goView('history')">📅 学習履歴</button>
+  <button class="nb"     id="nb-exam"    onclick="goView('exam')">🗓️ テスト前</button>
   <button class="nb"     id="nb-data"    onclick="goView('data')">💾 データ管理</button>
 </nav>
 
@@ -702,6 +787,7 @@ body::before {
   <div class="pg-title">DASHBOARD</div>
   <div class="pg-sub">// 学習状況の概要</div>
   <div id="home-reset-banner"></div>
+  <div id="home-exam-banner"></div>
   <div id="home-stale-banner"></div>
   <div id="home-deck-lv-card"></div>
   <div class="mode-grid">
@@ -1012,6 +1098,55 @@ body::before {
     <div class="empty" id="hist-empty">
       <div class="empty-ico">📅</div>
       <div class="empty-msg">学習履歴がありません。<br>テストを受けると自動で記録されます。</div>
+    </div>
+  </div>
+</div>
+
+<!-- EXAM -->
+<div class="view" id="view-exam">
+  <div class="pg-title">EXAM</div>
+  <div class="pg-sub">// テスト前モード</div>
+
+  <!-- 登録済みテストリスト -->
+  <div id="exam-list"></div>
+
+  <!-- 新規追加フォーム -->
+  <div class="exam-form" id="exam-add-form">
+    <div class="exam-form-title">// 新しいテストを登録</div>
+
+    <div class="exam-form-row">
+      <div class="exam-form-label">テスト名</div>
+      <input class="exam-form-input" type="text" id="ef-name" placeholder="例：英語期末テスト">
+    </div>
+
+    <div class="exam-form-row">
+      <div class="exam-form-label">試験日</div>
+      <input class="exam-form-input" type="date" id="ef-date">
+    </div>
+
+    <div class="exam-form-row">
+      <div class="exam-form-label">単語帳</div>
+      <div class="exam-deck-select" id="ef-deck-select"></div>
+    </div>
+
+    <div class="exam-form-row" id="ef-range-wrap">
+      <div class="exam-form-label">出題範囲（ID番号）</div>
+      <div class="exam-range-row">
+        <input class="exam-form-input" type="number" id="ef-range-start" placeholder="開始" min="1">
+        <span class="exam-range-sep">〜</span>
+        <input class="exam-form-input" type="number" id="ef-range-end" placeholder="終了" min="1">
+      </div>
+      <div style="font-size:10px;color:var(--muted);font-family:var(--font-mono);margin-top:4px;" id="ef-range-hint"></div>
+    </div>
+
+    <div class="exam-form-row">
+      <div class="exam-form-label">1日の目標（問）</div>
+      <input class="exam-form-input" type="number" id="ef-daily" value="20" min="1" max="200" placeholder="20">
+      <div style="font-size:10px;color:var(--muted);font-family:var(--font-mono);margin-top:4px;">空欄にすると自動計算します</div>
+    </div>
+
+    <div class="btn-row" style="margin-top:16px;">
+      <button class="btn btn-primary" onclick="addExam()">登録する</button>
     </div>
   </div>
 </div>
@@ -10175,6 +10310,249 @@ function renderMissions() {
 
 
 
+// ══════════════════════════════════════════════
+//  テスト前モード
+// ══════════════════════════════════════════════
+const EXAM_KEY = 'lexis_exams_v1';
+let exams = []; // [{id, name, date, deckId, rangeStart, rangeEnd, dailyGoal, createdAt}]
+
+function loadExams() {
+  try {
+    const d = localStorage.getItem(EXAM_KEY);
+    if (d) exams = JSON.parse(d);
+  } catch(e) { exams = []; }
+}
+
+function saveExams() {
+  try { localStorage.setItem(EXAM_KEY, JSON.stringify(exams)); } catch(e) {}
+}
+
+// 試験までの残り日数
+function examDaysLeft(dateStr) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const exam  = new Date(dateStr); exam.setHours(0,0,0,0);
+  return Math.ceil((exam - today) / 86400000);
+}
+
+// 範囲内の全アイテム数・習得済み数を計算
+function examStats(ex) {
+  const deck = DECKS.find(d => d.id === ex.deckId);
+  if (!deck) return null;
+  const st = stateMap[ex.deckId];
+  if (!st) return null;
+
+  const s = ex.rangeStart || 1;
+  const e = ex.rangeEnd   || deck.items.length;
+  const items = deck.items.filter(w => w.id >= s && w.id <= e);
+  const total = items.length;
+
+  // 正解済み（corrects > 0）を習得とみなす
+  const done = items.filter(w => (st.corrects[w.key||w.a] || 0) > 0).length;
+  const remaining = total - done;
+  return { total, done, remaining };
+}
+
+// 1日の推奨出題数を計算
+function calcDailyTarget(ex) {
+  const days = examDaysLeft(ex.date);
+  if (days <= 0) return 0;
+  const stats = examStats(ex);
+  if (!stats) return ex.dailyGoal || 20;
+
+  if (ex.dailyGoal) return ex.dailyGoal; // 手動設定があれば優先
+
+  // 残り語数 ÷ 残り日数（最低1）
+  return Math.max(1, Math.ceil(stats.remaining / days));
+}
+
+function addExam() {
+  const name  = document.getElementById('ef-name')?.value.trim();
+  const date  = document.getElementById('ef-date')?.value;
+  const deckId= _examSelectedDeck;
+  const rs    = +document.getElementById('ef-range-start')?.value || 1;
+  const deck  = DECKS.find(d => d.id === deckId);
+  const re    = +document.getElementById('ef-range-end')?.value || (deck ? deck.items.length : 100);
+  const daily = +document.getElementById('ef-daily')?.value || 0; // 0=自動
+
+  if (!name)   { showToast('テスト名を入力してください', 'e'); return; }
+  if (!date)   { showToast('試験日を選択してください', 'e'); return; }
+  if (!deckId) { showToast('単語帳を選択してください', 'e'); return; }
+
+  const exam = {
+    id: Date.now().toString(),
+    name, date, deckId,
+    rangeStart: rs,
+    rangeEnd:   re,
+    dailyGoal:  daily || 0,
+    createdAt: new Date().toISOString(),
+  };
+  exams.push(exam);
+  saveExams();
+  // フォームリセット
+  document.getElementById('ef-name').value = '';
+  document.getElementById('ef-date').value = '';
+  document.getElementById('ef-daily').value = '20';
+  _examSelectedDeck = null;
+  renderExamView();
+  showToast('テストを登録しました', 's');
+}
+
+function deleteExam(id) {
+  exams = exams.filter(e => e.id !== id);
+  saveExams();
+  renderExamView();
+  renderHomeExamBanner();
+}
+
+let _examSelectedDeck = null;
+
+function renderExamView() {
+  // デッキ選択ボタン生成
+  const sel = document.getElementById('ef-deck-select');
+  if (sel) {
+    sel.innerHTML = '';
+    DECKS.forEach(d => {
+      const btn = document.createElement('button');
+      btn.className = 'exam-deck-opt' + (d.id === _examSelectedDeck ? ' on' : '');
+      btn.textContent = d.name;
+      btn.onclick = () => {
+        _examSelectedDeck = d.id;
+        // 範囲の最大値を更新
+        const deckObj = DECKS.find(dk => dk.id === d.id);
+        if (deckObj) {
+          const eInput = document.getElementById('ef-range-end');
+          if (eInput && !eInput.value) eInput.value = deckObj.items.length;
+          eInput.max = deckObj.items.length;
+          document.getElementById('ef-range-start').max = deckObj.items.length;
+          document.getElementById('ef-range-hint').textContent =
+            `この単語帳は id:1 〜 ${deckObj.items.length}`;
+        }
+        renderExamView();
+      };
+      sel.appendChild(btn);
+    });
+  }
+
+  // 登録済みテストを描画
+  const list = document.getElementById('exam-list');
+  if (!list) return;
+  list.innerHTML = '';
+
+  if (!exams.length) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:12px;font-family:var(--font-mono);padding:12px 0 20px;">登録されたテストはありません</div>';
+    return;
+  }
+
+  // 日付順にソート
+  const sorted = [...exams].sort((a,b) => new Date(a.date) - new Date(b.date));
+
+  sorted.forEach(ex => {
+    const days   = examDaysLeft(ex.date);
+    const stats  = examStats(ex);
+    const daily  = calcDailyTarget(ex);
+    const deck   = DECKS.find(d => d.id === ex.deckId);
+    const pct    = stats ? Math.round((stats.done / stats.total) * 100) : 0;
+    const daysClass = days <= 3 ? '' : days <= 7 ? 'safe' : 'ok';
+    const dateStr = new Date(ex.date).toLocaleDateString('ja-JP',{month:'long',day:'numeric',weekday:'short'});
+    const statusTxt = days < 0 ? '試験終了' : days === 0 ? '今日が試験日！' : `あと ${days} 日`;
+
+    const card = document.createElement('div');
+    card.className = 'exam-card';
+    card.innerHTML = `
+      <button class="exam-delete-btn" onclick="deleteExam('${ex.id}')" title="削除">✕</button>
+      <div class="exam-card-head">
+        <div>
+          <div class="exam-name">${ex.name}</div>
+          <div class="exam-date-row">📅 ${dateStr}　${deck ? '📚 ' + deck.name : ''}　🔢 id:${ex.rangeStart}〜${ex.rangeEnd}</div>
+        </div>
+        <div class="exam-countdown">
+          <div class="exam-days-n ${daysClass}">${days < 0 ? '終了' : days}</div>
+          <div class="exam-days-l">${days < 0 ? '' : days === 0 ? '今日！' : 'DAYS LEFT'}</div>
+        </div>
+      </div>
+      ${stats ? `
+      <div class="exam-progress-wrap">
+        <div class="exam-progress-bar"><div class="exam-progress-fill" style="width:${pct}%"></div></div>
+        <div class="exam-progress-label">
+          <span>習得済み ${stats.done} / ${stats.total} 語</span>
+          <span>${pct}%</span>
+        </div>
+      </div>
+      ${days > 0 ? `
+      <div class="exam-today-box">
+        <div>
+          <div class="exam-today-label">今日の目標</div>
+          <div class="exam-today-unit">残り ${stats.remaining} 語 ÷ ${days} 日</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="exam-today-n">${daily}</div>
+          <div class="exam-today-unit">問 / 日</div>
+        </div>
+      </div>` : ''}` : ''}
+      <div class="exam-actions">
+        ${days > 0 && deck ? `<button class="btn btn-primary" style="font-size:12px;padding:8px 16px;" onclick="startExamTest('${ex.id}')">今日の分をテストする →</button>` : ''}
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+// テスト前モードからテストを開始
+function startExamTest(examId) {
+  const ex = exams.find(e => e.id === examId);
+  if (!ex) return;
+  // デッキ切り替え
+  switchDeck(ex.deckId);
+  // 範囲設定
+  document.getElementById('range-start').value = ex.rangeStart;
+  document.getElementById('range-end').value   = ex.rangeEnd;
+  // 出題数設定
+  const daily = calcDailyTarget(ex);
+  document.getElementById('q-count').value = daily;
+  // テストビューへ
+  goView('test');
+  setMode('range');
+  showToast(`${ex.name}のテストを開始します`, 's');
+}
+
+// ホームのテスト前バナーを描画
+function renderHomeExamBanner() {
+  const wrap = document.getElementById('home-exam-banner');
+  if (!wrap) return;
+  if (!exams.length) { wrap.innerHTML = ''; return; }
+
+  // 最も近いテスト
+  const upcoming = [...exams]
+    .filter(e => examDaysLeft(e.date) >= 0)
+    .sort((a,b) => new Date(a.date) - new Date(b.date));
+
+  if (!upcoming.length) { wrap.innerHTML = ''; return; }
+
+  const ex    = upcoming[0];
+  const days  = examDaysLeft(ex.date);
+  const stats = examStats(ex);
+  const daily = calcDailyTarget(ex);
+  const pct   = stats ? Math.round((stats.done / stats.total) * 100) : 0;
+  const daysClass = days <= 3 ? '' : days <= 7 ? 'safe' : 'ok';
+  const moreTxt   = upcoming.length > 1 ? `　他 ${upcoming.length - 1} 件` : '';
+
+  wrap.innerHTML = `
+    <div class="exam-home-banner" onclick="goView('exam')">
+      <div class="exam-home-banner-top">
+        <div class="exam-home-name">📝 ${ex.name}${moreTxt}</div>
+        <div>
+          <span class="exam-home-days ${daysClass}">${days === 0 ? '今日！' : days}</span>
+          ${days > 0 ? '<span style="font-size:9px;color:var(--muted);font-family:var(--font-mono);"> DAYS LEFT</span>' : ''}
+        </div>
+      </div>
+      ${stats ? `
+      <div class="exam-home-progress"><div class="exam-home-fill" style="width:${pct}%"></div></div>
+      <div class="exam-home-meta">
+        <span>${stats.done} / ${stats.total} 語習得 (${pct}%)</span>
+        ${days > 0 ? `<span class="exam-home-today">今日: ${daily} 問</span>` : '<span style="color:var(--success)">試験当日</span>'}
+      </div>` : ''}
+    </div>`;
+}
+
 const STALE_DEFAULT_DAYS = 14;
 
 let testState = { mode:'range', inputMode:'flash', direction:'ja2en', queue:[], idx:0, correct:0, wrong:[], answered:false, streak:0, sessionStreak:0, xpGained:0, xpLog:[] };
@@ -10328,12 +10706,13 @@ function goView(id) {
   const viewEl = document.getElementById('view-' + id);
   if (!viewEl) return;
   viewEl.classList.add('on');
-  const map = { home:0, test:1, ranking:2, words:3, history:4, data:5 };
+  const map = { home:0, test:1, ranking:2, words:3, history:4, exam:5, data:6 };
   document.querySelectorAll('.nb')[map[id]]?.classList.add('on');
   if (id === 'home')    renderHome();
   if (id === 'ranking') renderRanking();
   if (id === 'words')   renderWordList();
   if (id === 'history') renderHistory();
+  if (id === 'exam')    renderExamView();
   if (id === 'data')    syncResetUI();
 }
 
@@ -11255,6 +11634,7 @@ function renderHome() {
   }
 
   renderDeckLvCard();
+  renderHomeExamBanner();
   const staleCount=getStaleItems(STALE_DEFAULT_DAYS).length;
   const banner=document.getElementById('home-stale-banner');
   banner.innerHTML = staleCount>0 ? `
@@ -11950,6 +12330,7 @@ migrateOldData();
 loadState();
 loadGlobal();
 loadSettings();
+loadExams();
 renderDeckBar();
 (function() {
   const deck = getDeck();
