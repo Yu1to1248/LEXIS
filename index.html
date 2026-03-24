@@ -224,9 +224,9 @@ body::before {
 .prof-deck-name { font-size:11px; color:var(--muted); font-family:var(--font-mono); margin-bottom:6px; letter-spacing:1px; }
 .prof-deck-lv { font-size:24px; font-family:'Bebas Neue',sans-serif; color:var(--accent); }
 .prof-deck-xp { font-size:11px; color:var(--muted); font-family:var(--font-mono); }
-.prof-btn { position:fixed; top:18px; right:18px; z-index:100; background:var(--surface2);
-  border:1px solid var(--border); border-radius:50%; width:40px; height:40px;
-  display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px;
+.prof-btn { background:var(--surface2);
+  border:1px solid var(--border); border-radius:50%; width:36px; height:36px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:17px;
   transition:all .2s; color:var(--text); }
 .prof-btn:hover { background:var(--surface); border-color:var(--accent); }
 
@@ -370,7 +370,7 @@ body::before {
   display:flex; align-items:center; gap:8px;
 }
 .global-lv-badge {
-  font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:1.5px;
+  font-family:'Bebas Neue',sans-serif; font-size:32px; letter-spacing:2px;
   background:linear-gradient(120deg,var(--accent),var(--accent2));
   -webkit-background-clip:text; -webkit-text-fill-color:transparent;
   white-space:nowrap; line-height:1;
@@ -406,28 +406,46 @@ body::before {
 .deck-lv-bar-fill { height:4px; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:2px; transition:width .6s; }
 .deck-lv-xp { font-size:10px; color:var(--muted); font-family:var(--font-mono); }
 
-/* ── グローバルLvUp：全画面フラッシュ ── */
-.g-lvup-overlay {
-  position:fixed; inset:0; z-index:12000; pointer-events:none;
-  display:flex; align-items:center; justify-content:center;
-  background:rgba(79,142,247,0); transition:background .25s;
+/* ── グローバルLvUp：左サイドバナー ── */
+.g-lvup-banner {
+  position:fixed; left:0; top:50%; z-index:12000; pointer-events:none;
+  transform:translateY(-50%) translateX(-110%);
+  transition:transform .45s cubic-bezier(.34,1.56,.64,1);
+  background:linear-gradient(135deg,rgba(8,8,16,.96),rgba(14,18,36,.96));
+  border:1px solid rgba(79,142,247,.35);
+  border-left:none;
+  border-radius:0 16px 16px 0;
+  padding:20px 24px 20px 20px;
+  min-width:200px;
+  box-shadow:4px 0 32px rgba(79,142,247,.18);
 }
-.g-lvup-overlay.flash { background:rgba(79,142,247,.12); }
-.g-lvup-content {
-  text-align:center; opacity:0; transform:scale(.7) translateY(20px);
-  transition:all .4s cubic-bezier(.34,1.56,.64,1);
-  pointer-events:none;
+.g-lvup-banner.show { transform:translateY(-50%) translateX(0); pointer-events:auto; }
+.g-lvup-tag {
+  font-size:9px; color:var(--accent); font-family:var(--font-mono);
+  letter-spacing:2.5px; text-transform:uppercase; opacity:.7; margin-bottom:6px;
 }
-.g-lvup-overlay.show .g-lvup-content { opacity:1; transform:scale(1) translateY(0); }
-.g-lvup-overlay.show { pointer-events:auto; }
-.g-lvup-label { font-size:12px; color:var(--accent); font-family:var(--font-mono); letter-spacing:3px; margin-bottom:4px; opacity:.8; }
-.g-lvup-main {
-  font-family:'Bebas Neue',sans-serif; font-size:72px; letter-spacing:6px;
+.g-lvup-levels {
+  display:flex; align-items:center; gap:8px; margin-bottom:10px;
+}
+.g-lvup-lv-old {
+  font-family:'Bebas Neue',sans-serif; font-size:36px; color:var(--muted); line-height:1;
+}
+.g-lvup-arrow {
+  font-size:18px; color:var(--accent); opacity:.7;
+}
+.g-lvup-lv-new {
+  font-family:'Bebas Neue',sans-serif; font-size:52px; line-height:1;
   background:linear-gradient(120deg,var(--accent),var(--accent2));
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
 }
-.g-lvup-sub { font-size:14px; color:var(--muted); font-family:var(--font-mono); margin-top:8px; }
-.g-lvup-close { margin-top:20px; display:inline-block; font-size:11px; color:var(--muted); font-family:var(--font-mono); }
+.g-lvup-total {
+  font-size:10px; color:var(--muted); font-family:var(--font-mono);
+  border-top:1px solid rgba(255,255,255,.07); padding-top:8px; margin-top:2px;
+}
+.g-lvup-total-n {
+  font-size:15px; font-family:'Bebas Neue',sans-serif; color:var(--text);
+  letter-spacing:1px;
+}
 
 /* ── デッキLvUp：コンパクトなポップアップ（既存lvup-toastとは別スタイル） ── */
 .deck-lvup-popup {
@@ -505,10 +523,11 @@ body::before {
 .settings-preset-row { display:flex; gap:8px; margin-top:4px; }
 .settings-preset-btn { flex:1; padding:8px 4px; border:1px solid var(--border); border-radius:8px; background:none; color:var(--muted); font-size:11px; font-family:var(--font-ja); cursor:pointer; transition:all .2s; }
 .settings-preset-btn:hover { border-color:var(--accent); color:var(--accent); }
-.settings-btn { position:fixed; top:18px; right:64px; z-index:200;
+.settings-btn {
   background:var(--surface2); border:1px solid var(--border); border-radius:50%;
-  width:38px; height:38px; display:flex; align-items:center; justify-content:center;
-  cursor:pointer; font-size:16px; transition:all .2s; }
+  width:36px; height:36px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:15px; transition:all .2s; }
 .settings-btn:hover { border-color:var(--accent); }
 
 /* ── レスポンシブ ── */
@@ -523,7 +542,7 @@ body::before {
   .nb { padding:5px 9px; font-size:11px; }
   .hstat-n { font-size:14px; }
   .hstat-l { font-size:8px; }
-  .global-lv-badge { font-size:16px; }
+  .global-lv-badge { font-size:22px; }
   .header-stats { gap:14px; }
 }
 
@@ -534,16 +553,19 @@ body::before {
 <div class="orb orb2"></div>
 <div id="app">
 
-<button class="prof-btn" onclick="openProfile()" title="プロフィール">👤</button>
-<button class="settings-btn" onclick="openSettings()" title="設定">⚙️</button>
 
-<!-- グローバルLvUp オーバーレイ（全画面演出） -->
-<div class="g-lvup-overlay" id="g-lvup-overlay" onclick="closeGlobalLvUp()">
-  <div class="g-lvup-content" id="g-lvup-content">
-    <div class="g-lvup-label">✦ GLOBAL LEVEL UP ✦</div>
-    <div class="g-lvup-main" id="g-lvup-num">2</div>
-    <div class="g-lvup-sub" id="g-lvup-sub">LEVEL 2 REACHED</div>
-    <div class="g-lvup-close">タップして閉じる</div>
+
+<!-- グローバルLvUp 左サイドバナー -->
+<div class="g-lvup-banner" id="g-lvup-banner" onclick="closeGlobalLvUp()">
+  <div class="g-lvup-tag">✦ Level Up!</div>
+  <div class="g-lvup-levels">
+    <div class="g-lvup-lv-old" id="g-lvup-old">1</div>
+    <div class="g-lvup-arrow">→</div>
+    <div class="g-lvup-lv-new" id="g-lvup-new">2</div>
+  </div>
+  <div class="g-lvup-total">
+    <div style="margin-bottom:2px;">総出題数</div>
+    <div class="g-lvup-total-n" id="g-lvup-total">0</div>
   </div>
 </div>
 
@@ -587,6 +609,11 @@ body::before {
     <div class="hstat"><div class="hstat-n" id="hs-words">0</div><div class="hstat-l">登録単語</div></div>
     <div class="hstat"><div class="hstat-n" id="hs-weak">0</div><div class="hstat-l">苦手単語</div></div>
     <div class="hstat"><div class="hstat-n" id="hs-stale" style="color:var(--frost)">0</div><div class="hstat-l">未復習</div></div>
+  </div>
+  <!-- ヘッダー内ボタン群 -->
+  <div style="display:flex;gap:8px;flex-shrink:0;align-items:center;">
+    <button class="settings-btn" onclick="openSettings()" title="設定">⚙️</button>
+    <button class="prof-btn" onclick="openProfile()" title="プロフィール">👤</button>
   </div>
 </header>
 
@@ -647,6 +674,9 @@ body::before {
         <input type="checkbox" id="set-autonext" onchange="applySettings()" style="width:16px;height:16px;cursor:pointer;">
         <span style="font-size:10px;color:var(--muted);font-family:var(--font-mono);">ON</span>
       </label>
+    </div>
+    <div style="margin-top:20px;padding-top:12px;border-top:1px solid var(--border);text-align:right;">
+      <span id="app-ver-label" style="font-size:9px;color:rgba(255,255,255,.2);font-family:var(--font-mono);letter-spacing:1px;">ver 1.00</span>
     </div>
   </div>
 </div>
@@ -9555,6 +9585,7 @@ window.IMAGE_MAP = {
 //  stateMap[deckId] = { mistakes, corrects, lastSeen, totalAsked, history }
 // ══════════════════════════════════════════════
 const STORAGE_KEY = 'lexis_v4';
+const APP_VERSION = '1.00';
 let stateMap = {};
 let currentDeckId = 'yumetan';
 
@@ -9631,20 +9662,22 @@ function updateGlobalLvBar(){
 // ── グローバルLvUp演出：全画面フラッシュ ──
 let _gLvupTimer=null;
 function showGlobalLvUp(newLv){
-  const ov  = document.getElementById('g-lvup-overlay');
-  const num = document.getElementById('g-lvup-num');
-  const sub = document.getElementById('g-lvup-sub');
-  if(!ov) return;
-  if(num) num.textContent = newLv;
-  if(sub) sub.textContent = 'LEVEL '+newLv+' REACHED';
-  ov.classList.add('flash');
-  setTimeout(()=>ov.classList.add('show'),10);
+  const banner = document.getElementById('g-lvup-banner');
+  if(!banner) return;
+  // 旧Lv / 新Lv
+  document.getElementById('g-lvup-old').textContent = newLv - 1;
+  document.getElementById('g-lvup-new').textContent = newLv;
+  // 総出題数（全デッキ合計）
+  const total = DECKS.reduce((s,d) => s + (stateMap[d.id]?.totalAsked || 0), 0);
+  const totalEl = document.getElementById('g-lvup-total');
+  if(totalEl) totalEl.textContent = total.toLocaleString() + ' 問';
+  banner.classList.add('show');
   if(_gLvupTimer) clearTimeout(_gLvupTimer);
-  _gLvupTimer = setTimeout(closeGlobalLvUp, 4000);
+  _gLvupTimer = setTimeout(closeGlobalLvUp, 4500);
 }
 function closeGlobalLvUp(){
-  const ov=document.getElementById('g-lvup-overlay');
-  if(ov){ ov.classList.remove('show'); setTimeout(()=>ov.classList.remove('flash'),350); }
+  const banner=document.getElementById('g-lvup-banner');
+  if(banner) banner.classList.remove('show');
   if(_gLvupTimer) clearTimeout(_gLvupTimer);
 }
 
@@ -10262,7 +10295,7 @@ function switchDeck(deckId) {
   if (pgSub) pgSub.textContent = '// ' + deck.name;
   renderDeckBar();
   // テスト範囲上限を更新
-  document.getElementById('range-end').value = Math.min(100, deck.items.length);
+  document.getElementById('range-end').value = deck.items.length;
   document.getElementById('range-end').max = deck.items.length;
   document.getElementById('range-start').max = deck.items.length;
   updateHeaderStats();
@@ -11909,6 +11942,10 @@ function renderChartStatsDeck() {
 }
 
 // ── INIT ──
+// verラベル更新
+document.querySelectorAll('#app-ver-label').forEach(el => {
+  el.textContent = 'ver ' + APP_VERSION;
+});
 migrateOldData();
 loadState();
 loadGlobal();
@@ -11916,7 +11953,7 @@ loadSettings();
 renderDeckBar();
 (function() {
   const deck = getDeck();
-  document.getElementById('range-end').value = Math.min(100, deck.items.length);
+  document.getElementById('range-end').value = deck.items.length;
   document.getElementById('range-end').max   = deck.items.length;
   document.getElementById('range-start').max = deck.items.length;
 })();
