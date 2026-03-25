@@ -2,7 +2,9 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>LEXIS — 苦手分析ツール</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
@@ -535,15 +537,53 @@ body::before {
 .q-meaning { font-size:var(--q-font-size) !important; }
 .fc-front-text { font-size:calc(var(--q-font-size) * .7) !important; }
 @media (max-width:600px) {
-  .header { padding:10px 14px; gap:10px; }
-  .logo { font-size:26px; letter-spacing:3px; }
-  .main { padding:14px 12px; max-width:100%; }
-  .nav { padding:6px 10px; gap:2px; }
-  .nb { padding:5px 9px; font-size:11px; }
-  .hstat-n { font-size:14px; }
-  .hstat-l { font-size:8px; }
-  .global-lv-badge { font-size:22px; }
-  .header-stats { gap:14px; }
+  /* ヘッダー */
+  .header { padding:8px 12px; gap:8px; flex-wrap:nowrap; }
+  .logo { font-size:24px; letter-spacing:3px; }
+  .global-lv-badge { font-size:20px; }
+  .global-lv-bar-wrap { min-width:50px; }
+  .header-stats { gap:10px; }
+  .hstat-n { font-size:13px; }
+  .hstat-l { font-size:7px; }
+  /* ヘッダーの統計を2つに絞る（総出題数と苦手だけ表示） */
+  .hstat:nth-child(3), .hstat:nth-child(4) { display:none; }
+
+  /* ナビ */
+  .nav { padding:4px 8px; gap:1px; }
+  .nb { padding:5px 8px; font-size:10px; }
+
+  /* メイン */
+  .main { padding:12px 10px; max-width:100%; }
+  .pg-title { font-size:28px; letter-spacing:3px; }
+  .card { padding:16px 14px; }
+  .card-label { margin-bottom:10px; }
+
+  /* モードグリッド */
+  .mode-grid { grid-template-columns:1fr 1fr; gap:8px; }
+  .mode-card { padding:14px 10px; }
+  .mc-icon { font-size:22px; margin-bottom:4px; }
+  .mc-title { font-size:12px; }
+  .mc-desc { font-size:9px; }
+
+  /* テストカード */
+  .test-wrap { padding:28px 16px 24px; }
+  .fc-front-text { font-size:calc(var(--q-font-size) * .65) !important; }
+
+  /* 入力モードボタン */
+  .input-mode-row { gap:6px; }
+  .im-btn { padding:8px 6px; font-size:11px; }
+  .im-xp { font-size:8px; }
+
+  /* deckバー */
+  .subject-tab { padding:7px 10px; font-size:11px; }
+  .deck-panel { padding:5px 10px 8px; gap:4px; }
+  .deck-btn { font-size:11px; padding:4px 10px; }
+
+  /* form-grid を縦1列に */
+  .form-grid { grid-template-columns:1fr; }
+
+  /* ヘッダーボタン */
+  .settings-btn, .prof-btn { width:30px; height:30px; font-size:13px; }
 }
 
 /* ── テスト前モード ── */
@@ -11746,7 +11786,16 @@ function syncImport() {
     if (typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('データが不正です');
     stateMap = mergeStateMaps(stateMap, parsed);
     DECKS.forEach(d => { if (!stateMap[d.id]) stateMap[d.id] = emptyState(); });
-    saveState(); updateHeaderStats(); renderHome();
+    saveState();
+    // 総合XPをデッキXP合計から再計算（新端末でも正しく反映されるよう強制再計算）
+    let _syncTotalXp = 0;
+    DECKS.forEach(d => { _syncTotalXp += stateMap[d.id]?.xp || 0; });
+    if (_syncTotalXp > (globalSt.xp || 0)) {
+      globalSt.xp = _syncTotalXp;
+      globalSt.migrated = true;
+      saveGlobal();
+    }
+    updateHeaderStats(); updateGlobalLvBar(); renderHome();
     document.getElementById('sync-recv-text').value = '';
     stat.textContent = '✓ 統合完了'; stat.style.color = 'var(--success)';
     showToast('データを統合しました', 's');
@@ -11856,7 +11905,16 @@ function importData() {
       stateMap = mergeStateMaps(stateMap, parsed);
       DECKS.forEach(d => { if (!stateMap[d.id]) stateMap[d.id] = emptyState(); });
     }
-    saveState(); updateHeaderStats();
+    saveState();
+    // 総合XPを再計算
+    let _importTotalXp = 0;
+    DECKS.forEach(d => { _importTotalXp += stateMap[d.id]?.xp || 0; });
+    if (_importTotalXp > (globalSt.xp || 0)) {
+      globalSt.xp = _importTotalXp;
+      globalSt.migrated = true;
+      saveGlobal();
+    }
+    updateHeaderStats(); updateGlobalLvBar();
     document.getElementById('import-textarea').value = '';
     document.getElementById('import-status').textContent = '✓ 読み込み完了';
     document.getElementById('import-status').style.color = 'var(--success)';
