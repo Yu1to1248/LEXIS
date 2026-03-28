@@ -670,6 +670,127 @@ body::before {
 .exam-range-row input { flex:1; }
 .exam-range-sep { color:var(--muted); font-size:12px; flex-shrink:0; }
 
+/* ════════════════════════════════════════
+   学習カレンダー
+════════════════════════════════════════ */
+.cal-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px; }
+.cal-grid {
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:3px;
+  min-width:280px;
+}
+.cal-dow {
+  font-size:9px; color:var(--muted); font-family:var(--font-mono);
+  text-align:center; padding:2px 0 4px; letter-spacing:.5px;
+}
+.cal-cell {
+  aspect-ratio:1;
+  border-radius:4px;
+  background:rgba(255,255,255,.05);
+  cursor:default;
+  transition:transform .1s;
+  position:relative;
+  display:flex; align-items:flex-start; justify-content:flex-end;
+  padding:2px 3px;
+}
+.cal-cell:hover { transform:scale(1.15); z-index:2; }
+.cal-cell.lv0 { background:rgba(255,255,255,.05); }
+.cal-cell.lv1 { background:rgba(79,142,247,.35); }   /* 20問+ */
+.cal-cell.lv2 { background:rgba(79,142,247,.6); }    /* 50問+ */
+.cal-cell.lv3 { background:rgba(124,79,255,.75); }   /* 100問+ */
+.cal-cell.lv4 { background:linear-gradient(135deg,var(--accent),var(--accent2)); box-shadow:0 0 6px rgba(79,142,247,.5); } /* 300問+ */
+.cal-cell.today { outline:2px solid rgba(255,255,255,.4); }
+.cal-cell.future { opacity:.2; cursor:default; }
+.cal-month-label {
+  font-size:10px; color:var(--muted); font-family:var(--font-mono);
+  margin:10px 0 4px; letter-spacing:1px;
+}
+.cal-legend { display:flex; align-items:center; gap:6px; margin-top:8px; flex-wrap:wrap; }
+.cal-legend-cell { width:12px; height:12px; border-radius:3px; flex-shrink:0; }
+.cal-legend-label { font-size:9px; color:var(--muted); font-family:var(--font-mono); margin-right:6px; }
+.cal-stat-row { display:flex; gap:16px; margin-bottom:14px; flex-wrap:wrap; }
+.cal-stat { text-align:center; }
+.cal-stat-n { font-family:'Bebas Neue',sans-serif; font-size:28px; color:var(--accent); line-height:1; }
+.cal-stat-l { font-size:9px; color:var(--muted); font-family:var(--font-mono); letter-spacing:.5px; margin-top:1px; }
+
+/* ════════════════════════════════════════
+   バッジシステム
+════════════════════════════════════════ */
+.badge-section { margin-bottom:20px; }
+.badge-section-title {
+  font-size:10px; color:var(--muted); font-family:var(--font-mono);
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:12px;
+}
+.badge-grid { display:flex; flex-wrap:wrap; gap:10px; }
+.badge-item {
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  width:72px; cursor:default;
+}
+.badge-icon {
+  width:56px; height:56px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:26px; position:relative;
+  transition:transform .2s;
+}
+.badge-item:hover .badge-icon { transform:scale(1.1); }
+.badge-icon.locked {
+  filter:grayscale(1); opacity:.18;
+}
+.badge-icon.locked > span { opacity:.6; } /* アイコンはちょっと見える */
+/* 取得済み：グレードごとに輝き */
+.badge-icon.grade-bronze { background:radial-gradient(circle,#c8956c,#7d4f2f); box-shadow:0 2px 8px rgba(200,149,108,.4); }
+.badge-icon.grade-silver { background:radial-gradient(circle,#c8d0d8,#8090a0); box-shadow:0 2px 10px rgba(160,180,200,.5); }
+.badge-icon.grade-gold   { background:radial-gradient(circle,#ffd700,#c8860a); box-shadow:0 2px 12px rgba(255,215,0,.55); }
+.badge-icon.grade-plat   { background:radial-gradient(circle,#e8f4ff,#7ab8ff,#4f8ef7); box-shadow:0 2px 14px rgba(79,142,247,.7); }
+.badge-icon.grade-diamond{
+  background:radial-gradient(circle,#fff,#c8f0ff,#7c4fff);
+  box-shadow:0 0 18px rgba(124,79,255,.8), 0 0 6px rgba(255,255,255,.6);
+}
+.badge-icon.grade-locked { background:rgba(255,255,255,.06); }
+.badge-label {
+  font-size:9px; color:var(--muted); font-family:var(--font-mono);
+  text-align:center; line-height:1.3; letter-spacing:.3px;
+}
+.badge-label.unlocked { color:var(--text); font-weight:700; }
+/* 獲得時のキラキラ角バッジ */
+.badge-icon.new::after {
+  content:'NEW'; position:absolute; top:-4px; right:-4px;
+  background:var(--danger); color:#fff; font-size:7px;
+  font-family:var(--font-mono); border-radius:4px; padding:1px 4px;
+  font-weight:700; letter-spacing:.5px;
+}
+/* バッジ取得トースト */
+.badge-toast {
+  position:fixed; bottom:120px; left:50%; transform:translateX(-50%) translateY(20px) scale(.9);
+  background:var(--surface); border:2px solid var(--warn);
+  border-radius:18px; padding:14px 22px; text-align:center;
+  z-index:9999; opacity:0; pointer-events:none;
+  transition:all .4s cubic-bezier(.34,1.56,.64,1); min-width:220px;
+  box-shadow:0 6px 32px rgba(255,215,0,.25);
+}
+.badge-toast.show { opacity:1; transform:translateX(-50%) translateY(0) scale(1); }
+.badge-toast-icon { font-size:40px; margin-bottom:4px; }
+.badge-toast-label { font-size:9px; color:var(--warn); font-family:var(--font-mono); letter-spacing:2px; margin-bottom:2px; }
+.badge-toast-name { font-size:14px; font-weight:700; color:var(--text); }
+
+/* ── ヘッダーバッジ飾り ── */
+.header-badge-slot {
+  width:32px; height:32px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.04); cursor:pointer;
+  transition:transform .2s;
+}
+.header-badge-slot:hover { transform:scale(1.2); }
+.header-badge-slot.grade-bronze { background:radial-gradient(circle,#c8956c,#7d4f2f); border-color:rgba(200,149,108,.5); }
+.header-badge-slot.grade-silver { background:radial-gradient(circle,#c8d0d8,#8090a0); border-color:rgba(200,208,216,.5); }
+.header-badge-slot.grade-gold   { background:radial-gradient(circle,#ffd700,#c8860a); border-color:rgba(255,215,0,.5); box-shadow:0 0 6px rgba(255,215,0,.4); }
+.header-badge-slot.grade-plat   { background:radial-gradient(circle,#e8f4ff,#7ab8ff,#4f8ef7); border-color:rgba(79,142,247,.6); box-shadow:0 0 8px rgba(79,142,247,.5); }
+.header-badge-slot.grade-diamond{ background:radial-gradient(circle,#fff,#c8f0ff,#7c4fff); border-color:rgba(124,79,255,.7); box-shadow:0 0 10px rgba(124,79,255,.6); }
+.header-badge-slot.empty { opacity:.2; font-size:11px; }
+@media(max-width:600px){ .header-badge-slot { width:22px; height:22px; font-size:11px; } }
+
 </style>
 </head>
 <body>
@@ -710,16 +831,18 @@ body::before {
 
 <header class="header">
   <div style="min-width:0;">
-    <!-- ロゴ行：LEXIS + 総合レベルを横並び -->
-    <div style="display:flex;align-items:baseline;gap:14px;">
-      <div class="logo">LEXIS</div>
-      <div class="global-lv-wrap">
+    <!-- ロゴ行：LEXIS + 総合レベル + バッジ飾り -->
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:nowrap;">
+      <div class="logo" style="flex-shrink:0;">LEXIS</div>
+      <div class="global-lv-wrap" style="align-items:center;">
         <div class="global-lv-badge" id="g-lv-badge">Lv.1</div>
         <div class="global-lv-bar-wrap">
           <div class="global-lv-bar-bg"><div class="global-lv-bar-fill" id="g-lv-bar" style="width:0%"></div></div>
           <div class="global-lv-label" id="g-lv-label">0 / 50 XP</div>
         </div>
       </div>
+      <!-- バッジ飾り枠（最大3個） -->
+      <div id="header-badges" style="display:flex;gap:10px;align-items:center;margin-left:8px;"></div>
     </div>
     <div class="logo-sub" id="logo-sub">英単語 苦手分析ツール</div>
     <!-- 旧XPバー（参照保持のみ・非表示） -->
@@ -1129,6 +1252,28 @@ body::before {
 <div class="view" id="view-history">
   <div class="pg-title">HISTORY</div>
   <div class="pg-sub">// 学習履歴</div>
+
+  <!-- 学習カレンダー -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-label" style="display:flex;align-items:center;justify-content:space-between;">
+      <span>// 学習カレンダー</span>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <button onclick="calMove(-1)" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:2px 8px;cursor:pointer;font-size:13px;">‹</button>
+        <span id="cal-month-label" style="font-size:11px;color:var(--text);font-family:var(--font-mono);min-width:72px;text-align:center;"></span>
+        <button onclick="calMove(1)" id="cal-next-btn" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:2px 8px;cursor:pointer;font-size:13px;">›</button>
+      </div>
+    </div>
+    <div class="cal-stat-row" id="cal-stats"></div>
+    <div class="cal-wrap" id="cal-wrap"></div>
+    <div class="cal-legend" id="cal-legend"></div>
+  </div>
+
+  <!-- バッジ -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-label">// バッジ</div>
+    <div id="badge-list-wrap"></div>
+  </div>
+
   <div class="btn-row" style="margin-bottom:20px;">
     <button class="btn btn-outline" onclick="clearHistory()">履歴をすべて削除</button>
   </div>
@@ -1140,6 +1285,13 @@ body::before {
       <div class="empty-msg">学習履歴がありません。<br>テストを受けると自動で記録されます。</div>
     </div>
   </div>
+</div>
+
+<!-- バッジトースト -->
+<div class="badge-toast" id="badge-toast">
+  <div class="badge-toast-icon" id="badge-toast-icon">🏅</div>
+  <div class="badge-toast-label">BADGE UNLOCKED!</div>
+  <div class="badge-toast-name" id="badge-toast-name"></div>
 </div>
 
 <!-- EXAM -->
@@ -4202,7 +4354,7 @@ const QDALL=[
   {id:844,ch:7,q:"大名が土地の収穫高を銭に換算して課税した制度",a:"貫高制",t:"normal"},
   {id:845,ch:7,q:"戦国大名が家臣団を編成する際に有力家臣を寄親、下級武士を寄子として配属させる制度",a:"寄親・寄子制",t:"normal",set:1},
   {id:846,ch:7,q:"戦国大名が領国統治のために制定した方針・法令",a:"分国法",t:"normal"},
-  {id:847,ch:7,q:"農民の耕作する土地面積や年貢量を調査し検知帳に記載した制度",a:"検知",t:"normal"},
+  {id:847,ch:7,q:"農民の耕作する土地面積や年貢量を調査して帳面に記載した制度",a:"検知",t:"normal"},
   {id:848,ch:7,q:"戦国大名が家臣・農民に領有する土地面積・年貢量などを自己申告させる検知",a:"指出検知",t:"normal"},
   {id:849,ch:7,q:"世俗の権力から市場を開放し自由な商売を可能にした経済政策",a:"楽市楽座(楽市令)",t:"normal"},
   {id:850,ch:7,q:"主要な街道に宿駅を設け周辺農民に伝馬役を課して人馬を提供させる制度",a:"伝馬制度",t:"normal"},
@@ -4764,7 +4916,7 @@ const QDALL=[
   {id:10521,ch:9,q:"問屋制家内工業で産地の百姓に資金・原料を貸与して家内工業を組織した農村の有力者を何というか",a:"豪農",t:"normal"},
   {id:10522,ch:9,q:"江戸本町に越後屋呉服店を開いた人物は誰か",a:"三井高利",t:"normal"},
   {id:10523,ch:9,q:"三井家の商法を何というか",a:"現金かけねなし",t:"normal"},
-  {id:10524,ch:9,q:"卸売市場のことを何というか",a:"卸売市場",t:"normal"},
+  {id:10524,ch:9,q:"商品を大量に仕入れて小売業者に売る市場を何というか",a:"卸売市場",t:"normal"},
   {id:10525,ch:9,q:"大坂の米市場はどこか",a:"堂島",t:"normal"},
   {id:10526,ch:9,q:"大坂の魚市場はどこか",a:"雑喉場",t:"normal"},
   {id:10527,ch:9,q:"大坂の青物市場はどこか",a:"天満",t:"normal"},
@@ -4781,7 +4933,7 @@ const QDALL=[
   {id:10538,ch:9,q:"元禄文化で多くの何が発達したか",a:"学問",t:"normal"},
   {id:10539,ch:9,q:"元禄期に武士の間で和歌が盛んになった理由は何か",a:"朝幕関係が良好になり、諸大名が公家から和歌の指導を受けるようになったから",t:"desc"},
   {id:10540,ch:9,q:"井原西鶴が初めに師事した俳諧師は誰か",a:"西山宗因",t:"normal"},
-  {id:10541,ch:9,q:"井原西鶴が書いた浮世草子のジャンル名を答えよ",a:"浮世草子",t:"normal"},
+  {id:10541,ch:9,q:"井原西鶴が確立した、町人の生活を描いた小説ジャンルを何というか",a:"浮世草子",t:"normal"},
   {id:10542,ch:9,q:"井原西鶴の好色物の代表作を答えよ",a:"『好色一代男』",t:"normal"},
   {id:10543,ch:9,q:"井原西鶴の武家物の代表作を答えよ",a:"『武道伝来記』",t:"normal"},
   {id:10544,ch:9,q:"井原西鶴の町人物の代表作を2つ答えよ",a:"『日本永代蔵』・『世間胸算用』",t:"normal",set:1},
@@ -10560,9 +10712,9 @@ function renderHomeExamBanner() {
   if (!wrap) return;
   if (!exams.length) { wrap.innerHTML = ''; return; }
 
-  // 最も近いテスト
+  // 現在のデッキに関係するテストのみ表示
   const upcoming = [...exams]
-    .filter(e => examDaysLeft(e.date) >= 0)
+    .filter(e => examDaysLeft(e.date) >= 0 && e.deckId === currentDeckId)
     .sort((a,b) => new Date(a.date) - new Date(b.date));
 
   if (!upcoming.length) { wrap.innerHTML = ''; return; }
@@ -10591,6 +10743,371 @@ function renderHomeExamBanner() {
         ${days > 0 ? `<span class="exam-home-today">今日: ${daily} 問</span>` : '<span style="color:var(--success)">試験当日</span>'}
       </div>` : ''}
     </div>`;
+}
+
+// ══════════════════════════════════════════════
+//  学習カレンダー
+// ══════════════════════════════════════════════
+function getDailyTotals() {
+  // 全デッキの history を日付ごとに集計
+  const map = {};
+  DECKS.forEach(d => {
+    (stateMap[d.id]?.history || []).forEach(h => {
+      const day = h.date?.slice(0, 10);
+      if (!day) return;
+      map[day] = (map[day] || 0) + (h.total || 0);
+    });
+  });
+  return map;
+}
+
+// 現在表示中の年月（null = 当月）
+let _calYear = null, _calMonth = null;
+
+function calMove(delta) {
+  const today = new Date();
+  if (_calYear === null) { _calYear = today.getFullYear(); _calMonth = today.getMonth(); }
+  _calMonth += delta;
+  if (_calMonth < 0)  { _calMonth = 11; _calYear--; }
+  if (_calMonth > 11) { _calMonth = 0;  _calYear++; }
+  // 未来月には進めない
+  const now = new Date();
+  if (_calYear > now.getFullYear() || (_calYear === now.getFullYear() && _calMonth > now.getMonth())) {
+    _calYear = now.getFullYear(); _calMonth = now.getMonth();
+  }
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const wrap  = document.getElementById('cal-wrap');
+  const stats = document.getElementById('cal-stats');
+  const leg   = document.getElementById('cal-legend');
+  const mlabel= document.getElementById('cal-month-label');
+  const nextBtn = document.getElementById('cal-next-btn');
+  if (!wrap) return;
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  // 表示月を決定
+  const dispYear  = _calYear  !== null ? _calYear  : today.getFullYear();
+  const dispMonth = _calMonth !== null ? _calMonth : today.getMonth();
+
+  // 月ラベル
+  if (mlabel) mlabel.textContent = `${dispYear}年 ${dispMonth+1}月`;
+  // 来月以降は「›」を薄く
+  const isCurrentMonth = dispYear === today.getFullYear() && dispMonth === today.getMonth();
+  if (nextBtn) nextBtn.style.opacity = isCurrentMonth ? '.3' : '1';
+
+  const dailyMap = getDailyTotals();
+
+  // その月の日数・開始曜日
+  const firstDay = new Date(dispYear, dispMonth, 1);
+  const lastDay  = new Date(dispYear, dispMonth + 1, 0);
+  const daysInMonth = lastDay.getDate();
+  const startDow = firstDay.getDay(); // 0=日
+
+  // 月内の統計
+  const monthDays = [];
+  for (let i = 1; i <= daysInMonth; i++) {
+    const key = `${dispYear}-${String(dispMonth+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+    monthDays.push({ key, q: dailyMap[key] || 0 });
+  }
+  const activeDays = monthDays.filter(d => d.q >= 20).length;
+  const monthTotal = monthDays.reduce((s,d) => s+d.q, 0);
+  const maxQ = Math.max(0, ...monthDays.map(d=>d.q));
+
+  // 全期間の連続日数
+  let streak = 0;
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(today); d.setDate(d.getDate() - i);
+    if ((dailyMap[d.toISOString().slice(0,10)] || 0) >= 1) streak++;
+    else break;
+  }
+
+  if (stats) stats.innerHTML = `
+    <div class="cal-stat"><div class="cal-stat-n">${streak}</div><div class="cal-stat-l">連続日数</div></div>
+    <div class="cal-stat"><div class="cal-stat-n">${activeDays}</div><div class="cal-stat-l">学習日(20問+)</div></div>
+    <div class="cal-stat"><div class="cal-stat-n">${monthTotal.toLocaleString()}</div><div class="cal-stat-l">月間出題数</div></div>
+    <div class="cal-stat"><div class="cal-stat-n">${maxQ}</div><div class="cal-stat-l">最高(1日)</div></div>`;
+
+  // グリッド描画
+  wrap.innerHTML = '';
+
+  // 曜日ヘッダー
+  const dowRow = document.createElement('div');
+  dowRow.className = 'cal-grid';
+  ['日','月','火','水','木','金','土'].forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-dow'; el.textContent = d;
+    dowRow.appendChild(el);
+  });
+  wrap.appendChild(dowRow);
+
+  // 日付グリッド
+  const grid = document.createElement('div');
+  grid.className = 'cal-grid';
+  // 先頭の空白
+  for (let i = 0; i < startDow; i++) {
+    const blank = document.createElement('div');
+    blank.className = 'cal-cell future';
+    grid.appendChild(blank);
+  }
+  for (let day = 1; day <= daysInMonth; day++) {
+    const key = `${dispYear}-${String(dispMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const q   = dailyMap[key] || 0;
+    const lv  = q >= 300 ? 'lv4' : q >= 100 ? 'lv3' : q >= 50 ? 'lv2' : q >= 20 ? 'lv1' : 'lv0';
+    const cellDate = new Date(dispYear, dispMonth, day);
+    const isTodayCell = cellDate.getTime() === today.getTime();
+    const isFuture    = cellDate > today;
+    const cell = document.createElement('div');
+    cell.className = `cal-cell ${isFuture ? 'future' : lv}${isTodayCell ? ' today' : ''}`;
+    cell.title = `${key}  ${q}問`;
+    // 日付の数字を小さく表示
+    cell.innerHTML = `<span style="font-size:8px;opacity:.5;line-height:1;">${day}</span>`;
+    grid.appendChild(cell);
+  }
+  wrap.appendChild(grid);
+
+  // 凡例
+  if (leg) leg.innerHTML = `
+    <div class="cal-cell cal-legend-cell lv0" style="width:12px;height:12px;"></div><span class="cal-legend-label">0</span>
+    <div class="cal-cell cal-legend-cell lv1" style="width:12px;height:12px;"></div><span class="cal-legend-label">20+</span>
+    <div class="cal-cell cal-legend-cell lv2" style="width:12px;height:12px;"></div><span class="cal-legend-label">50+</span>
+    <div class="cal-cell cal-legend-cell lv3" style="width:12px;height:12px;"></div><span class="cal-legend-label">100+</span>
+    <div class="cal-cell cal-legend-cell lv4" style="width:12px;height:12px;"></div><span class="cal-legend-label">300+</span>`;
+}
+
+// ══════════════════════════════════════════════
+//  バッジシステム
+// ══════════════════════════════════════════════
+const BADGE_KEY = 'lexis_badges_v1';
+let earnedBadges = {}; // {badgeId: true}
+
+function loadBadges() {
+  try { const d=localStorage.getItem(BADGE_KEY); if(d) earnedBadges={...JSON.parse(d)}; } catch(e){}
+}
+function saveBadges() {
+  try { localStorage.setItem(BADGE_KEY, JSON.stringify(earnedBadges)); } catch(e){}
+}
+
+// バッジ定義
+function getBadgeDefs() {
+  const defs = [];
+
+  // ① 継続日数バッジ
+  const streakMilestones = [
+    {days:10,  icon:'🌱', label:'10日連続', grade:'bronze'},
+    {days:30,  icon:'🌿', label:'30日連続', grade:'silver'},
+    {days:50,  icon:'🌳', label:'50日連続', grade:'gold'},
+    {days:100, icon:'🔥', label:'100日連続', grade:'plat'},
+    {days:365, icon:'🌟', label:'365日連続', grade:'diamond'},
+  ];
+  streakMilestones.forEach(m => {
+    defs.push({
+      id: `streak_${m.days}`, category:'① 継続日数',
+      icon: m.icon, label: m.label, grade: m.grade,
+      check: () => {
+        const dailyMap = getDailyTotals();
+        const today = new Date(); today.setHours(0,0,0,0);
+        let streak = 0;
+        for (let i=0; i<400; i++) {
+          const d = new Date(today); d.setDate(d.getDate()-i);
+          if ((dailyMap[d.toISOString().slice(0,10)]||0)>=1) streak++;
+          else break;
+        }
+        return streak >= m.days;
+      }
+    });
+  });
+
+  // ② 単語帳バッジ（全問1回以上正解）
+  DECKS.forEach(deck => {
+    defs.push({
+      id: `clear1_${deck.id}`, category:'② 単語帳クリア',
+      icon: '📖', label: deck.name+'\nクリア', grade: 'gold',
+      check: () => {
+        const st = stateMap[deck.id];
+        if (!st) return false;
+        return deck.items.every(w => (st.corrects[w.key||w.a]||0) > 0);
+      }
+    });
+  });
+
+  // ③ 単語帳制覇バッジ（全問「完璧」= 直近5回全正解）
+  DECKS.forEach(deck => {
+    defs.push({
+      id: `master_${deck.id}`, category:'③ 単語帳制覇',
+      icon: '💎', label: deck.name+'\n制覇', grade: 'diamond',
+      check: () => {
+        const st = stateMap[deck.id];
+        if (!st) return false;
+        return deck.items.every(w => {
+          const log = (st.recentLog||{})[w.key||w.a] || [];
+          return log.length >= 5 && log.every(v=>v===1);
+        });
+      }
+    });
+  });
+
+  // ④ 総合レベルバッジ
+  const lvMilestones = [
+    {lv:10,  icon:'⭐',  label:'Lv.10到達', grade:'bronze'},
+    {lv:20,  icon:'⭐⭐', label:'Lv.20到達', grade:'silver'},
+    {lv:30,  icon:'🌠',  label:'Lv.30到達', grade:'gold'},
+    {lv:40,  icon:'💫',  label:'Lv.40到達', grade:'plat'},
+    {lv:50,  icon:'🏆',  label:'Lv.50到達', grade:'diamond'},
+  ];
+  lvMilestones.forEach(m => {
+    defs.push({
+      id: `glv_${m.lv}`, category:'④ レベル',
+      icon: m.icon, label: m.label, grade: m.grade,
+      check: () => getGlobalLv(globalSt.xp||0) >= m.lv
+    });
+  });
+
+  // ⑤ 総出題数バッジ（おまけ）
+  const qMilestones = [
+    {q:100,   icon:'🐣', label:'100問突破',  grade:'bronze'},
+    {q:500,   icon:'📚', label:'500問突破',  grade:'silver'},
+    {q:1000,  icon:'🎯', label:'1000問突破', grade:'gold'},
+    {q:5000,  icon:'🚀', label:'5000問突破', grade:'plat'},
+    {q:10000, icon:'🌌', label:'10000問突破',grade:'diamond'},
+  ];
+  qMilestones.forEach(m => {
+    defs.push({
+      id: `total_${m.q}`, category:'⑤ 総出題数',
+      icon: m.icon, label: m.label, grade: m.grade,
+      check: () => {
+        const total = DECKS.reduce((s,d)=>s+(stateMap[d.id]?.totalAsked||0),0);
+        return total >= m.q;
+      }
+    });
+  });
+
+  // ⑥ 一夜漬けバッジ（1日に大量出題）
+  const cramMilestones = [
+    {q:500,  icon:'📖', label:'一夜漬け\n500問', grade:'gold'},
+    {q:1000, icon:'🌙', label:'超一夜漬け\n1000問', grade:'diamond'},
+  ];
+  cramMilestones.forEach(m => {
+    defs.push({
+      id: `cram_${m.q}`, category:'⑥ 一夜漬け',
+      icon: m.icon, label: m.label, grade: m.grade,
+      check: () => {
+        const dailyMap = getDailyTotals();
+        return Object.values(dailyMap).some(v => v >= m.q);
+      }
+    });
+  });
+
+  return defs;
+}
+
+// バッジ判定・新規取得通知
+function checkBadges(silent=false) {
+  const defs = getBadgeDefs();
+  let newOnes = [];
+  defs.forEach(def => {
+    if (!earnedBadges[def.id] && def.check()) {
+      earnedBadges[def.id] = new Date().toISOString();
+      newOnes.push(def);
+    }
+  });
+  if (newOnes.length) {
+    saveBadges();
+    updateHeaderBadges();
+    if (!silent) {
+      // 1つずつ順番にトーストを出す
+      newOnes.forEach((def, i) => {
+        setTimeout(() => showBadgeToast(def), i * 2000);
+      });
+    }
+  }
+}
+
+
+// ── ヘッダーバッジ飾りを更新 ──
+function updateHeaderBadges() {
+  const wrap = document.getElementById('header-badges');
+  if (!wrap) return;
+  const defs = getBadgeDefs();
+  // 取得済みバッジを新しい順に並べて最大3個表示
+  const earned = defs
+    .filter(d => earnedBadges[d.id])
+    .sort((a,b) => new Date(earnedBadges[b.id]) - new Date(earnedBadges[a.id]))
+    .slice(0, 3);
+
+  wrap.innerHTML = '';
+  // 3スロット分描画（空スロットも表示）
+  for (let i = 0; i < 3; i++) {
+    const def = earned[i];
+    const slot = document.createElement('div');
+    slot.className = 'header-badge-slot' + (def ? ` grade-${def.grade}` : ' empty');
+    slot.textContent = def ? def.icon : '·';
+    if (def) slot.title = def.label.replace('\n', ' ');
+    wrap.appendChild(slot);
+  }
+}
+let _badgeToastTimer = null;
+function showBadgeToast(def) {
+  const toast = document.getElementById('badge-toast');
+  const icon  = document.getElementById('badge-toast-icon');
+  const name  = document.getElementById('badge-toast-name');
+  if (!toast) return;
+  if (icon) icon.textContent = def.icon;
+  if (name) name.textContent = def.label.replace('\n',' ');
+  toast.classList.add('show');
+  if (_badgeToastTimer) clearTimeout(_badgeToastTimer);
+  _badgeToastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+function renderBadges() {
+  const wrap = document.getElementById('badge-list-wrap');
+  if (!wrap) return;
+  const defs = getBadgeDefs();
+  // カテゴリごとにグループ化
+  const catMap = {};
+  defs.forEach(d => {
+    if (!catMap[d.category]) catMap[d.category] = [];
+    catMap[d.category].push(d);
+  });
+  wrap.innerHTML = '';
+  Object.entries(catMap).forEach(([cat, items]) => {
+    const sec = document.createElement('div');
+    sec.className = 'badge-section';
+    const title = document.createElement('div');
+    title.className = 'badge-section-title';
+    title.textContent = cat;
+    sec.appendChild(title);
+    const grid = document.createElement('div');
+    grid.className = 'badge-grid';
+    items.forEach(def => {
+      const earned = !!earnedBadges[def.id];
+      const isNew  = earned &&
+        (new Date() - new Date(earnedBadges[def.id])) < 86400000 * 3;
+      const item = document.createElement('div');
+      item.className = 'badge-item';
+      const iconGrade = earned ? `grade-${def.grade}` : 'grade-locked locked';
+      item.innerHTML = `
+        <div class="badge-icon ${iconGrade}${isNew?' new':''}">
+          <span>${def.icon}</span>
+        </div>
+        <div class="badge-label${earned?' unlocked':''}">${def.label.replace('\n','<br>')}</div>`;
+      if (earned) {
+        const d = new Date(earnedBadges[def.id]);
+        item.title = `取得: ${d.toLocaleDateString('ja-JP')}`;
+      }
+      grid.appendChild(item);
+    });
+    sec.appendChild(grid);
+    wrap.appendChild(sec);
+  });
+  // 取得済み数をラベルに
+  const total   = defs.length;
+  const earned  = defs.filter(d=>earnedBadges[d.id]).length;
+  const header  = wrap.previousElementSibling; // card-label
+  if (header && header.classList.contains('card-label')) {
+    header.textContent = `// バッジ  ${earned} / ${total}`;
+  }
 }
 
 const STALE_DEFAULT_DAYS = 14;
@@ -11414,6 +11931,7 @@ function showResult() {
   state.history.unshift({ date:new Date().toISOString(), mode:testState.mode, total, correct, wrong:testState.wrong.map(w=>w.a) });
   if (state.history.length > 100) state.history = state.history.slice(0,100);
   saveState(); updateGlobalLvBar();
+  checkBadges(); // バッジ判定
 
   const ul = document.getElementById('res-wrong-list');
   ul.innerHTML='';
@@ -11597,19 +12115,74 @@ function renderWordList() {
 const modeLabel = { range:'範囲テスト', weak:'苦手テスト', stale:'未復習テスト' };
 
 function renderHistory() {
-  const state = getState();
-  const ul=document.getElementById('hist-list'), empty=document.getElementById('hist-empty');
-  ul.innerHTML='';
-  if (!state.history.length) { empty.style.display=''; return; }
-  empty.style.display='none';
-  state.history.forEach(s => {
-    const rate=s.total?Math.round((s.correct/s.total)*100):0;
-    const li=document.createElement('li'); li.className='hist-item';
-    li.innerHTML=`
-      <span class="hist-date">${fmtDateFull(s.date)}</span>
-      <span class="hist-mode ${s.mode||'range'}">${modeLabel[s.mode]||s.mode}</span>
-      <span class="hist-score"><span class="ok">${s.correct}</span>/${s.total} <span style="color:var(--warn)">${rate}%</span></span>`;
-    ul.appendChild(li);
+  renderCalendar();
+  renderBadges();
+  renderMonthlyHistory();
+}
+
+function renderMonthlyHistory() {
+  const ul    = document.getElementById('hist-list');
+  const empty = document.getElementById('hist-empty');
+  if (!ul) return;
+  ul.innerHTML = '';
+
+  // 全デッキのhistoryをまとめて日付降順で集計
+  const allHistory = [];
+  DECKS.forEach(d => {
+    (stateMap[d.id]?.history || []).forEach(h => {
+      allHistory.push({ ...h, deckName: d.name });
+    });
+  });
+  allHistory.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+  if (!allHistory.length) { empty.style.display=''; ul.style.display='none'; return; }
+  empty.style.display='none'; ul.style.display='';
+
+  // 月ごとにグループ化
+  const monthMap = {};
+  allHistory.forEach(s => {
+    const m = s.date?.slice(0,7) || '不明';
+    if (!monthMap[m]) monthMap[m] = [];
+    monthMap[m].push(s);
+  });
+
+  Object.entries(monthMap).forEach(([month, sessions]) => {
+    // 月ヘッダー
+    const [y,mo] = month.split('-');
+    const totalQ = sessions.reduce((s,h)=>s+(h.total||0),0);
+    const header = document.createElement('li');
+    header.style.cssText='list-style:none;padding:10px 0 4px;font-size:10px;color:var(--muted);font-family:var(--font-mono);letter-spacing:1px;border-bottom:1px solid var(--border);margin-bottom:4px;';
+    header.textContent = `${y}年 ${parseInt(mo)}月  ──  ${totalQ.toLocaleString()} 問`;
+    ul.appendChild(header);
+
+    // その月のセッション（日付ごとにまとめる）
+    const dayMap = {};
+    sessions.forEach(s => {
+      const day = s.date?.slice(0,10) || '?';
+      if (!dayMap[day]) dayMap[day] = [];
+      dayMap[day].push(s);
+    });
+    Object.entries(dayMap).sort((a,b)=>b[0].localeCompare(a[0])).forEach(([day, daySessions]) => {
+      const d = new Date(day);
+      const dayStr = `${parseInt(d.toISOString().slice(5,7))}/${parseInt(d.toISOString().slice(8,10))}(${['日','月','火','水','木','金','土'][d.getDay()]})`;
+      const dayTotal = daySessions.reduce((s,h)=>s+(h.total||0),0);
+
+      const dayItem = document.createElement('li');
+      dayItem.className = 'hist-item';
+      dayItem.style.cssText='align-items:flex-start;flex-direction:column;gap:4px;padding:8px 0;';
+      const dayHeader = `<span style="font-size:11px;color:var(--text);font-family:var(--font-mono);font-weight:700;">${dayStr}</span><span style="font-size:10px;color:var(--muted);font-family:var(--font-mono);margin-left:8px;">${dayTotal}問</span>`;
+      const sessionRows = daySessions.map(s=>{
+        const rate=s.total?Math.round((s.correct/s.total)*100):0;
+        const rateColor=rate>=80?'var(--success)':rate>=50?'var(--warn)':'var(--danger)';
+        return `<div style="font-size:11px;color:var(--muted);padding-left:12px;display:flex;gap:8px;align-items:center;">
+          <span style="font-size:9px;background:rgba(79,142,247,.1);color:var(--accent);padding:1px 6px;border-radius:4px;">${s.deckName||''}</span>
+          <span>${modeLabel[s.mode]||s.mode||'テスト'}</span>
+          <span style="color:${rateColor};font-family:var(--font-mono);">${s.correct}/${s.total} ${rate}%</span>
+        </div>`;
+      }).join('');
+      dayItem.innerHTML = `<div>${dayHeader}</div>${sessionRows}`;
+      ul.appendChild(dayItem);
+    });
   });
 }
 
@@ -12389,6 +12962,9 @@ loadState();
 loadGlobal();
 loadSettings();
 loadExams();
+loadBadges();
+checkBadges(true); // 起動時はサイレントで判定
+updateHeaderBadges();
 renderDeckBar();
 (function() {
   const deck = getDeck();
