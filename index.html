@@ -695,11 +695,11 @@ body::before {
   padding:2px 3px;
 }
 .cal-cell:hover { transform:scale(1.15); z-index:2; }
-.cal-cell.lv0 { background:rgba(255,255,255,.05); }
-.cal-cell.lv1 { background:rgba(79,142,247,.35); }   /* 20問+ */
-.cal-cell.lv2 { background:rgba(79,142,247,.6); }    /* 50問+ */
-.cal-cell.lv3 { background:rgba(124,79,255,.75); }   /* 100問+ */
-.cal-cell.lv4 { background:linear-gradient(135deg,var(--accent),var(--accent2)); box-shadow:0 0 6px rgba(79,142,247,.5); } /* 300問+ */
+.cal-cell.lv0 { background:rgba(255,255,255,.06); }
+.cal-cell.lv1 { background:#1a4a8a; }                /* 20問+  薄青 */
+.cal-cell.lv2 { background:#2563cc; }                /* 50問+  青 */
+.cal-cell.lv3 { background:#7c3aed; }                /* 100問+ 紫 */
+.cal-cell.lv4 { background:linear-gradient(135deg,#f59e0b,#ef4444); box-shadow:0 0 8px rgba(245,158,11,.6); } /* 300問+ 金→赤 */
 .cal-cell.today { outline:2px solid rgba(255,255,255,.4); }
 .cal-cell.future { opacity:.2; cursor:default; }
 .cal-month-label {
@@ -790,6 +790,63 @@ body::before {
 .header-badge-slot.grade-diamond{ background:radial-gradient(circle,#fff,#c8f0ff,#7c4fff); border-color:rgba(124,79,255,.7); box-shadow:0 0 10px rgba(124,79,255,.6); }
 .header-badge-slot.empty { opacity:.2; font-size:11px; }
 @media(max-width:600px){ .header-badge-slot { width:22px; height:22px; font-size:11px; } }
+
+/* ── バッジピッカー（ボトムシート） ── */
+.badge-picker-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,.55);
+  backdrop-filter:blur(4px); z-index:15000;
+  display:none; align-items:flex-end; justify-content:center;
+}
+.badge-picker-overlay.show { display:flex; }
+.badge-picker-sheet {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:20px 20px 0 0; width:100%; max-width:520px;
+  padding:20px 16px 32px; max-height:68vh; overflow-y:auto;
+  animation:slideUp .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes slideUp { from{transform:translateY(60px);opacity:0} to{transform:translateY(0);opacity:1} }
+.badge-picker-title {
+  font-size:11px; color:var(--muted); font-family:var(--font-mono);
+  letter-spacing:1.5px; text-transform:uppercase;
+  margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;
+}
+.badge-picker-close {
+  background:none; border:none; color:var(--muted); font-size:22px;
+  cursor:pointer; line-height:1; padding:0;
+}
+.badge-picker-none {
+  font-size:11px; color:var(--muted); font-family:var(--font-mono);
+  padding:8px 0; text-align:center;
+}
+.badge-picker-grid {
+  display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-bottom:8px;
+}
+@media(max-width:400px){ .badge-picker-grid { grid-template-columns:repeat(4,1fr); } }
+.badge-picker-item {
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  cursor:pointer; padding:6px 2px; border-radius:10px;
+  border:2px solid transparent; transition:all .2s;
+}
+.badge-picker-item:hover { background:rgba(255,255,255,.06); }
+.badge-picker-item.selected {
+  border-color:var(--accent); background:rgba(79,142,247,.1);
+}
+.badge-picker-item .badge-icon { width:44px; height:44px; font-size:22px; }
+.badge-picker-item .badge-label { font-size:8px; }
+.badge-picker-cat {
+  font-size:9px; color:var(--muted); font-family:var(--font-mono);
+  letter-spacing:1px; margin:12px 0 6px; text-transform:uppercase;
+}
+/* スロットにホバー時の編集アイコン */
+.header-badge-slot { position:relative; }
+.header-badge-slot::after {
+  content:'✎'; position:absolute; bottom:-2px; right:-2px;
+  font-size:8px; background:var(--surface2); border-radius:50%;
+  width:12px; height:12px; display:flex; align-items:center; justify-content:center;
+  opacity:0; transition:opacity .2s; pointer-events:none;
+  color:var(--muted); line-height:12px; text-align:center;
+}
+.header-badge-slot:hover::after { opacity:1; }
 
 </style>
 </head>
@@ -1287,6 +1344,17 @@ body::before {
   </div>
 </div>
 
+
+<!-- バッジピッカー -->
+<div class="badge-picker-overlay" id="badge-picker-overlay" onclick="if(event.target===this)closeBadgePicker()">
+  <div class="badge-picker-sheet">
+    <div class="badge-picker-title">
+      <span id="badge-picker-title-text">// スロット 1 に飾るバッジを選ぶ</span>
+      <button class="badge-picker-close" onclick="closeBadgePicker()">✕</button>
+    </div>
+    <div id="badge-picker-body"></div>
+  </div>
+</div>
 <!-- バッジトースト -->
 <div class="badge-toast" id="badge-toast">
   <div class="badge-toast-icon" id="badge-toast-icon">🏅</div>
@@ -11026,24 +11094,107 @@ function checkBadges(silent=false) {
 
 
 // ── ヘッダーバッジ飾りを更新 ──
+
+// ── バッジ固定選択 ──
+const PINNED_KEY = 'lexis_pinned_badges_v1';
+let pinnedBadges = [null, null, null]; // スロット0〜2: badgeId or null
+
+function loadPinnedBadges() {
+  try {
+    const d = localStorage.getItem(PINNED_KEY);
+    if (d) pinnedBadges = JSON.parse(d);
+    if (!Array.isArray(pinnedBadges) || pinnedBadges.length !== 3) pinnedBadges = [null,null,null];
+  } catch(e) { pinnedBadges = [null,null,null]; }
+}
+function savePinnedBadges() {
+  try { localStorage.setItem(PINNED_KEY, JSON.stringify(pinnedBadges)); } catch(e){}
+}
+
+let _pickerSlot = 0; // 現在編集中のスロット番号
+
+function openBadgePicker(slotIndex) {
+  _pickerSlot = slotIndex;
+  const title = document.getElementById('badge-picker-title-text');
+  if (title) title.textContent = `// スロット ${slotIndex+1} に飾るバッジを選ぶ`;
+  renderBadgePickerBody();
+  document.getElementById('badge-picker-overlay').classList.add('show');
+}
+function closeBadgePicker() {
+  document.getElementById('badge-picker-overlay').classList.remove('show');
+}
+
+function renderBadgePickerBody() {
+  const body = document.getElementById('badge-picker-body');
+  if (!body) return;
+  body.innerHTML = '';
+
+  const defs = getBadgeDefs();
+  const earnedDefs = defs.filter(d => earnedBadges[d.id]);
+
+  if (!earnedDefs.length) {
+    body.innerHTML = '<div class="badge-picker-none">まだバッジを取得していません</div>';
+    return;
+  }
+
+  // 「なし」選択肢
+  const noneGrid = document.createElement('div');
+  noneGrid.className = 'badge-picker-grid';
+  const noneItem = document.createElement('div');
+  noneItem.className = 'badge-picker-item' + (pinnedBadges[_pickerSlot] === null ? ' selected' : '');
+  noneItem.innerHTML = `<div class="badge-icon grade-locked" style="width:44px;height:44px;font-size:20px;opacity:.4;">✕</div><div class="badge-label">なし</div>`;
+  noneItem.onclick = () => { pinnedBadges[_pickerSlot] = null; savePinnedBadges(); updateHeaderBadges(); closeBadgePicker(); };
+  noneGrid.appendChild(noneItem);
+  body.appendChild(noneGrid);
+
+  // カテゴリごとに表示
+  const catMap = {};
+  earnedDefs.forEach(d => {
+    if (!catMap[d.category]) catMap[d.category] = [];
+    catMap[d.category].push(d);
+  });
+
+  Object.entries(catMap).forEach(([cat, items]) => {
+    const catLabel = document.createElement('div');
+    catLabel.className = 'badge-picker-cat';
+    catLabel.textContent = cat;
+    body.appendChild(catLabel);
+
+    const grid = document.createElement('div');
+    grid.className = 'badge-picker-grid';
+    items.forEach(def => {
+      const isSelected = pinnedBadges[_pickerSlot] === def.id;
+      const item = document.createElement('div');
+      item.className = 'badge-picker-item' + (isSelected ? ' selected' : '');
+      item.innerHTML = `
+        <div class="badge-icon grade-${def.grade}" style="width:44px;height:44px;font-size:22px;">${def.icon}</div>
+        <div class="badge-label${isSelected?' unlocked':''}">${def.label.replace('\n','<br>')}</div>`;
+      item.onclick = () => {
+        pinnedBadges[_pickerSlot] = def.id;
+        savePinnedBadges();
+        updateHeaderBadges();
+        closeBadgePicker();
+      };
+      grid.appendChild(item);
+    });
+    body.appendChild(grid);
+  });
+}
+
 function updateHeaderBadges() {
   const wrap = document.getElementById('header-badges');
   if (!wrap) return;
   const defs = getBadgeDefs();
-  // 取得済みバッジを新しい順に並べて最大3個表示
-  const earned = defs
-    .filter(d => earnedBadges[d.id])
-    .sort((a,b) => new Date(earnedBadges[b.id]) - new Date(earnedBadges[a.id]))
-    .slice(0, 3);
+  const defMap = Object.fromEntries(defs.map(d => [d.id, d]));
 
   wrap.innerHTML = '';
-  // 3スロット分描画（空スロットも表示）
   for (let i = 0; i < 3; i++) {
-    const def = earned[i];
+    const badgeId = pinnedBadges[i];
+    const def = badgeId ? defMap[badgeId] : null;
     const slot = document.createElement('div');
     slot.className = 'header-badge-slot' + (def ? ` grade-${def.grade}` : ' empty');
-    slot.textContent = def ? def.icon : '·';
-    if (def) slot.title = def.label.replace('\n', ' ');
+    slot.textContent = def ? def.icon : '＋';
+    slot.title = def ? def.label.replace('\n',' ') : `スロット${i+1}（タップして選択）`;
+    slot.onclick = () => openBadgePicker(i);
     wrap.appendChild(slot);
   }
 }
@@ -11993,8 +12144,7 @@ function getWeakItems(limit) {
   const deck = getDeck();
   const state = getState();
   return Object.entries(state.mistakes)
-    .filter(([ans]) => !isGraduated(state, ans))  // 直近5回全正解は除外
-    .sort((a,b)=>b[1]-a[1]).slice(0,limit)
+    .filter(([ans]) => !isGraduated(state, ans))
     .map(([ans,wrong])=>{
       const w = deck.items.find(x=>(x.key||x.a)===ans);
       if (!w) return null;
@@ -12003,7 +12153,10 @@ function getWeakItems(limit) {
       const rate=total?Math.round((ok/total)*100):0;
       const recent = (state.recentLog||{})[ans] || [];
       return { ...w, wrong, ok, total, rate, recent };
-    }).filter(Boolean);
+    }).filter(Boolean)
+    // 正答率昇順 → 同率なら誤答数降順
+    .sort((a,b) => a.rate !== b.rate ? a.rate - b.rate : b.wrong - a.wrong)
+    .slice(0, limit);
 }
 
 function renderRanking() {
@@ -12963,6 +13116,7 @@ loadGlobal();
 loadSettings();
 loadExams();
 loadBadges();
+loadPinnedBadges();
 checkBadges(true); // 起動時はサイレントで判定
 updateHeaderBadges();
 renderDeckBar();
