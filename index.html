@@ -179,11 +179,22 @@ body::before {
 .badge-progress-overlay.show { display:flex; }
 .badge-progress-modal { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px 32px; text-align:center; min-width:220px; max-width:300px; box-shadow:0 20px 60px rgba(0,0,0,.5); }
 .bpm-icon { font-size:44px; margin-bottom:12px; filter:grayscale(1) brightness(.5); }
+.bpm-icon.bpm-icon-earned { filter:none; }
+.bpm-icon.grade-bronze { text-shadow:0 0 12px rgba(200,149,108,.8); }
+.bpm-icon.grade-silver { text-shadow:0 0 12px rgba(160,180,200,.8); }
+.bpm-icon.grade-gold   { text-shadow:0 0 16px rgba(255,215,0,.9); }
+.bpm-icon.grade-plat   { text-shadow:0 0 18px rgba(79,142,247,.9); }
+.bpm-icon.grade-diamond{ text-shadow:0 0 20px rgba(124,79,255,.9),0 0 8px rgba(255,255,255,.6); }
+.bpm-icon.grade-master { text-shadow:0 0 20px rgba(255,215,0,.9),0 0 36px rgba(180,100,255,.7); animation:masterGlow 2.8s ease infinite; }
 .bpm-label { font-size:14px; font-weight:700; margin-bottom:16px; color:var(--muted); }
 .bpm-prog-text { font-family:var(--font-mono); font-size:28px; font-weight:700; color:var(--accent); margin-bottom:8px; }
 .bpm-prog-bar { height:5px; background:var(--border); border-radius:3px; overflow:hidden; margin-bottom:12px; }
 .bpm-prog-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:3px; transition:width .5s ease; }
 .bpm-hint { font-size:10px; color:var(--muted); letter-spacing:1px; font-family:var(--font-mono); }
+.bpm-cond-row { text-align:left; }
+.bpm-cond-label { font-size:10px; color:var(--muted); font-family:var(--font-mono); letter-spacing:.5px; margin-bottom:3px; }
+.bpm-cond-text { font-family:var(--font-mono); font-size:18px; font-weight:700; color:var(--accent); margin-bottom:5px; }
+.bpm-prog-fill.bpm-prog-fill-warn { background:linear-gradient(90deg,var(--danger),var(--warn)); }
 .tag-frost { display:inline-block; padding:1px 7px; border-radius:4px; font-size:9px; font-family:var(--font-mono); background:rgba(79,212,247,.12); color:var(--frost); border:1px solid rgba(79,212,247,.3); margin-left:6px; vertical-align:middle; }
 
 .wi-num { font-family:var(--font-mono); font-size:10px; color:var(--muted); min-width:30px; text-align:right; }
@@ -719,6 +730,18 @@ body::before {
   background:radial-gradient(circle,#fff,#c8f0ff,#7c4fff);
   box-shadow:0 0 18px rgba(124,79,255,.8), 0 0 6px rgba(255,255,255,.6);
 }
+.badge-icon.grade-master {
+  background: linear-gradient(135deg,#ffe082,#ffffff,#e0b0ff,#ffe082);
+  background-size:300% 300%;
+  animation: masterGlow 2.8s ease infinite;
+  box-shadow: 0 0 18px rgba(255,215,0,.8), 0 0 36px rgba(180,100,255,.55), 0 0 8px rgba(255,255,255,.5);
+  border:1px solid rgba(255,240,180,.7);
+}
+@keyframes masterGlow {
+  0%   { background-position:0% 50%;   box-shadow:0 0 18px rgba(255,215,0,.8),0 0 36px rgba(180,100,255,.55); }
+  50%  { background-position:100% 50%; box-shadow:0 0 28px rgba(180,100,255,.9),0 0 50px rgba(255,215,0,.5); }
+  100% { background-position:0% 50%;   box-shadow:0 0 18px rgba(255,215,0,.8),0 0 36px rgba(180,100,255,.55); }
+}
 .badge-icon.grade-locked { background:rgba(255,255,255,.06); }
 .badge-label {
   font-size:9px; color:var(--muted); font-family:var(--font-mono);
@@ -760,6 +783,7 @@ body::before {
 .header-badge-slot.grade-gold   { background:radial-gradient(circle,#ffd700,#c8860a); border-color:rgba(255,215,0,.5); box-shadow:0 0 6px rgba(255,215,0,.4); }
 .header-badge-slot.grade-plat   { background:radial-gradient(circle,#e8f4ff,#7ab8ff,#4f8ef7); border-color:rgba(79,142,247,.6); box-shadow:0 0 8px rgba(79,142,247,.5); }
 .header-badge-slot.grade-diamond{ background:radial-gradient(circle,#fff,#c8f0ff,#7c4fff); border-color:rgba(124,79,255,.7); box-shadow:0 0 10px rgba(124,79,255,.6); }
+.header-badge-slot.grade-master { background:linear-gradient(135deg,#ffe082,#ffffff,#e0b0ff); border-color:rgba(255,215,0,.7); box-shadow:0 0 12px rgba(255,215,0,.6),0 0 20px rgba(180,100,255,.4); animation:masterGlow 2.8s ease infinite; }
 .header-badge-slot.empty { opacity:.2; font-size:11px; }
 @media(max-width:600px){ .header-badge-slot { width:22px; height:22px; font-size:11px; } }
 
@@ -12359,11 +12383,24 @@ function getBadgeDefs() {
     });
   });
 
-  // ② 単語帳バッジ（全問1回以上出題）
+  // デッキごとの絵文字マップ
+  const DECK_ICONS = {
+    yumetan:   '📕',
+    yumetan2:  '📘',
+    nextstage: '📙',
+    kogo:      '📜',
+    patan1:    '📗',
+    'jp-hist': '🏯',
+    yamakawa:  '🏯',
+    biology:   '🐁',
+    kokyou:    '💵',
+  };
+
+  // ② 単語帳クリアバッジ（全問1回以上出題）
   DECKS.forEach(deck => {
     defs.push({
       id: `clear1_${deck.id}`, category:'② 単語帳クリア',
-      icon: '📖', label: deck.name+'\nクリア', grade: 'gold',
+      icon: DECK_ICONS[deck.id] || '📖', label: deck.name+'\nクリア', grade: 'gold',
       progress: () => {
         const st = stateMap[deck.id];
         if (!st) return { current:0, total:deck.items.length };
@@ -12378,27 +12415,30 @@ function getBadgeDefs() {
     });
   });
 
-  // ③ 単語帳制覇バッジ（全問「完璧」= 直近5回全正解）
+  // ③ 単語帳制覇バッジ（全単語1回以上正解 ＋ 苦手TOP100消滅）
   DECKS.forEach(deck => {
     defs.push({
       id: `master_${deck.id}`, category:'③ 単語帳制覇',
-      icon: '💎', label: deck.name+'\n制覇', grade: 'diamond',
+      icon: DECK_ICONS[deck.id] || '📖', label: deck.name+'\n制覇', grade: 'master',
       progress: () => {
         const st = stateMap[deck.id];
-        if (!st) return { current:0, total:deck.items.length };
-        const current = deck.items.filter(w => {
-          const log = (st.recentLog||{})[w.key||w.a] || [];
-          return log.length >= 5 && log.every(v=>v===1);
-        }).length;
-        return { current, total: deck.items.length };
+        const mistakes = st ? (st.mistakes || {}) : {};
+        // 苦手単語でなくかつ1回以上正解している単語数
+        // ※苦手TOP100は見た目100件だが、100件超の場合も全mistakesを対象にする
+        const cleared = st ? deck.items.filter(w => {
+          const key = w.key || w.a;
+          return !!st.lastSeen[key] && !mistakes[key];
+        }).length : 0;
+        return { current: cleared, total: deck.items.length };
       },
       check: () => {
         const st = stateMap[deck.id];
         if (!st) return false;
-        return deck.items.every(w => {
-          const log = (st.recentLog||{})[w.key||w.a] || [];
-          return log.length >= 5 && log.every(v=>v===1);
-        });
+        // 条件1: 全単語1回以上正解
+        const allSeen = deck.items.every(w => !!st.lastSeen[w.key||w.a]);
+        if (!allSeen) return false;
+        // 条件2: 苦手TOP100が全て消えている（mistakesが0件）
+        return Object.keys(st.mistakes||{}).length === 0;
       }
     });
   });
@@ -12641,8 +12681,8 @@ function renderBadges() {
         </div>
         <div class="badge-label${earned?' unlocked':''}">${def.label.replace('\n','<br>')}</div>`;
       if (earned) {
-        const d = new Date(earnedBadges[def.id]);
-        item.title = `取得: ${d.toLocaleDateString('ja-JP')}`;
+        item.style.cursor = 'pointer';
+        item.onclick = () => showEarnedBadge(def);
       } else if (def.progress) {
         item.style.cursor = 'pointer';
         item.onclick = () => showBadgeProgress(def);
@@ -14148,13 +14188,58 @@ function showToast(msg,type) {
 
 function showBadgeProgress(def) {
   const prog = def.progress ? def.progress() : { current: 0, total: 1 };
-  const pct = prog.total > 0 ? Math.min(100, Math.round((prog.current / prog.total) * 100)) : 0;
   document.getElementById('bpm-icon').textContent = def.icon;
+  document.getElementById('bpm-icon').className = 'bpm-icon';  // 未取得：グレーアウトのまま
   document.getElementById('bpm-label').textContent = def.label.replace('\n', ' ');
-  document.getElementById('bpm-prog-text').textContent = `${prog.current.toLocaleString()} / ${prog.total.toLocaleString()}`;
-  document.getElementById('bpm-prog-fill').style.width = pct + '%';
+  document.getElementById('bpm-earned-info').style.display = 'none';
+
+  let overallPct = 0;
+  if (prog.conditions && prog.conditions.length === 2) {
+    // 制覇バッジ：2条件表示
+    document.getElementById('bpm-single').style.display = 'none';
+    document.getElementById('bpm-dual').style.display = 'block';
+    const c1 = prog.conditions[0], c2 = prog.conditions[1];
+    document.getElementById('bpm-cond-label1').textContent = c1.label;
+    document.getElementById('bpm-cond-text1').textContent = `${c1.current.toLocaleString()} / ${c1.total.toLocaleString()}`;
+    const p1 = c1.total>0 ? Math.min(100,Math.round(c1.current/c1.total*100)) : 0;
+    document.getElementById('bpm-cond-fill1').style.width = p1+'%';
+    document.getElementById('bpm-cond-label2').textContent = c2.label;
+    document.getElementById('bpm-cond-text2').textContent = `${c2.current.toLocaleString()} / ${c2.total.toLocaleString()}`;
+    const p2 = c2.total>0 ? Math.min(100,Math.round(c2.current/c2.total*100)) : 0;
+    document.getElementById('bpm-cond-fill2').style.width = p2+'%';
+    overallPct = Math.round((p1 + p2) / 2);
+  } else {
+    // 通常バッジ：単一進捗
+    document.getElementById('bpm-single').style.display = 'block';
+    document.getElementById('bpm-dual').style.display = 'none';
+    overallPct = prog.total > 0 ? Math.min(100, Math.round((prog.current / prog.total) * 100)) : 0;
+    document.getElementById('bpm-prog-text').textContent = `${prog.current.toLocaleString()} / ${prog.total.toLocaleString()}`;
+    document.getElementById('bpm-prog-fill').style.width = overallPct + '%';
+  }
+  // 進捗50%超のときだけヒントを表示
+  document.getElementById('bpm-hint').textContent = overallPct > 50 ? '取得まであと少し！' : '';
   document.getElementById('badge-progress-overlay').classList.add('show');
 }
+
+function showEarnedBadge(def) {
+  const earnedAt = earnedBadges[def.id];
+  document.getElementById('bpm-icon').textContent = def.icon;
+  document.getElementById('bpm-icon').className = `bpm-icon bpm-icon-earned grade-${def.grade}`;
+  document.getElementById('bpm-label').textContent = def.label.replace('\n', ' ');
+  document.getElementById('bpm-single').style.display = 'none';
+  document.getElementById('bpm-dual').style.display = 'none';
+  document.getElementById('bpm-hint').textContent = '';
+  const info = document.getElementById('bpm-earned-info');
+  info.style.display = 'block';
+  const d = earnedAt ? new Date(earnedAt) : null;
+  info.innerHTML = `
+    <div style="font-size:28px;font-family:var(--font-mono);font-weight:700;color:var(--success);margin-bottom:6px;">✓ 取得済み</div>
+    ${d ? `<div style="font-size:11px;color:var(--muted);font-family:var(--font-mono);letter-spacing:1px;">${d.toLocaleDateString('ja-JP', {year:'numeric',month:'long',day:'numeric'})} 取得</div>` : ''}
+    <div style="margin-top:8px;display:inline-block;padding:2px 12px;border-radius:20px;font-size:10px;font-family:var(--font-mono);background:rgba(63,221,138,.12);color:var(--success);border:1px solid rgba(63,221,138,.3);">${def.grade.toUpperCase()}</div>
+  `;
+  document.getElementById('badge-progress-overlay').classList.add('show');
+}
+
 function closeBadgeProgress() {
   document.getElementById('badge-progress-overlay').classList.remove('show');
 }
@@ -14193,9 +14278,26 @@ renderHome();
   <div class="badge-progress-modal">
     <div class="bpm-icon" id="bpm-icon">🏅</div>
     <div class="bpm-label" id="bpm-label">バッジ名</div>
-    <div class="bpm-prog-text" id="bpm-prog-text">0 / 0</div>
-    <div class="bpm-prog-bar"><div class="bpm-prog-fill" id="bpm-prog-fill" style="width:0%"></div></div>
-    <div class="bpm-hint">取得まであと少し！</div>
+    <!-- 単一進捗（通常バッジ） -->
+    <div id="bpm-single">
+      <div class="bpm-prog-text" id="bpm-prog-text">0 / 0</div>
+      <div class="bpm-prog-bar"><div class="bpm-prog-fill" id="bpm-prog-fill" style="width:0%"></div></div>
+    </div>
+    <!-- 二重進捗（制覇バッジ） -->
+    <div id="bpm-dual" style="display:none;width:100%;">
+      <div class="bpm-cond-row">
+        <div class="bpm-cond-label" id="bpm-cond-label1">全単語1回以上正解</div>
+        <div class="bpm-cond-text" id="bpm-cond-text1">0 / 0</div>
+        <div class="bpm-prog-bar"><div class="bpm-prog-fill" id="bpm-cond-fill1" style="width:0%"></div></div>
+      </div>
+      <div class="bpm-cond-row" style="margin-top:12px;">
+        <div class="bpm-cond-label" id="bpm-cond-label2">苦手TOP100消滅</div>
+        <div class="bpm-cond-text" id="bpm-cond-text2">0 / 100</div>
+        <div class="bpm-prog-bar"><div class="bpm-prog-fill bpm-prog-fill-warn" id="bpm-cond-fill2" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div id="bpm-earned-info" style="display:none;text-align:center;"></div>
+    <div class="bpm-hint" id="bpm-hint">取得まであと少し！</div>
   </div>
 </div>
 </body>
