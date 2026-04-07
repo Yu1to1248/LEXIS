@@ -175,6 +175,15 @@ body::before {
 .toast.s { background:rgba(63,221,138,.15); border:1px solid rgba(63,221,138,.4); color:var(--success); }
 .toast.e { background:rgba(255,79,106,.15); border:1px solid rgba(255,79,106,.4); color:var(--danger); }
 
+.badge-progress-overlay { position:fixed; inset:0; z-index:9000; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.5); backdrop-filter:blur(4px); }
+.badge-progress-overlay.show { display:flex; }
+.badge-progress-modal { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px 32px; text-align:center; min-width:220px; max-width:300px; box-shadow:0 20px 60px rgba(0,0,0,.5); }
+.bpm-icon { font-size:44px; margin-bottom:12px; filter:grayscale(1) brightness(.5); }
+.bpm-label { font-size:14px; font-weight:700; margin-bottom:16px; color:var(--muted); }
+.bpm-prog-text { font-family:var(--font-mono); font-size:28px; font-weight:700; color:var(--accent); margin-bottom:8px; }
+.bpm-prog-bar { height:5px; background:var(--border); border-radius:3px; overflow:hidden; margin-bottom:12px; }
+.bpm-prog-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:3px; transition:width .5s ease; }
+.bpm-hint { font-size:10px; color:var(--muted); letter-spacing:1px; font-family:var(--font-mono); }
 .tag-frost { display:inline-block; padding:1px 7px; border-radius:4px; font-size:9px; font-family:var(--font-mono); background:rgba(79,212,247,.12); color:var(--frost); border:1px solid rgba(79,212,247,.3); margin-left:6px; vertical-align:middle; }
 
 .wi-num { font-family:var(--font-mono); font-size:10px; color:var(--muted); min-width:30px; text-align:right; }
@@ -12168,10 +12177,11 @@ function renderHomeExamBanner() {
 //  学習カレンダー
 // ══════════════════════════════════════════════
 function getDailyTotals() {
-  // 全デッキの history を日付ごとに集計
+  // 全デッキの history を日付ごとに集計（ミス再テストは除外）
   const map = {};
   DECKS.forEach(d => {
     (stateMap[d.id]?.history || []).forEach(h => {
+      if (h.isRetest) return; // テスト後ミス再テストはカウントしない
       const day = h.date?.slice(0, 10);
       if (!day) return;
       map[day] = (map[day] || 0) + (h.total || 0);
@@ -12324,6 +12334,17 @@ function getBadgeDefs() {
     defs.push({
       id: `streak_${m.days}`, category:'① 継続日数',
       icon: m.icon, label: m.label, grade: m.grade,
+      progress: () => {
+        const dailyMap = getDailyTotals();
+        const today = new Date(); today.setHours(0,0,0,0);
+        let streak = 0;
+        for (let i=0; i<400; i++) {
+          const d = new Date(today); d.setDate(d.getDate()-i);
+          if ((dailyMap[d.toISOString().slice(0,10)]||0)>=1) streak++;
+          else break;
+        }
+        return { current: Math.min(streak, m.days), total: m.days };
+      },
       check: () => {
         const dailyMap = getDailyTotals();
         const today = new Date(); today.setHours(0,0,0,0);
@@ -12338,15 +12359,21 @@ function getBadgeDefs() {
     });
   });
 
-  // ② 単語帳バッジ（全問1回以上正解）
+  // ② 単語帳バッジ（全問1回以上出題）
   DECKS.forEach(deck => {
     defs.push({
       id: `clear1_${deck.id}`, category:'② 単語帳クリア',
       icon: '📖', label: deck.name+'\nクリア', grade: 'gold',
+      progress: () => {
+        const st = stateMap[deck.id];
+        if (!st) return { current:0, total:deck.items.length };
+        const current = deck.items.filter(w => !!st.lastSeen[w.key||w.a]).length;
+        return { current, total: deck.items.length };
+      },
       check: () => {
         const st = stateMap[deck.id];
         if (!st) return false;
-        return deck.items.every(w => (st.corrects[w.key||w.a]||0) > 0);
+        return deck.items.every(w => !!st.lastSeen[w.key||w.a]);
       }
     });
   });
@@ -12356,6 +12383,15 @@ function getBadgeDefs() {
     defs.push({
       id: `master_${deck.id}`, category:'③ 単語帳制覇',
       icon: '💎', label: deck.name+'\n制覇', grade: 'diamond',
+      progress: () => {
+        const st = stateMap[deck.id];
+        if (!st) return { current:0, total:deck.items.length };
+        const current = deck.items.filter(w => {
+          const log = (st.recentLog||{})[w.key||w.a] || [];
+          return log.length >= 5 && log.every(v=>v===1);
+        }).length;
+        return { current, total: deck.items.length };
+      },
       check: () => {
         const st = stateMap[deck.id];
         if (!st) return false;
@@ -12379,6 +12415,7 @@ function getBadgeDefs() {
     defs.push({
       id: `glv_${m.lv}`, category:'④ レベル',
       icon: m.icon, label: m.label, grade: m.grade,
+      progress: () => ({ current: Math.min(getGlobalLv(globalSt.xp||0), m.lv), total: m.lv }),
       check: () => getGlobalLv(globalSt.xp||0) >= m.lv
     });
   });
@@ -12395,6 +12432,10 @@ function getBadgeDefs() {
     defs.push({
       id: `total_${m.q}`, category:'⑤ 総出題数',
       icon: m.icon, label: m.label, grade: m.grade,
+      progress: () => {
+        const total = DECKS.reduce((s,d)=>s+(stateMap[d.id]?.totalAsked||0),0);
+        return { current: Math.min(total, m.q), total: m.q };
+      },
       check: () => {
         const total = DECKS.reduce((s,d)=>s+(stateMap[d.id]?.totalAsked||0),0);
         return total >= m.q;
@@ -12411,6 +12452,11 @@ function getBadgeDefs() {
     defs.push({
       id: `cram_${m.q}`, category:'⑥ 一夜漬け',
       icon: m.icon, label: m.label, grade: m.grade,
+      progress: () => {
+        const dailyMap = getDailyTotals();
+        const maxDay = Math.max(0, ...Object.values(dailyMap));
+        return { current: Math.min(maxDay, m.q), total: m.q };
+      },
       check: () => {
         const dailyMap = getDailyTotals();
         return Object.values(dailyMap).some(v => v >= m.q);
@@ -12597,6 +12643,9 @@ function renderBadges() {
       if (earned) {
         const d = new Date(earnedBadges[def.id]);
         item.title = `取得: ${d.toLocaleDateString('ja-JP')}`;
+      } else if (def.progress) {
+        item.style.cursor = 'pointer';
+        item.onclick = () => showBadgeProgress(def);
       }
       grid.appendChild(item);
     });
@@ -13481,7 +13530,7 @@ function showResult() {
     xpCard.style.display = 'none';
   }
 
-  state.history.unshift({ date:new Date().toISOString(), mode:testState.mode, total, correct, wrong:testState.wrong.map(w=>w.a) });
+  state.history.unshift({ date:new Date().toISOString(), mode:testState.mode, total, correct, wrong:testState.wrong.map(w=>w.a), isRetest:!!testState.isRetest });
   if (state.history.length > 100) state.history = state.history.slice(0,100);
   saveState(); updateGlobalLvBar();
   checkBadges(); // バッジ判定
@@ -13530,6 +13579,7 @@ function retryWrong() {
   testState.xpGained     = 0;
   testState.xpLog        = [];
   testState.inputMode    = savedInputMode;
+  testState.isRetest     = true;
   document.getElementById('test-setup').style.display   = 'none';
   document.getElementById('test-playing').style.display = '';
   document.getElementById('test-result').style.display  = 'none';
@@ -13667,7 +13717,7 @@ function renderWordList() {
 }
 
 // ── HISTORY ──
-const modeLabel = { range:'範囲テスト', weak:'苦手テスト', stale:'未復習テスト' };
+const modeLabel = { range:'範囲テスト', weak:'苦手テスト', stale:'未復習テスト', virgin:'未学習テスト' };
 
 function renderHistory() {
   renderCalendar();
@@ -13803,9 +13853,21 @@ function renderHome() {
 
   renderDeckLvCard();
   renderHomeExamBanner();
+  const virginCount=getVirginItems().length;
   const staleCount=getStaleItems(STALE_DEFAULT_DAYS).length;
   const banner=document.getElementById('home-stale-banner');
-  banner.innerHTML = staleCount>0 ? `
+  if (virginCount > 0) {
+    banner.innerHTML = `
+    <div class="stale-banner" style="border-color:rgba(63,221,138,.28);background:rgba(63,221,138,.06);">
+      <div class="sb-ico">🌱</div>
+      <div class="sb-text">
+        <div class="sb-title" style="color:var(--success)">${virginCount} 問が未学習です</div>
+        <div class="sb-sub">未学習テストで新しい単語を覚えましょう</div>
+      </div>
+      <button class="btn btn-primary" onclick="goView('test');setMode('virgin')">テスト開始 →</button>
+    </div>`;
+  } else if (staleCount > 0) {
+    banner.innerHTML = `
     <div class="stale-banner">
       <div class="sb-ico">❄️</div>
       <div class="sb-text">
@@ -13813,7 +13875,10 @@ function renderHome() {
         <div class="sb-sub">未復習テストで効率よく記憶を定着させましょう</div>
       </div>
       <button class="btn btn-frost" onclick="goView('test');setMode('stale')">テスト開始 →</button>
-    </div>` : '';
+    </div>`;
+  } else {
+    banner.innerHTML = '';
+  }
 
   const list=getWeakItems(5), ul=document.getElementById('home-recent'), empty=document.getElementById('home-empty');
   ul.innerHTML='';
@@ -14080,6 +14145,20 @@ function showToast(msg,type) {
 }
 
 
+
+function showBadgeProgress(def) {
+  const prog = def.progress ? def.progress() : { current: 0, total: 1 };
+  const pct = prog.total > 0 ? Math.min(100, Math.round((prog.current / prog.total) * 100)) : 0;
+  document.getElementById('bpm-icon').textContent = def.icon;
+  document.getElementById('bpm-label').textContent = def.label.replace('\n', ' ');
+  document.getElementById('bpm-prog-text').textContent = `${prog.current.toLocaleString()} / ${prog.total.toLocaleString()}`;
+  document.getElementById('bpm-prog-fill').style.width = pct + '%';
+  document.getElementById('badge-progress-overlay').classList.add('show');
+}
+function closeBadgeProgress() {
+  document.getElementById('badge-progress-overlay').classList.remove('show');
+}
+
 // ── INIT ──
 // verラベル更新
 document.querySelectorAll('#app-ver-label').forEach(el => {
@@ -14110,5 +14189,14 @@ applyDefaultInputMode();
 });
 renderHome();
 </script>
+<div class="badge-progress-overlay" id="badge-progress-overlay" onclick="if(event.target===this)closeBadgeProgress()">
+  <div class="badge-progress-modal">
+    <div class="bpm-icon" id="bpm-icon">🏅</div>
+    <div class="bpm-label" id="bpm-label">バッジ名</div>
+    <div class="bpm-prog-text" id="bpm-prog-text">0 / 0</div>
+    <div class="bpm-prog-bar"><div class="bpm-prog-fill" id="bpm-prog-fill" style="width:0%"></div></div>
+    <div class="bpm-hint">取得まであと少し！</div>
+  </div>
+</div>
 </body>
 </html>
