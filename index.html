@@ -845,6 +845,149 @@ body::before {
 }
 .header-badge-slot:hover::after { opacity:1; }
 
+/* ════════════════════════════════════════
+   タイマー
+════════════════════════════════════════ */
+.timer-mode-tabs { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+.timer-tab-btn {
+  flex:1; min-width:120px; padding:14px 10px; border-radius:12px;
+  border:1px solid var(--border); background:var(--surface);
+  color:var(--muted); font-family:var(--font-ja); font-size:13px;
+  cursor:pointer; transition:all .2s; text-align:center;
+}
+.timer-tab-btn:hover { border-color:var(--accent); color:var(--text); }
+.timer-tab-btn.on { background:rgba(79,142,247,.1); border-color:rgba(79,142,247,.4); color:var(--accent); font-weight:700; }
+.timer-tab-btn .tb-icon { font-size:22px; display:block; margin-bottom:4px; }
+.timer-tab-btn .tb-label { font-size:12px; }
+
+.timer-display-wrap {
+  text-align:center; padding:40px 24px 32px;
+  background:var(--surface); border:1px solid var(--border); border-radius:20px;
+  margin-bottom:16px; position:relative; overflow:hidden;
+}
+.timer-display-wrap::before {
+  content:''; position:absolute; top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+}
+.timer-display-wrap.pomo-work::before { background:linear-gradient(90deg,var(--danger),var(--warn)); }
+.timer-display-wrap.pomo-break::before { background:linear-gradient(90deg,var(--success),var(--frost)); }
+.timer-label-top {
+  font-family:var(--font-mono); font-size:10px; color:var(--muted);
+  letter-spacing:3px; text-transform:uppercase; margin-bottom:16px;
+}
+.timer-clock {
+  font-family:var(--font-display); font-size:88px; letter-spacing:6px;
+  line-height:1; color:var(--text); transition:color .3s;
+  user-select:none;
+}
+.timer-clock.running { color:var(--accent); }
+.timer-clock.pomo-work { color:var(--danger); }
+.timer-clock.pomo-break { color:var(--success); }
+.timer-clock.warning { color:var(--warn); animation:blink .8s ease infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
+.timer-ms { font-family:var(--font-mono); font-size:20px; color:var(--muted); margin-top:2px; }
+.timer-status-tag {
+  display:inline-block; margin-top:12px; padding:3px 14px; border-radius:20px;
+  font-size:10px; font-family:var(--font-mono); letter-spacing:1.5px;
+}
+.timer-status-tag.work { background:rgba(255,79,106,.15); color:var(--danger); border:1px solid rgba(255,79,106,.35); }
+.timer-status-tag.brk  { background:rgba(63,221,138,.12); color:var(--success); border:1px solid rgba(63,221,138,.3); }
+.timer-status-tag.ready{ background:rgba(255,255,255,.06); color:var(--muted); border:1px solid var(--border); }
+
+.timer-circle-wrap { position:relative; width:200px; height:200px; margin:0 auto 16px; }
+.timer-circle-svg { width:200px; height:200px; transform:rotate(-90deg); }
+.timer-circle-bg { fill:none; stroke:rgba(255,255,255,.07); stroke-width:8; }
+.timer-circle-fill { fill:none; stroke:var(--accent); stroke-width:8; stroke-linecap:round; transition:stroke-dashoffset .5s linear, stroke .3s; }
+.timer-circle-fill.work { stroke:var(--danger); }
+.timer-circle-fill.brk  { stroke:var(--success); }
+.timer-circle-center {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  text-align:center;
+}
+
+.timer-controls { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:8px; }
+.timer-btn {
+  padding:12px 28px; border-radius:10px; border:none; font-family:var(--font-ja);
+  font-size:14px; font-weight:700; cursor:pointer; transition:all .2s; letter-spacing:.5px;
+}
+.tbtn-start { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+.tbtn-start:hover { opacity:.85; transform:translateY(-1px); }
+.tbtn-pause { background:rgba(255,178,48,.15); color:var(--warn); border:1px solid rgba(255,178,48,.4); }
+.tbtn-pause:hover { background:rgba(255,178,48,.25); }
+.tbtn-stop  { background:rgba(255,255,255,.07); color:var(--muted); border:1px solid var(--border); }
+.tbtn-stop:hover  { border-color:var(--danger); color:var(--danger); }
+.tbtn-reset { background:rgba(255,255,255,.06); color:var(--muted); border:1px solid var(--border); font-size:12px; padding:8px 18px; }
+
+.pomo-round-indicator { display:flex; gap:8px; justify-content:center; margin:14px 0 0; flex-wrap:wrap; }
+.pomo-dot {
+  width:10px; height:10px; border-radius:50%;
+  background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.15);
+  transition:all .3s;
+}
+.pomo-dot.done { background:var(--danger); border-color:var(--danger); box-shadow:0 0 6px rgba(255,79,106,.6); }
+.pomo-dot.current { background:var(--warn); border-color:var(--warn); animation:blink .8s ease infinite; }
+
+/* ── タイマー設定カード ── */
+.timer-setting-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+@media(max-width:600px){ .timer-setting-grid { grid-template-columns:1fr; } }
+
+/* ── 目標タイマー ── */
+.goal-ring-wrap { position:relative; width:280px; height:280px; margin:0 auto 28px; }
+.goal-ring-svg { width:280px; height:280px; transform:rotate(-90deg); }
+.goal-ring-bg   { fill:none; stroke:rgba(255,255,255,.07); stroke-width:14; }
+.goal-ring-fill { fill:none; stroke:url(#goalGrad); stroke-width:14; stroke-linecap:round; transition:stroke-dashoffset 1s ease; }
+.goal-ring-center { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; }
+.goal-ring-pct { font-family:var(--font-display); font-size:50px; letter-spacing:2px; line-height:1; }
+.goal-ring-sub { font-size:10px; color:var(--muted); font-family:var(--font-mono); margin-top:4px; letter-spacing:1px; }
+
+.goal-stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:24px 0 12px; }
+.goal-stat-box { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:8px 6px; text-align:center; }
+.goal-stat-n { font-family:var(--font-display); font-size:20px; color:var(--accent); line-height:1; }
+.goal-stat-l { font-size:8px; color:var(--muted); font-family:var(--font-mono); margin-top:3px; letter-spacing:.5px; }
+.goal-stat-box.done .goal-stat-n { color:var(--success); }
+.goal-stat-box.warn .goal-stat-n { color:var(--warn); }
+
+.goal-session-list { list-style:none; }
+.goal-session-item {
+  display:flex; align-items:center; gap:12px; padding:9px 8px;
+  border-bottom:1px solid var(--border); font-family:var(--font-mono); font-size:12px;
+}
+.goal-session-item:last-child { border-bottom:none; }
+.goal-session-date { color:var(--muted); min-width:88px; font-size:10px; }
+.goal-session-dur  { color:var(--accent); font-weight:700; }
+.goal-session-del  { margin-left:auto; background:none; border:none; color:var(--muted); font-size:14px; cursor:pointer; padding:2px 6px; }
+.goal-session-del:hover { color:var(--danger); }
+
+.goal-complete-banner {
+  background:linear-gradient(135deg,rgba(63,221,138,.1),rgba(79,142,247,.07));
+  border:1px solid rgba(63,221,138,.35); border-radius:14px; padding:20px;
+  text-align:center; margin-bottom:16px;
+}
+.goal-complete-icon { font-size:40px; margin-bottom:8px; }
+.goal-complete-title { font-family:var(--font-display); font-size:28px; letter-spacing:3px; color:var(--success); }
+.goal-complete-sub { font-size:11px; color:var(--muted); font-family:var(--font-mono); margin-top:6px; }
+
+/* タイマー history log */
+.timer-hist-item {
+  display:flex; align-items:center; gap:14px; padding:10px 8px;
+  border-bottom:1px solid var(--border);
+}
+.timer-hist-item:last-child { border-bottom:none; }
+.timer-hist-type { font-size:18px; min-width:28px; }
+.timer-hist-info { flex:1; }
+.timer-hist-mode { font-size:11px; color:var(--muted); font-family:var(--font-mono); letter-spacing:1px; }
+.timer-hist-dur  { font-family:var(--font-mono); font-size:14px; font-weight:700; color:var(--accent); }
+.timer-hist-date { font-size:10px; color:var(--muted); font-family:var(--font-mono); }
+
+@media(max-width:600px){
+  .timer-clock { font-size:64px; letter-spacing:3px; }
+  .timer-tab-btn { min-width:80px; padding:10px 6px; }
+  .timer-circle-wrap,.goal-ring-wrap { width:220px; height:220px; }
+  .timer-circle-svg,.goal-ring-svg { width:220px; height:220px; }
+  .goal-ring-pct { font-size:42px; }
+  .goal-stats-row { grid-template-columns:repeat(3,1fr); gap:6px; }
+  .goal-stat-n { font-size:16px; }
+}
 </style>
 </head>
 <body>
@@ -1025,6 +1168,7 @@ body::before {
   <button class="nb"     id="nb-history" onclick="goView('history')">📅 学習履歴</button>
   <button class="nb"     id="nb-exam"    onclick="goView('exam')">🗓️ テスト前</button>
   <button class="nb"     id="nb-data"    onclick="goView('data')">💾 データ管理</button>
+  <button class="nb"     id="nb-timer"   onclick="goView('timer')">⏱️ タイマー</button>
 </nav>
 
 <div class="main">
@@ -1509,8 +1653,255 @@ body::before {
   </div>
 </div>
 
+<!-- TIMER -->
+<div class="view" id="view-timer">
+  <div class="pg-title">TIMER</div>
+  <div class="pg-sub">// 学習タイマー</div>
 
-</div></div>
+  <!-- モード選択タブ -->
+  <div class="timer-mode-tabs">
+    <button class="timer-tab-btn on" id="tmr-tab-sw"     onclick="timerSwitchTab('sw')">
+      <span class="tb-icon">⏱️</span><span class="tb-label">ストップウォッチ</span>
+    </button>
+    <button class="timer-tab-btn" id="tmr-tab-cd"     onclick="timerSwitchTab('cd')">
+      <span class="tb-icon">⏳</span><span class="tb-label">カウントダウン</span>
+    </button>
+    <button class="timer-tab-btn" id="tmr-tab-pomo"   onclick="timerSwitchTab('pomo')">
+      <span class="tb-icon">🍅</span><span class="tb-label">ポモドーロ</span>
+    </button>
+    <button class="timer-tab-btn" id="tmr-tab-goal"   onclick="timerSwitchTab('goal')">
+      <span class="tb-icon">🎯</span><span class="tb-label">目標タイマー</span>
+    </button>
+  </div>
+
+  <!-- ══ ストップウォッチ ══ -->
+  <div id="tmr-sw" class="tmr-panel">
+    <div class="timer-display-wrap" id="sw-display">
+      <div class="timer-label-top">STOPWATCH</div>
+      <div class="timer-clock" id="sw-clock">00:00:00</div>
+      <div class="timer-ms" id="sw-ms">.00</div>
+    </div>
+    <div class="timer-controls">
+      <button class="timer-btn tbtn-start" id="sw-btn-start" onclick="swStart()">▶ スタート</button>
+      <button class="timer-btn tbtn-stop"  id="sw-btn-stop"  onclick="swStop()" style="display:none">⏹ 停止</button>
+      <button class="timer-btn tbtn-reset" id="sw-btn-reset" onclick="swReset()">↺ リセット</button>
+    </div>
+    <div class="card" style="margin-top:16px;">
+      <div class="card-label">// 直近の計測</div>
+      <ul id="sw-history" class="goal-session-list"></ul>
+      <div class="empty" id="sw-history-empty" style="padding:24px;"><div class="empty-ico" style="font-size:24px;">⏱️</div><div class="empty-msg" style="font-size:11px;">まだ計測がありません</div></div>
+    </div>
+  </div>
+
+  <!-- ══ カウントダウン ══ -->
+  <div id="tmr-cd" class="tmr-panel" style="display:none;">
+    <div class="card" style="margin-bottom:14px;" id="cd-setup-card">
+      <div class="card-label">// 時間を設定</div>
+      <div class="timer-setting-grid">
+        <div class="field"><label>時間</label><input type="number" id="cd-h" value="0" min="0" max="23" oninput="cdUpdateDisplay()"></div>
+        <div class="field"><label>分</label><input type="number" id="cd-m" value="25" min="0" max="59" oninput="cdUpdateDisplay()"></div>
+        <div class="field"><label>秒</label><input type="number" id="cd-s" value="0" min="0" max="59" oninput="cdUpdateDisplay()"></div>
+        <div class="field">
+          <label>プリセット</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
+            <button class="btn btn-outline" style="padding:6px 12px;font-size:11px;" onclick="cdPreset(5)">5分</button>
+            <button class="btn btn-outline" style="padding:6px 12px;font-size:11px;" onclick="cdPreset(10)">10分</button>
+            <button class="btn btn-outline" style="padding:6px 12px;font-size:11px;" onclick="cdPreset(25)">25分</button>
+            <button class="btn btn-outline" style="padding:6px 12px;font-size:11px;" onclick="cdPreset(60)">1時間</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="timer-display-wrap" id="cd-display">
+      <div class="timer-label-top">COUNTDOWN</div>
+      <div class="timer-circle-wrap" style="margin-bottom:8px;">
+        <svg class="timer-circle-svg" viewBox="0 0 200 200">
+          <circle class="timer-circle-bg"   cx="100" cy="100" r="86"/>
+          <circle class="timer-circle-fill" cx="100" cy="100" r="86" id="cd-circle"
+            stroke-dasharray="540.35" stroke-dashoffset="0"/>
+        </svg>
+        <div class="timer-circle-center">
+          <div class="timer-clock" id="cd-clock" style="font-size:48px;">25:00</div>
+        </div>
+      </div>
+    </div>
+    <div class="timer-controls">
+      <button class="timer-btn tbtn-start" id="cd-btn-start" onclick="cdStart()">▶ スタート</button>
+      <button class="timer-btn tbtn-pause" id="cd-btn-pause" onclick="cdPause()" style="display:none">⏸ 一時停止</button>
+      <button class="timer-btn tbtn-stop"  id="cd-btn-stop"  onclick="cdStop()"  style="display:none">⏹ 停止</button>
+      <button class="timer-btn tbtn-reset" onclick="cdReset()">↺ リセット</button>
+    </div>
+  </div>
+
+  <!-- ══ ポモドーロ ══ -->
+  <div id="tmr-pomo" class="tmr-panel" style="display:none;">
+    <div class="card" style="margin-bottom:14px;" id="pomo-setup-card">
+      <div class="card-label">// ポモドーロ設定</div>
+      <div class="timer-setting-grid">
+        <div class="field"><label>作業時間（分）</label><input type="number" id="pomo-work-min" value="25" min="1" max="120"></div>
+        <div class="field"><label>短い休憩（分）</label><input type="number" id="pomo-short-min" value="5" min="1" max="60"></div>
+        <div class="field"><label>長い休憩（分）</label><input type="number" id="pomo-long-min" value="15" min="1" max="120"></div>
+        <div class="field"><label>セット数（長休憩まで）</label><input type="number" id="pomo-sets" value="4" min="2" max="10"></div>
+      </div>
+    </div>
+    <div class="timer-display-wrap" id="pomo-display">
+      <div class="timer-label-top" id="pomo-label-top">POMODORO — WORK</div>
+      <div class="timer-circle-wrap" style="margin-bottom:8px;">
+        <svg class="timer-circle-svg" viewBox="0 0 200 200">
+          <circle class="timer-circle-bg"   cx="100" cy="100" r="86"/>
+          <circle class="timer-circle-fill work" cx="100" cy="100" r="86" id="pomo-circle"
+            stroke-dasharray="540.35" stroke-dashoffset="0"/>
+        </svg>
+        <div class="timer-circle-center">
+          <div class="timer-clock pomo-work" id="pomo-clock" style="font-size:48px;">25:00</div>
+          <div id="pomo-phase-tag"><span class="timer-status-tag work">WORK</span></div>
+        </div>
+      </div>
+      <div class="pomo-round-indicator" id="pomo-dots"></div>
+    </div>
+    <div class="timer-controls">
+      <button class="timer-btn tbtn-start" id="pomo-btn-start" onclick="pomoStart()">▶ スタート</button>
+      <button class="timer-btn tbtn-pause" id="pomo-btn-pause" onclick="pomoPause()" style="display:none">⏸ 一時停止</button>
+      <button class="timer-btn tbtn-stop"  id="pomo-btn-stop"  onclick="pomoStop()"  style="display:none">⏹ 停止</button>
+      <button class="timer-btn tbtn-reset" onclick="pomoReset()">↺ リセット</button>
+    </div>
+    <div class="card" style="margin-top:16px;">
+      <div class="card-label">// 本日の作業サマリー</div>
+      <div id="pomo-today-summary" style="font-family:var(--font-mono);font-size:13px;color:var(--muted);padding:12px 0;">
+        今日の完了ポモドーロ: <span id="pomo-today-count" style="color:var(--accent);font-weight:700;">0</span> セット
+        ／ 作業時間: <span id="pomo-today-time" style="color:var(--accent);font-weight:700;">0分</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 目標タイマー ══ -->
+  <div id="tmr-goal" class="tmr-panel" style="display:none;">
+    <!-- 目標未設定時：設定フォーム -->
+    <div id="goal-setup-form">
+      <div class="card">
+        <div class="card-label">// 目標を設定する</div>
+        <div class="timer-setting-grid" style="margin-bottom:16px;">
+          <div class="field"><label>目標名（任意）</label><input type="text" id="goal-name" placeholder="例: 英語 1週間特訓" maxlength="30"></div>
+          <div class="field"><label>目標合計時間（時間）</label><input type="number" id="goal-total-h" value="50" min="1" max="10000"></div>
+          <div class="field"><label>期間（日数）</label><input type="number" id="goal-days" value="7" min="1" max="365"></div>
+          <div class="field"><label>開始日</label><input type="date" id="goal-start"></div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);font-family:var(--font-mono);margin-bottom:14px;line-height:2;" id="goal-preview-text"></div>
+        <button class="btn btn-primary" onclick="goalCreate()">🎯 目標を設定する</button>
+      </div>
+    </div>
+
+    <!-- 目標設定済み時：ダッシュボード -->
+    <div id="goal-dashboard" style="display:none;">
+      <div id="goal-complete-banner" style="display:none;" class="goal-complete-banner">
+        <div class="goal-complete-icon">🎉</div>
+        <div class="goal-complete-title">GOAL ACHIEVED!</div>
+        <div class="goal-complete-sub" id="goal-complete-sub"></div>
+      </div>
+
+      <div class="timer-display-wrap" id="goal-display" style="padding:28px 24px;">
+        <div class="timer-label-top" id="goal-display-name">STUDY GOAL</div>
+
+        <!-- SW / CD モード切替 -->
+        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:28px;">
+          <button id="goal-mode-sw" class="timer-tab-btn on" style="min-width:130px;padding:10px 14px;"
+            onclick="goalSetMode('sw')">
+            <span class="tb-icon" style="font-size:16px;">⏱️</span>
+            <span class="tb-label">ストップウォッチ<br><span style="font-size:9px;opacity:.6;">積み上げ式</span></span>
+          </button>
+          <button id="goal-mode-cd" class="timer-tab-btn" style="min-width:130px;padding:10px 14px;"
+            onclick="goalSetMode('cd')">
+            <span class="tb-icon" style="font-size:16px;">⏳</span>
+            <span class="tb-label">カウントダウン<br><span style="font-size:9px;opacity:.6;">残り時間式</span></span>
+          </button>
+        </div>
+
+        <div class="goal-ring-wrap">
+          <svg class="goal-ring-svg" viewBox="0 0 220 220">
+            <defs>
+              <linearGradient id="goalGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%"   stop-color="#4f8ef7"/>
+                <stop offset="100%" stop-color="#7c4fff"/>
+              </linearGradient>
+              <linearGradient id="goalGradCD" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%"   stop-color="#4fd4f7"/>
+                <stop offset="100%" stop-color="#4f8ef7"/>
+              </linearGradient>
+            </defs>
+            <circle class="goal-ring-bg"   cx="110" cy="110" r="96"/>
+            <circle class="goal-ring-fill" cx="110" cy="110" r="96" id="goal-ring-circle"
+              stroke-dasharray="603.19" stroke-dashoffset="603.19"/>
+          </svg>
+          <div class="goal-ring-center">
+            <!-- 計測中：現在の経過/残り時間を大きく -->
+            <div id="goal-ring-live" style="display:none;">
+              <div class="goal-ring-pct" id="goal-ring-live-time" style="font-size:28px;letter-spacing:1px;color:var(--accent);">00:00:00</div>
+              <div class="goal-ring-sub" id="goal-ring-live-label">経過時間</div>
+            </div>
+            <!-- 静止中：達成率 -->
+            <div id="goal-ring-static">
+              <div class="goal-ring-pct" id="goal-pct-text" style="color:var(--accent);">0%</div>
+              <div class="goal-ring-sub">達成率</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="goal-stats-row">
+          <div class="goal-stat-box">
+            <div class="goal-stat-n" id="goal-stat-remaining">50h</div>
+            <div class="goal-stat-l">残り時間</div>
+          </div>
+          <div class="goal-stat-box">
+            <div class="goal-stat-n" id="goal-stat-done">0h</div>
+            <div class="goal-stat-l">達成済み</div>
+          </div>
+          <div class="goal-stat-box">
+            <div class="goal-stat-n" id="goal-stat-days">7日</div>
+            <div class="goal-stat-l">残り日数</div>
+          </div>
+        </div>
+
+        <div style="font-size:12px;color:var(--muted);font-family:var(--font-mono);margin-top:8px;" id="goal-daily-quota">
+          1日あたり必要: <span style="color:var(--warn);font-weight:700;" id="goal-daily-need">--</span>
+        </div>
+      </div>
+
+      <!-- タイマーコントロール（目標セッション計測） -->
+      <div class="card" style="margin-top:14px;text-align:center;">
+        <div class="card-label" id="goal-session-card-label">// 学習セッションを計測（ストップウォッチ）</div>
+
+        <!-- カウントダウン用：目標残り時間から自動カウントダウン -->
+        <div id="goal-cd-setup" style="display:none;margin-bottom:14px;">
+          <div style="background:rgba(255,79,106,.07);border:1px solid rgba(255,79,106,.25);border-radius:10px;padding:12px 16px;font-size:11px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.5px;line-height:1.8;text-align:center;">
+            ⏳ 目標の <span style="color:var(--warn);font-weight:700;" id="goal-cd-remaining-label">--</span> からカウントダウンします
+          </div>
+        </div>
+
+        <div class="timer-clock" id="goal-session-clock" style="font-size:60px;margin:12px 0;">00:00:00</div>
+        <div class="timer-controls" style="margin-top:0;">
+          <button class="timer-btn tbtn-start" id="goal-btn-start" onclick="goalSessionStart()">▶ 計測開始</button>
+          <button class="timer-btn tbtn-pause" id="goal-btn-pause" onclick="goalSessionPause()" style="display:none">⏸ 一時停止</button>
+          <button class="timer-btn tbtn-stop"  id="goal-btn-stop"  onclick="goalSessionStop()"  style="display:none">⏹ 完了・記録</button>
+          <button class="timer-btn tbtn-reset" onclick="goalSessionDiscard()" id="goal-btn-discard" style="display:none">✕ 破棄</button>
+        </div>
+      </div>
+
+      <!-- セッション履歴 -->
+      <div class="card" style="margin-top:14px;">
+        <div class="card-label" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>// セッション履歴</span>
+          <button class="btn-ghost" style="font-size:11px;" onclick="goalReset()">🗑 目標をリセット</button>
+        </div>
+        <ul id="goal-session-list" class="goal-session-list"></ul>
+        <div class="empty" id="goal-session-empty" style="padding:20px;"><div class="empty-ico" style="font-size:22px;">📋</div><div class="empty-msg" style="font-size:11px;">まだセッションがありません</div></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /view-timer -->
+
+</div><!-- /.main -->
+</div><!-- /#app -->
 <div class="toast" id="toast"></div>
 
 <script>
@@ -12833,6 +13224,17 @@ function getDailyTotals() {
   return map;
 }
 
+// 目標タイマーのセッション記録から「直近7日間の合計勉強時間(h)」を返す
+function getWeeklyStudyHours() {
+  try {
+    const data = JSON.parse(localStorage.getItem('lexis_goal_v1'));
+    if (!data || !data.sessions) return 0;
+    const cutoff = Date.now() - 7 * 86400000;
+    const ms = data.sessions.filter(s => s.ts >= cutoff).reduce((a,s)=>a+s.ms, 0);
+    return ms / 3600000; // → 時間
+  } catch(e) { return 0; }
+}
+
 // 現在表示中の年月（null = 当月）
 let _calYear = null, _calMonth = null;
 
@@ -13120,6 +13522,25 @@ function getBadgeDefs() {
         const dailyMap = getDailyTotals();
         return Object.values(dailyMap).some(v => v >= m.q);
       }
+    });
+  });
+
+  // ⑦ 週間勉強時間バッジ（目標タイマーのセッション記録から算出）
+  const weeklyMilestones = [
+    {h:30,  icon:'⏰', label:'週30時間\n達成', grade:'bronze'},
+    {h:50,  icon:'🔥', label:'週50時間\n達成', grade:'silver'},
+    {h:70,  icon:'⚡', label:'週70時間\n達成', grade:'gold'},
+    {h:100, icon:'💎', label:'週100時間\n達成', grade:'diamond'},
+  ];
+  weeklyMilestones.forEach(m => {
+    defs.push({
+      id: `weekly_${m.h}h`, category:'⑦ 週間勉強時間',
+      icon: m.icon, label: m.label, grade: m.grade,
+      progress: () => {
+        const best = getWeeklyStudyHours();
+        return { current: Math.min(best, m.h), total: m.h };
+      },
+      check: () => getWeeklyStudyHours() >= m.h
     });
   });
 
@@ -14892,6 +15313,828 @@ applyDefaultInputMode();
   document.getElementById(id)?.addEventListener('input',updateSetupInfo);
 });
 renderHome();
+
+// ══════════════════════════════════════════════
+//  ⏱️  TIMER MODULE
+// ══════════════════════════════════════════════
+
+// ── タブ切り替え ──
+let timerCurrentTab = 'sw';
+function timerSwitchTab(tab) {
+  // 動いているタイマーを止める
+  if (timerCurrentTab === 'sw'   && swRunning)   swStop();
+  if (timerCurrentTab === 'cd'   && cdRunning)   cdStop();
+  if (timerCurrentTab === 'pomo' && pomoRunning) pomoStop();
+  if (timerCurrentTab === 'goal' && goalRunning) goalSessionPause();
+
+  timerCurrentTab = tab;
+  ['sw','cd','pomo','goal'].forEach(t => {
+    document.getElementById('tmr-' + t).style.display  = t === tab ? 'block' : 'none';
+    document.getElementById('tmr-tab-' + t).classList.toggle('on', t === tab);
+  });
+
+  if (tab === 'goal') goalRenderDashboard();
+  if (tab === 'pomo') pomoRenderDots();
+  if (tab === 'cd')   cdUpdateDisplay();
+}
+
+// ══ ストップウォッチ ══
+let swRunning = false, swStartTime = 0, swElapsed = 0, swRaf = null;
+
+function swTick() {
+  const now = Date.now();
+  const total = swElapsed + (now - swStartTime);
+  document.getElementById('sw-clock').textContent = fmtHMS(Math.floor(total / 1000));
+  document.getElementById('sw-ms').textContent = '.' + String(Math.floor((total % 1000) / 10)).padStart(2,'0');
+  swRaf = requestAnimationFrame(swTick);
+}
+
+function swStart() {
+  if (swRunning) return;
+  swRunning = true;
+  swStartTime = Date.now();
+  swRaf = requestAnimationFrame(swTick);
+  document.getElementById('sw-clock').classList.add('running');
+  document.getElementById('sw-btn-start').style.display = 'none';
+  document.getElementById('sw-btn-stop').style.display  = '';
+}
+
+function swStop() {
+  if (!swRunning) return;
+  swRunning = false;
+  cancelAnimationFrame(swRaf);
+  const elapsed = swElapsed + (Date.now() - swStartTime);
+  swElapsed = 0;
+  document.getElementById('sw-clock').classList.remove('running');
+  document.getElementById('sw-btn-start').style.display = '';
+  document.getElementById('sw-btn-stop').style.display  = 'none';
+  if (elapsed > 2000) {
+    timerSaveHistory('sw', elapsed);
+    swRenderHistory();
+  }
+  document.getElementById('sw-clock').textContent = '00:00:00';
+  document.getElementById('sw-ms').textContent    = '.00';
+}
+
+function swReset() {
+  swRunning = false;
+  cancelAnimationFrame(swRaf);
+  swElapsed = 0;
+  document.getElementById('sw-clock').textContent = '00:00:00';
+  document.getElementById('sw-ms').textContent    = '.00';
+  document.getElementById('sw-clock').classList.remove('running');
+  document.getElementById('sw-btn-start').style.display = '';
+  document.getElementById('sw-btn-stop').style.display  = 'none';
+}
+
+function swRenderHistory() {
+  const hist = timerLoadHistory().filter(h => h.mode === 'sw').slice(0, 10);
+  const ul   = document.getElementById('sw-history');
+  const emp  = document.getElementById('sw-history-empty');
+  if (!hist.length) { ul.innerHTML=''; emp.style.display=''; return; }
+  emp.style.display = 'none';
+  ul.innerHTML = hist.map(h => `
+    <li class="goal-session-item">
+      <span class="goal-session-date">${fmtDateShort(h.ts)}</span>
+      <span class="goal-session-dur">${fmtDuration(h.ms)}</span>
+    </li>`).join('');
+}
+
+// ══ カウントダウン ══
+let cdRunning = false, cdPaused = false, cdTotalMs = 0, cdRemainMs = 0, cdStartTs = 0, cdRaf2 = null;
+const CD_CIRC = 540.35;
+
+function cdUpdateDisplay() {
+  const h = parseInt(document.getElementById('cd-h').value)||0;
+  const m = parseInt(document.getElementById('cd-m').value)||0;
+  const s = parseInt(document.getElementById('cd-s').value)||0;
+  cdTotalMs = (h*3600 + m*60 + s) * 1000;
+  cdRemainMs = cdTotalMs;
+  document.getElementById('cd-clock').textContent = fmtHMS(Math.floor(cdRemainMs/1000));
+  cdUpdateCircle(1);
+}
+
+function cdPreset(mins) {
+  document.getElementById('cd-h').value = 0;
+  document.getElementById('cd-m').value = mins >= 60 ? Math.floor(mins/60) : mins;
+  document.getElementById('cd-s').value = 0;
+  if (mins >= 60) { document.getElementById('cd-h').value = Math.floor(mins/60); document.getElementById('cd-m').value = 0; }
+  cdUpdateDisplay();
+}
+
+function cdTick() {
+  const elapsed = Date.now() - cdStartTs;
+  cdRemainMs = Math.max(0, cdTotalMs - elapsed + (cdTotalMs - cdRemainMs === 0 ? 0 : 0));
+  // Recalculate from scratch each start
+  const remain = Math.max(0, cdRemainMs - (Date.now() - cdStartTs - (cdTotalMs - cdRemainMs)));
+  const actual = cdTotalMs - (Date.now() - cdStartTs);
+  const r = Math.max(0, actual);
+  document.getElementById('cd-clock').textContent = fmtHMS(Math.ceil(r/1000));
+  const ratio = cdTotalMs > 0 ? r / cdTotalMs : 0;
+  cdUpdateCircle(ratio);
+  const clk = document.getElementById('cd-clock');
+  if (r < 10000) { clk.classList.add('warning'); } else { clk.classList.remove('warning'); }
+  if (r <= 0) { cdFinish(); return; }
+  cdRaf2 = requestAnimationFrame(cdTick);
+}
+
+let cdStartedAt = 0, cdElapsedBefore = 0;
+function cdStart() {
+  if (!cdTotalMs) { showToast('時間を設定してください','e'); return; }
+  if (cdRunning) return;
+  cdRunning = true;
+  cdPaused  = false;
+  cdStartedAt   = Date.now();
+  document.getElementById('cd-btn-start').style.display = 'none';
+  document.getElementById('cd-btn-pause').style.display = '';
+  document.getElementById('cd-btn-stop').style.display  = '';
+  document.getElementById('cd-setup-card').style.opacity = '.5';
+  document.getElementById('cd-setup-card').style.pointerEvents = 'none';
+  cdTickV2();
+}
+
+let cdRemainAtPause = 0;
+function cdTickV2() {
+  const r = Math.max(0, cdRemainAtPause - (Date.now() - cdStartedAt));
+  document.getElementById('cd-clock').textContent = fmtHMS(Math.ceil(r/1000));
+  const ratio = cdTotalMs > 0 ? r / cdTotalMs : 0;
+  cdUpdateCircle(ratio);
+  const clk = document.getElementById('cd-clock');
+  if (r < 10001 && r > 0) { clk.classList.add('warning'); } else { clk.classList.remove('warning'); }
+  if (r <= 0) { cdFinish(); return; }
+  cdRaf2 = requestAnimationFrame(cdTickV2);
+}
+
+function cdPause() {
+  if (!cdRunning || cdPaused) return;
+  cdPaused = true;
+  cdRunning = false;
+  cancelAnimationFrame(cdRaf2);
+  cdRemainAtPause = Math.max(0, cdRemainAtPause - (Date.now() - cdStartedAt));
+  document.getElementById('cd-btn-pause').textContent = '▶ 再開';
+  document.getElementById('cd-btn-pause').onclick = cdResume;
+}
+
+function cdResume() {
+  cdRunning = true; cdPaused = false;
+  cdStartedAt = Date.now();
+  document.getElementById('cd-btn-pause').textContent = '⏸ 一時停止';
+  document.getElementById('cd-btn-pause').onclick = cdPause;
+  cdTickV2();
+}
+
+function cdStop() {
+  cancelAnimationFrame(cdRaf2);
+  cdRunning = false; cdPaused = false;
+  const done = cdTotalMs - cdRemainAtPause;
+  if (done > 2000) timerSaveHistory('cd', done);
+  cdReset();
+}
+
+function cdReset() {
+  cancelAnimationFrame(cdRaf2);
+  cdRunning = false; cdPaused = false;
+  cdRemainAtPause = cdTotalMs;
+  cdStartedAt = 0;
+  document.getElementById('cd-clock').textContent = fmtHMS(Math.floor(cdTotalMs/1000));
+  document.getElementById('cd-clock').classList.remove('warning');
+  cdUpdateCircle(1);
+  document.getElementById('cd-btn-start').style.display = '';
+  document.getElementById('cd-btn-pause').style.display = 'none';
+  document.getElementById('cd-btn-stop').style.display  = 'none';
+  document.getElementById('cd-btn-pause').textContent = '⏸ 一時停止';
+  document.getElementById('cd-btn-pause').onclick = cdPause;
+  document.getElementById('cd-setup-card').style.opacity = '1';
+  document.getElementById('cd-setup-card').style.pointerEvents = '';
+}
+
+function cdFinish() {
+  cancelAnimationFrame(cdRaf2);
+  cdRunning = false;
+  timerSaveHistory('cd', cdTotalMs);
+  document.getElementById('cd-clock').textContent = '00:00';
+  cdUpdateCircle(0);
+  showToast('カウントダウン終了！','s');
+  try { new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAA').play(); } catch(e){}
+  // ベル通知
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification('LEXIS Timer', { body: 'カウントダウン終了！', icon: '' });
+  }
+  setTimeout(cdReset, 1500);
+}
+
+function cdUpdateCircle(ratio) {
+  const offset = CD_CIRC * (1 - ratio);
+  document.getElementById('cd-circle').style.strokeDashoffset = offset;
+}
+
+// init cd
+(function(){ cdTotalMs = 25*60*1000; cdRemainAtPause = cdTotalMs; cdUpdateDisplay(); })();
+
+
+// ══ ポモドーロ ══
+let pomoRunning = false, pomoPaused = false;
+let pomoPhase = 'work'; // 'work' | 'short' | 'long'
+let pomoRound = 0;      // 完了した作業セット数
+let pomoRemainAtPause = 0, pomoStartedAt = 0, pomoRaf = null;
+let pomoTodayCount = 0, pomoTodayMs = 0;
+const POMO_CIRC = 540.35;
+
+function pomoGetDurations() {
+  return {
+    work:  (parseInt(document.getElementById('pomo-work-min').value)  || 25) * 60 * 1000,
+    short: (parseInt(document.getElementById('pomo-short-min').value) || 5)  * 60 * 1000,
+    long:  (parseInt(document.getElementById('pomo-long-min').value)  || 15) * 60 * 1000,
+    sets:   parseInt(document.getElementById('pomo-sets').value)       || 4,
+  };
+}
+
+function pomoRenderDots() {
+  const { sets } = pomoGetDurations();
+  const ul = document.getElementById('pomo-dots');
+  let html = '';
+  for (let i=0; i<sets; i++) {
+    let cls = 'pomo-dot';
+    if (i < pomoRound)        cls += ' done';
+    else if (i === pomoRound) cls += ' current';
+    html += `<div class="${cls}"></div>`;
+  }
+  ul.innerHTML = html;
+}
+
+function pomoGetPhaseDuration() {
+  const d = pomoGetDurations();
+  if (pomoPhase === 'work')  return d.work;
+  if (pomoPhase === 'short') return d.short;
+  return d.long;
+}
+
+function pomoTickV2() {
+  const r = Math.max(0, pomoRemainAtPause - (Date.now() - pomoStartedAt));
+  document.getElementById('pomo-clock').textContent = fmtMS(Math.ceil(r/1000));
+  const total = pomoGetPhaseDuration();
+  const ratio = total > 0 ? r / total : 0;
+  const offset = POMO_CIRC * (1 - ratio);
+  document.getElementById('pomo-circle').style.strokeDashoffset = offset;
+  if (r <= 0) { pomoPhaseComplete(); return; }
+  pomoRaf = requestAnimationFrame(pomoTickV2);
+}
+
+function pomoPhaseComplete() {
+  cancelAnimationFrame(pomoRaf);
+  const { sets } = pomoGetDurations();
+  showToast(pomoPhase === 'work' ? '作業完了！休憩してください 🎉' : '休憩終了！作業を再開しましょう 💪', 's');
+
+  if (pomoPhase === 'work') {
+    pomoRound++;
+    pomoTodayCount++;
+    pomoTodayMs += pomoGetDurations().work;
+    timerSaveHistory('pomo', pomoGetDurations().work);
+    pomoUpdateTodaySummary();
+    if (pomoRound >= sets) {
+      pomoPhase = 'long';
+      pomoRound = 0;
+    } else {
+      pomoPhase = 'short';
+    }
+  } else {
+    pomoPhase = 'work';
+  }
+
+  pomoRemainAtPause = pomoGetPhaseDuration();
+  pomoUpdateUI();
+  pomoRenderDots();
+
+  if (pomoRunning) {
+    pomoStartedAt = Date.now();
+    pomoRaf = requestAnimationFrame(pomoTickV2);
+  }
+}
+
+function pomoUpdateUI() {
+  const isWork = pomoPhase === 'work';
+  const display = document.getElementById('pomo-display');
+  const clk     = document.getElementById('pomo-clock');
+  const circle  = document.getElementById('pomo-circle');
+  const tag     = document.getElementById('pomo-phase-tag');
+  const label   = document.getElementById('pomo-label-top');
+
+  clk.className = 'timer-clock ' + (isWork ? 'pomo-work' : 'pomo-break');
+  circle.className = 'timer-circle-fill ' + (isWork ? 'work' : 'brk');
+  display.className = 'timer-display-wrap ' + (isWork ? 'pomo-work' : 'pomo-break');
+  label.textContent = isWork ? 'POMODORO — WORK' : (pomoPhase === 'short' ? 'POMODORO — SHORT BREAK' : 'POMODORO — LONG BREAK');
+
+  const remain = Math.ceil(pomoRemainAtPause / 1000);
+  clk.textContent = fmtMS(remain);
+  tag.innerHTML = isWork
+    ? '<span class="timer-status-tag work">WORK</span>'
+    : `<span class="timer-status-tag brk">${pomoPhase === 'short' ? 'SHORT BREAK' : 'LONG BREAK'}</span>`;
+}
+
+function pomoStart() {
+  if (pomoRunning) return;
+  pomoRunning = true; pomoPaused = false;
+  if (!pomoRemainAtPause) pomoRemainAtPause = pomoGetPhaseDuration();
+  pomoStartedAt = Date.now();
+  document.getElementById('pomo-btn-start').style.display = 'none';
+  document.getElementById('pomo-btn-pause').style.display = '';
+  document.getElementById('pomo-btn-stop').style.display  = '';
+  document.getElementById('pomo-setup-card').style.opacity = '.5';
+  document.getElementById('pomo-setup-card').style.pointerEvents = 'none';
+  pomoRaf = requestAnimationFrame(pomoTickV2);
+}
+
+function pomoPause() {
+  if (!pomoRunning) return;
+  pomoRunning = false; pomoPaused = true;
+  cancelAnimationFrame(pomoRaf);
+  pomoRemainAtPause = Math.max(0, pomoRemainAtPause - (Date.now() - pomoStartedAt));
+  document.getElementById('pomo-btn-pause').textContent = '▶ 再開';
+  document.getElementById('pomo-btn-pause').onclick = pomoResume;
+}
+
+function pomoResume() {
+  pomoRunning = true; pomoPaused = false;
+  pomoStartedAt = Date.now();
+  document.getElementById('pomo-btn-pause').textContent = '⏸ 一時停止';
+  document.getElementById('pomo-btn-pause').onclick = pomoPause;
+  pomoRaf = requestAnimationFrame(pomoTickV2);
+}
+
+function pomoStop() {
+  cancelAnimationFrame(pomoRaf);
+  pomoRunning = false; pomoPaused = false;
+  pomoReset();
+}
+
+function pomoReset() {
+  cancelAnimationFrame(pomoRaf);
+  pomoRunning = false; pomoPaused = false;
+  pomoPhase = 'work'; pomoRound = 0;
+  pomoRemainAtPause = pomoGetPhaseDuration();
+  pomoUpdateUI();
+  pomoRenderDots();
+  document.getElementById('pomo-btn-start').style.display = '';
+  document.getElementById('pomo-btn-pause').style.display = 'none';
+  document.getElementById('pomo-btn-stop').style.display  = 'none';
+  document.getElementById('pomo-btn-pause').textContent = '⏸ 一時停止';
+  document.getElementById('pomo-btn-pause').onclick = pomoPause;
+  document.getElementById('pomo-setup-card').style.opacity = '1';
+  document.getElementById('pomo-setup-card').style.pointerEvents = '';
+}
+
+function pomoUpdateTodaySummary() {
+  document.getElementById('pomo-today-count').textContent = pomoTodayCount;
+  document.getElementById('pomo-today-time').textContent  = Math.round(pomoTodayMs / 60000) + '分';
+}
+
+// init pomo
+(function(){ pomoRemainAtPause = pomoGetPhaseDuration(); pomoUpdateUI(); pomoRenderDots(); })();
+
+
+// ══ 目標タイマー ══
+let goalRunning = false, goalPaused = false;
+let goalSessionMs = 0, goalSessionStartTs = 0, goalSessionRaf = null;
+let goalMode = 'sw'; // 'sw' = stopwatch, 'cd' = countdown
+let goalCdTargetMs = 0; // カウントダウン設定時間（ms）
+let goalCommittedMsAtStart = 0; // セッション開始時点の累計済みms（SW累積表示用）
+
+const GOAL_KEY = 'lexis_goal_v1';
+
+function goalLoad() {
+  try { return JSON.parse(localStorage.getItem(GOAL_KEY)) || null; } catch(e) { return null; }
+}
+function goalSave(data) {
+  localStorage.setItem(GOAL_KEY, JSON.stringify(data));
+}
+
+// カウントダウン: 目標残り時間を使用（プリセットは不要）
+
+// モード切替
+function goalSetMode(mode) {
+  if (goalRunning || goalPaused) { showToast('計測中はモードを変更できません','e'); return; }
+  goalMode = mode;
+  document.getElementById('goal-mode-sw').classList.toggle('on', mode === 'sw');
+  document.getElementById('goal-mode-cd').classList.toggle('on', mode === 'cd');
+
+  const ring = document.getElementById('goal-ring-circle');
+  ring.style.stroke = 'url(#goalGradCD)';
+
+  const label = mode === 'sw' ? '// 学習セッションを計測（ストップウォッチ）' : '// 学習セッションを計測（カウントダウン）';
+  document.getElementById('goal-session-card-label').textContent = label;
+  document.getElementById('goal-ring-live-label').textContent = mode === 'sw' ? '経過時間' : '残り時間';
+
+  // カウントダウン設定パネルの表示
+  const cdSetup = document.getElementById('goal-cd-setup');
+  if (cdSetup) cdSetup.style.display = mode === 'cd' ? '' : 'none';
+
+  // CDモードの残り時間ラベルを更新
+  if (mode === 'cd') {
+    const remEl = document.getElementById('goal-cd-remaining-label');
+    if (remEl) remEl.textContent = goalCdFormatClock();
+  }
+
+  // セッションクロックをリセット表示
+  document.getElementById('goal-session-clock').textContent = mode === 'cd' ? goalCdFormatClock() : '00:00:00';
+
+  goalRenderRing(); // リングの向きなどを更新
+}
+
+// カウントダウン残り時間をクロック形式で返す（目標残り時間ベース）
+function goalCdGetRemainingMs() {
+  const data = goalLoad();
+  if (!data) return 0;
+  const committedMs = data.sessions.reduce((a,s)=>a+s.ms, 0);
+  return Math.max(0, data.totalMs - committedMs);
+}
+
+function goalCdFormatClock() {
+  const ms = goalCdGetRemainingMs();
+  return fmtHMS(Math.floor(ms / 1000));
+}
+
+function goalCreate() {
+  const name     = document.getElementById('goal-name').value.trim() || '学習目標';
+  const totalH   = parseFloat(document.getElementById('goal-total-h').value) || 50;
+  const days     = parseInt(document.getElementById('goal-days').value)    || 7;
+  const startVal = document.getElementById('goal-start').value;
+  const startDate= startVal ? new Date(startVal) : new Date();
+  startDate.setHours(0,0,0,0);
+  const endDate  = new Date(startDate.getTime() + days * 86400000);
+
+  const data = {
+    name, totalMs: totalH * 3600000, days,
+    startTs: startDate.getTime(), endTs: endDate.getTime(),
+    sessions: [],
+    doneMs: 0,
+  };
+  goalSave(data);
+  goalRenderDashboard();
+}
+
+// ── リングをリアルタイム更新 ──
+function goalRenderRing(liveSessionMs) {
+  const data = goalLoad();
+  if (!data) return;
+  const CIRC = 603.19;
+  const committedMs = data.sessions.reduce((a,s)=>a+s.ms, 0);
+  const live = liveSessionMs !== undefined ? liveSessionMs : 0;
+  const totalDoneMs = committedMs + live;
+  const remainMs    = Math.max(0, data.totalMs - totalDoneMs);
+  const pct = Math.min(1, totalDoneMs / data.totalMs);
+
+  const ring = document.getElementById('goal-ring-circle');
+  // SW / CD どちらも全体達成率でリングを描画（0→満杯）
+  ring.style.strokeDashoffset = CIRC * (1 - pct);
+
+  // 静止中は% 表示
+  document.getElementById('goal-pct-text').textContent = Math.round(pct * 100) + '%';
+
+  // 計測中はリング中央に live 時間
+  if (liveSessionMs !== undefined) {
+    document.getElementById('goal-ring-static').style.display = 'none';
+    document.getElementById('goal-ring-live').style.display   = '';
+    const liveEl = document.getElementById('goal-ring-live-time');
+    if (goalMode === 'sw') {
+      // ストップウォッチ：これまでの累計時間を表示
+      liveEl.textContent = fmtHMS(Math.floor((committedMs + liveSessionMs) / 1000));
+      liveEl.style.color = 'var(--accent)';
+    } else {
+      // カウントダウンモード：セッション残り時間を表示
+      const cdRemaining = Math.max(0, goalCdTargetMs - liveSessionMs);
+      liveEl.textContent = fmtHMS(Math.floor(cdRemaining / 1000));
+      liveEl.style.color = cdRemaining < 300000
+        ? (cdRemaining < 60000 ? 'var(--danger)' : 'var(--warn)')
+        : 'var(--frost)';
+    }
+    // 統計も動的更新
+    document.getElementById('goal-stat-remaining').textContent = fmtHourMin(remainMs);
+    document.getElementById('goal-stat-done').textContent      = fmtHourMin(totalDoneMs);
+  } else {
+    document.getElementById('goal-ring-static').style.display = '';
+    document.getElementById('goal-ring-live').style.display   = 'none';
+  }
+}
+
+function goalRenderDashboard() {
+  const data = goalLoad();
+  const form = document.getElementById('goal-setup-form');
+  const dash = document.getElementById('goal-dashboard');
+
+  goalUpdatePreview();
+
+  if (!data) { form.style.display=''; dash.style.display='none'; return; }
+  form.style.display='none'; dash.style.display='';
+
+  const committedMs = data.sessions.reduce((a,s)=>a+s.ms, 0);
+  const remainMs    = Math.max(0, data.totalMs - committedMs);
+  const pct         = Math.min(100, Math.round(committedMs / data.totalMs * 100));
+
+  // リング（静止状態）
+  goalRenderRing();
+
+  // 残り日数
+  const now      = Date.now();
+  const daysLeft = Math.max(0, Math.ceil((data.endTs - now) / 86400000));
+  const daysOver = now > data.endTs;
+
+  document.getElementById('goal-display-name').textContent = data.name.toUpperCase();
+  document.getElementById('goal-stat-remaining').textContent = fmtHourMin(remainMs);
+  document.getElementById('goal-stat-done').textContent      = fmtHourMin(committedMs);
+  document.getElementById('goal-stat-days').textContent      = daysOver ? '期限終了' : daysLeft + '日';
+
+  // モードUIの色を同期
+  const ring = document.getElementById('goal-ring-circle');
+  ring.style.stroke = 'url(#goalGradCD)';
+  document.getElementById('goal-mode-sw').classList.toggle('on', goalMode === 'sw');
+  document.getElementById('goal-mode-cd').classList.toggle('on', goalMode === 'cd');
+
+  // 1日あたり必要時間
+  const dailyNeed = daysLeft > 0 ? remainMs / daysLeft : 0;
+  document.getElementById('goal-daily-need').textContent = daysLeft > 0 ? fmtHourMin(dailyNeed) : '—';
+
+  // 目標達成バナー
+  const banner = document.getElementById('goal-complete-banner');
+  if (pct >= 100) {
+    banner.style.display = '';
+    document.getElementById('goal-complete-sub').textContent = `${data.name}を達成しました！合計 ${fmtHourMin(committedMs)} 学習`;
+  } else {
+    banner.style.display = 'none';
+  }
+
+  // CDモード表示中のラベルを更新
+  if (goalMode === 'cd' && !goalRunning && !goalPaused) {
+    const remEl = document.getElementById('goal-cd-remaining-label');
+    if (remEl) remEl.textContent = goalCdFormatClock();
+    document.getElementById('goal-session-clock').textContent = goalCdFormatClock();
+  }
+
+  goalRenderSessions(data);
+}
+
+function goalRenderSessions(data) {
+  const ul  = document.getElementById('goal-session-list');
+  const emp = document.getElementById('goal-session-empty');
+  const sessions = [...(data.sessions || [])].reverse().slice(0, 20);
+  if (!sessions.length) { ul.innerHTML=''; emp.style.display=''; return; }
+  emp.style.display = 'none';
+  ul.innerHTML = sessions.map((s, idx) => `
+    <li class="goal-session-item">
+      <span class="goal-session-date">${fmtDateShort(s.ts)}</span>
+      <span class="goal-session-dur">${fmtDuration(s.ms)}</span>
+      <button class="goal-session-del" onclick="goalDeleteSession(${data.sessions.length - 1 - idx})" title="削除">✕</button>
+    </li>`).join('');
+}
+
+function goalDeleteSession(idx) {
+  const data = goalLoad();
+  if (!data) return;
+  data.sessions.splice(idx, 1);
+  goalSave(data);
+  goalRenderDashboard();
+}
+
+function goalUpdatePreview() {
+  const totalH = parseFloat(document.getElementById('goal-total-h').value) || 50;
+  const days   = parseInt(document.getElementById('goal-days').value) || 7;
+  const daily  = totalH / days;
+  document.getElementById('goal-preview-text').textContent =
+    `${days}日間で合計 ${totalH}時間 ＝ 1日あたり約 ${daily.toFixed(1)}時間`;
+}
+
+// 開始日の初期値（今日）
+(function(){
+  const d = new Date();
+  const s = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  document.getElementById('goal-start').value = s;
+  document.getElementById('goal-total-h').addEventListener('input', goalUpdatePreview);
+  document.getElementById('goal-days').addEventListener('input', goalUpdatePreview);
+  goalUpdatePreview();
+})();
+
+function goalSessionStart() {
+  if (goalRunning) return;
+
+  // カウントダウンモード：目標残り時間を使用
+  if (goalMode === 'cd') {
+    const remainMs = goalCdGetRemainingMs();
+    if (remainMs < 60000) { showToast('目標時間が達成済みか、残り時間が1分未満です','e'); return; }
+    goalCdTargetMs = remainMs;
+  }
+
+  // 開始時点の累計済み時間を記録（SW累積表示・CDリング計算用）
+  const _startData = goalLoad();
+  goalCommittedMsAtStart = _startData ? _startData.sessions.reduce((a,s)=>a+s.ms, 0) : 0;
+
+  goalRunning = true; goalPaused = false;
+  goalSessionStartTs = Date.now();
+  goalSessionMs = 0;
+  document.getElementById('goal-btn-start').style.display   = 'none';
+  document.getElementById('goal-btn-pause').style.display   = '';
+  document.getElementById('goal-btn-stop').style.display    = '';
+  document.getElementById('goal-btn-discard').style.display = '';
+
+  // カウントダウン設定パネルを隠す
+  const cdSetup = document.getElementById('goal-cd-setup');
+  if (cdSetup) cdSetup.style.display = 'none';
+
+  goalSessionTick();
+}
+
+function goalSessionTick() {
+  const elapsed = goalSessionMs + (Date.now() - goalSessionStartTs);
+
+  if (goalMode === 'sw') {
+    // ストップウォッチ：経過時間を表示
+    document.getElementById('goal-session-clock').textContent = fmtHMS(Math.floor(elapsed / 1000));
+    goalRenderRing(elapsed);
+    goalSessionRaf = requestAnimationFrame(goalSessionTick);
+  } else {
+    // カウントダウン：残り時間を表示
+    const remaining = Math.max(0, goalCdTargetMs - elapsed);
+    const clockEl = document.getElementById('goal-session-clock');
+    clockEl.textContent = fmtHMS(Math.floor(remaining / 1000));
+
+    // 残り5分以下で警告色
+    if (remaining <= 300000) {
+      clockEl.style.color = remaining <= 60000 ? 'var(--danger)' : 'var(--warn)';
+    } else {
+      clockEl.style.color = '';
+    }
+
+    goalRenderRing(elapsed);
+
+    if (remaining <= 0) {
+      // カウントダウン終了：自動記録
+      clockEl.style.color = '';
+      goalSessionStop(true);
+      // 通知
+      try {
+        if (Notification.permission === 'granted') {
+          new Notification('LEXIS Timer', { body: 'カウントダウン終了！お疲れ様でした！', icon: '' });
+        }
+      } catch(e) {}
+      showToast('⏰ カウントダウン終了！', 's');
+      return;
+    }
+    goalSessionRaf = requestAnimationFrame(goalSessionTick);
+  }
+}
+
+function goalSessionPause() {
+  if (!goalRunning) return;
+  goalRunning = false; goalPaused = true;
+  cancelAnimationFrame(goalSessionRaf);
+  goalSessionMs += Date.now() - goalSessionStartTs;
+
+  // カウントダウンモード：一時停止中も残り時間を表示
+  if (goalMode === 'cd') {
+    const remaining = Math.max(0, goalCdTargetMs - goalSessionMs);
+    const clockEl = document.getElementById('goal-session-clock');
+    clockEl.textContent = fmtHMS(Math.floor(remaining / 1000));
+    clockEl.style.color = remaining < 300000 ? (remaining < 60000 ? 'var(--danger)' : 'var(--warn)') : '';
+  }
+
+  goalRenderRing(goalSessionMs); // 一時停止中も live 表示
+  document.getElementById('goal-btn-pause').textContent = '▶ 再開';
+  document.getElementById('goal-btn-pause').onclick = goalSessionResume;
+}
+
+function goalSessionResume() {
+  goalRunning = true; goalPaused = false;
+  goalSessionStartTs = Date.now();
+  document.getElementById('goal-btn-pause').textContent = '⏸ 一時停止';
+  document.getElementById('goal-btn-pause').onclick = goalSessionPause;
+  goalSessionTick();
+}
+
+function goalSessionStop(autoStop = false) {
+  cancelAnimationFrame(goalSessionRaf);
+  const total = goalSessionMs + (goalRunning ? Date.now() - goalSessionStartTs : 0);
+  goalRunning = false; goalPaused = false;
+
+  // カウントダウン自動停止の場合は goalCdTargetMs を使う
+  const recordMs = autoStop && goalMode === 'cd' ? Math.min(total, goalCdTargetMs) : total;
+
+  if (recordMs < 3000) { showToast('計測時間が短すぎます','e'); goalSessionResetUI(); return; }
+
+  const data = goalLoad();
+  if (!data) { goalSessionResetUI(); return; }
+  data.sessions.push({ ts: Date.now(), ms: recordMs });
+  goalSave(data);
+  if (!autoStop) showToast(fmtDuration(recordMs) + ' 記録しました！','s');
+  checkBadges(); // 週間バッジ判定
+  goalSessionResetUI();
+  goalRenderDashboard();
+}
+
+function goalSessionDiscard() {
+  cancelAnimationFrame(goalSessionRaf);
+  goalRunning = false; goalPaused = false;
+  goalSessionResetUI();
+  goalRenderRing(); // 静止状態に戻す
+}
+
+function goalSessionResetUI() {
+  goalSessionMs = 0;
+  const clockEl = document.getElementById('goal-session-clock');
+  clockEl.style.color = '';
+  clockEl.textContent = goalMode === 'cd' ? goalCdFormatClock() : '00:00:00';
+  document.getElementById('goal-btn-start').style.display   = '';
+  document.getElementById('goal-btn-pause').style.display   = 'none';
+  document.getElementById('goal-btn-stop').style.display    = 'none';
+  document.getElementById('goal-btn-discard').style.display = 'none';
+  document.getElementById('goal-btn-pause').textContent = '⏸ 一時停止';
+  document.getElementById('goal-btn-pause').onclick = goalSessionPause;
+  // カウントダウン設定パネルを再表示
+  const cdSetup = document.getElementById('goal-cd-setup');
+  if (cdSetup) cdSetup.style.display = goalMode === 'cd' ? '' : 'none';
+  // リング中央を %表示 に戻す
+  document.getElementById('goal-ring-static').style.display = '';
+  document.getElementById('goal-ring-live').style.display   = 'none';
+}
+
+function goalReset() {
+  if (!confirm('目標をリセットしますか？すべてのセッション記録が削除されます。')) return;
+  localStorage.removeItem(GOAL_KEY);
+  goalRunning = false; goalPaused = false;
+  cancelAnimationFrame(goalSessionRaf);
+  goalSessionMs = 0;
+  goalSessionResetUI();
+  goalRenderDashboard();
+}
+
+
+// ══ タイマー共通履歴 ══
+const TIMER_HIST_KEY = 'lexis_timer_hist_v1';
+
+function timerLoadHistory() {
+  try { return JSON.parse(localStorage.getItem(TIMER_HIST_KEY)) || []; } catch(e) { return []; }
+}
+
+function timerSaveHistory(mode, ms) {
+  const hist = timerLoadHistory();
+  hist.unshift({ mode, ms, ts: Date.now() });
+  if (hist.length > 50) hist.length = 50;
+  localStorage.setItem(TIMER_HIST_KEY, JSON.stringify(hist));
+}
+
+
+// ══ フォーマットユーティリティ ══
+function fmtHMS(secs) {
+  secs = Math.max(0, secs);
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function fmtMS(secs) {
+  secs = Math.max(0, secs);
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function fmtDuration(ms) {
+  const s = Math.floor(ms / 1000);
+  if (s < 60)   return s + '秒';
+  const m = Math.floor(s / 60);
+  if (m < 60)   return m + '分' + (s%60 ? (s%60)+'秒' : '');
+  const h = Math.floor(m / 60);
+  const rm = m % 60;
+  return h + '時間' + (rm ? rm+'分' : '');
+}
+
+function fmtHourMin(ms) {
+  const totalMin = Math.floor(ms / 60000);
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  if (h === 0) return m + '分';
+  if (m === 0) return h + 'h';
+  return h + 'h' + m + 'm';
+}
+
+function fmtDateShort(ts) {
+  const d = new Date(ts);
+  return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+
+// ── goView 拡張：timer タブ初期化 ──
+const _origGoView = goView;
+goView = function(v) {
+  _origGoView(v);
+  if (v === 'timer') {
+    swRenderHistory();
+    if (timerCurrentTab === 'goal') goalRenderDashboard();
+  }
+};
+
+// カウントダウンモード切替時にラベルを更新
+document.addEventListener('DOMContentLoaded', function() {
+  // goalRenderDashboard 呼び出し後に残り時間ラベルを初期化
+});
 </script>
 <div class="badge-progress-overlay" id="badge-progress-overlay" onclick="if(event.target===this)closeBadgeProgress()">
   <div class="badge-progress-modal">
